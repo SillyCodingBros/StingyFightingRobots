@@ -4,7 +4,9 @@
 // Codé par Leo et Thomas
 
 typedef struct{
-  char map [42][75];
+  int width;
+  int height;
+  char* map ;
 }map;
 
 typedef struct{
