@@ -7,15 +7,4 @@ struct message{
 };
 typedef struct message msg;
 
-struct un{
-  int x;
-  int y;
-};
-typedef struct un pos;
-
-struct deux{
-  char vie;
-};
-typedef struct deux truc;
-
 #endif

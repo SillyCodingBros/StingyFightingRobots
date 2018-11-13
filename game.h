@@ -12,7 +12,7 @@ typedef struct{
 typedef struct{
   char* name;                   // nom du script du robot
 
-  char size;                //  taille du robot
+  char size;                    //  taille du robot
 
   float pos_x;                 // position axe x
   float pos_y;                 // position axe y
@@ -20,10 +20,10 @@ typedef struct{
 
   char pv;               // points de vie
 
-  int speed;               // vitesse de déplacemment mm/s
+  int speed;               // vitesse de déplacemment mm/s a diviser par 1000 pour application
 
   char bullet_damage;     // puissance de l'attaque à distance
-  char speed_bullet;      // vitesse de la balle pour le robot basique mm/s
+  int speed_bullet;      // vitesse de la balle pour le robot basique mm/s a diviser par 1000 pour application
 
   int money;              // L'ARGENT !!!!!!!
 
