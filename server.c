@@ -31,7 +31,7 @@ int main(int argc, char const *argv[]) {
   }
   printf("\n");
 
-  server = mq_open("/server", O_WRONLY | O_CREAT, 0600, NULL);
+  server = mq_open("/server", O_RDONLY | O_CREAT, 0600, NULL);
   new_Client = mq_open("/new_Client", O_WRONLY | O_CREAT, 0600, NULL);
 
   if(argc != 2 && !atoi(argv[1])){
@@ -57,6 +57,7 @@ int main(int argc, char const *argv[]) {
       mq_receive(server, buffer, taille, NULL);
     }
     if(demande->action == 1){
+      printf("message recue\n");
       int* strSize = malloc(sizeof(int));
       strSize = (int*) buffer;
       mq_receive(server, buffer, taille, NULL);
@@ -65,6 +66,8 @@ int main(int argc, char const *argv[]) {
       mq_receive(server, buffer, taille, NULL);
       listOfBot[i] = create_robot(name);
     }
+    buffer = NULL;
+    buffer = realloc(buffer,taille);
   }
 
   printf("verification robot\n");
