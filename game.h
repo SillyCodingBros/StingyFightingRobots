@@ -3,6 +3,7 @@
 
 // Codé par Leo et Thomas
 
+#include <unistd.h>
 #include <mqueue.h>
 #include <stdlib.h>
 #include <stdio.h>
@@ -15,6 +16,7 @@ typedef struct{
 
 typedef struct{
   char* name;                   // nom du script du robot
+  char id;
 
   char size;                    //  taille du robot
 

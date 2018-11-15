@@ -1,14 +1,17 @@
 #include "game.h"
 
 int create_map(char* path_file, map* new_map);
-robot create_robot(char* name);
+robot create_robot(char* name, char id);
 
 int main(int argc, char const *argv[]) {
 
   mqd_t server, new_Client;  //definition des file de message utilisé
   msg* demande;  //definition de la structure message a recup dans la file_de_message
   map mapOfGame;  //definition de la map du jeu
-  robot* listOfBot;  //tableau des robot present dans le jeu
+  int nbBot;  //nombre d'element dans le tableau de robot
+  robot* listOfBot;  //tableau des robots presents dans le jeu
+  int nbBullet;  //nombre d'element dans le tableau des balles
+  bullet* listOfBullet; //tableau des balles presentes dans le jeu
   struct mq_attr attr;  //recuperatione de la taille du buffer pour la file_de_message
   int taille;
   char* buffer;  //definition du buffer pour la file_de_message
@@ -22,12 +25,11 @@ int main(int argc, char const *argv[]) {
 //temporraire verification de la map
   printf("verification\n");
   for(int j = 0; j < mapOfGame.height; j++){
-    printf("\n");
     for (int i = 0; i < mapOfGame.width; i++) {
       printf("%c", mapOfGame.map[(j*mapOfGame.width) + i]);
     }
+    printf("\n");
   }
-  printf("\n");
 
 //ouverture des file_de_message
   server = mq_open("/server", O_RDONLY | O_CREAT, 0600, NULL);
@@ -51,7 +53,7 @@ int main(int argc, char const *argv[]) {
   buffer = malloc(taille);
 
 //set-up du nombre de joueur attendu
-  int nbBot = atoi(argv[1]);
+  nbBot = atoi(argv[1]);
   listOfBot = malloc(nbBot * sizeof(robot));
 
 //recuperation des client et creation des robots
@@ -68,7 +70,7 @@ int main(int argc, char const *argv[]) {
       char* name = malloc(*strSize * sizeof(char));
       name = (char*) buffer;
       mq_receive(server, buffer, taille, NULL);
-      listOfBot[i] = create_robot(name);
+      listOfBot[i] = create_robot(name,i);
     }
     buffer = NULL;
     buffer = realloc(buffer,taille);
@@ -80,14 +82,38 @@ int main(int argc, char const *argv[]) {
     printf("name bot %d is %s\n", i, listOfBot[i].name);
   }
 
+  char pasFini = 1;
+
+  //boucle principale
+  while (pasFini) {
+    //traitement des messages envoyer par les clients
+
+    //affichage a remplacer par GLUT ou openGL ;)
+    for(int j = 0; j < mapOfGame.height; j++){
+      for (int i = 0; i < mapOfGame.width; i++) {
+        for (int r = 0; r < nbBot; r++) {
+          //a changer avec struct coordonnées
+          if(listOfBot[r].pos_x == i && listOfBot[r].pos_y == j){
+            printf("o");
+          }else{
+            printf("%c", mapOfGame.map[(j*mapOfGame.width) + i]);
+          }
+        }
+      }
+      printf("\n");
+    }
+    sleep(2);
+  }
+
   return 0;
 }
 
 
 //fonction de creation des robots
-robot create_robot(char* name){
+robot create_robot(char* name,char id){
   robot new_robot;
   new_robot.name = name;
+  new_robot.id = id;
   new_robot.size = 2;
   //coordonnées a set au lancement de la map
   new_robot.direction = 1;
