@@ -3,6 +3,10 @@
 
 // Codé par Leo et Thomas
 
+#include <mqueue.h>
+#include <stdlib.h>
+#include <stdio.h>
+
 typedef struct{
   int width;
   int height;
@@ -54,5 +58,11 @@ typedef struct{
 
 }chest;
 
+//structure de header de message a envoyer au server
+struct message{
+  char client;  //id du client qui envoie le message
+  char action;  //action demander par le client
+};
+typedef struct message msg;
 
 #endif  // GAME_H_

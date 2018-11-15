@@ -1,27 +1,25 @@
-#include "structure.h"
 #include "game.h"
-#include <mqueue.h>
-#include <stdlib.h>
-#include <stdio.h>
 
 int create_map(char* path_file, map* new_map);
 robot create_robot(char* name);
 
 int main(int argc, char const *argv[]) {
 
-  mqd_t server, new_Client;
-  msg* demande;
-  map mapOfGame;
-  robot* listOfBot;
-  struct mq_attr attr;
-  char* buffer;
+  mqd_t server, new_Client;  //definition des file de message utilisé
+  msg* demande;  //definition de la structure message a recup dans la file_de_message
+  map mapOfGame;  //definition de la map du jeu
+  robot* listOfBot;  //tableau des robot present dans le jeu
+  struct mq_attr attr;  //recuperatione de la taille du buffer pour la file_de_message
   int taille;
+  char* buffer;  //definition du buffer pour la file_de_message
 
+//creation de la map
   if(create_map("map_type_1",&mapOfGame)<0){
     printf("erreur dans la creation de la map\n");
     return 1;
   }
 
+//temporraire verification de la map
   printf("verification\n");
   for(int j = 0; j < mapOfGame.height; j++){
     printf("\n");
@@ -31,26 +29,32 @@ int main(int argc, char const *argv[]) {
   }
   printf("\n");
 
+//ouverture des file_de_message
   server = mq_open("/server", O_RDONLY | O_CREAT, 0600, NULL);
   new_Client = mq_open("/new_Client", O_WRONLY | O_CREAT, 0600, NULL);
 
+//verification des arguments pour eviter les erreur
   if(argc != 2 && !atoi(argv[1])){
     fprintf(stderr, "usage: %s nb_max_joueur\n", argv[0]);
     return 1;
   }
 
+//recuperation de la taille du buffer pour la file_de_message server
   if (mq_getattr(server, & attr) != 0) {
         perror("mq_getattr");
         return -1;
   }
 
+//set-up du buffer
   taille = attr.mq_msgsize;
   printf("attr.mq_msgsize = %ld\n", attr.mq_msgsize);
   buffer = malloc(taille);
 
+//set-up du nombre de joueur attendu
   int nbBot = atoi(argv[1]);
   listOfBot = malloc(nbBot * sizeof(robot));
 
+//recuperation des client et creation des robots
   for (int i = 0; i < atoi(argv[1]); i++) {
     demande = (msg*) buffer;
     while (!demande->action) {
@@ -70,6 +74,7 @@ int main(int argc, char const *argv[]) {
     buffer = realloc(buffer,taille);
   }
 
+//temporraire verification du set-up des robots
   printf("verification robot\n");
   for (int i = 0; i < nbBot; i++) {
     printf("name bot %d is %s\n", i, listOfBot[i].name);
@@ -79,6 +84,7 @@ int main(int argc, char const *argv[]) {
 }
 
 
+//fonction de creation des robots
 robot create_robot(char* name){
   robot new_robot;
   new_robot.name = name;
@@ -94,6 +100,7 @@ robot create_robot(char* name){
 }
 
 
+//fonction de creation de la map
 int create_map(char* path_file, map* new_map){
   char c;
   FILE* f = NULL;
