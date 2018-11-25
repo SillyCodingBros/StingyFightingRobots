@@ -1,9 +1,6 @@
 #include "game.h"
-#include <stdlib.h>
-#include <stdio.h>
-#include <mqueue.h>
 
-coords get_coord(robot *bot){
+coord get_coord(robot *bot){
   //float x = bot->pos->x
   return bot->pos;
 }
@@ -28,61 +25,81 @@ short get_armor(robot *bot){
   return bot->inventory->armor;
 }
 
-void avancer(robot *bot, int move, mqd_t serveur, mqd_t client) {
-  short dir = get_direction(bot);
-  coords coor = get_coord(bot);
-  int bot_speed = bot->speed;
-  int move_time = move/bot_speed;
+void start(robot* bot, mqd_t server){
+    msg message = {bot->id,1};
+    mq_send(server, (char*) &message, sizeof(msg), 1);
+}
 
-  for (int i = 0; i < move_time; i++) {
-      switch (dir) {
-        case 1:
-          coor.y += bot_speed;
-          break;
-        case 2:
-          coor.x += bot_speed;
-          break;
-        case 3:
-          coor.y -= bot_speed;
-          break;
-        case 4:
-          coor.x -= bot_speed;
-          break;
-      }
+void avancer(robot *bot, int move, mqd_t server, mqd_t client, char* buffer, int taille) {
+    short dir = get_direction(bot);
+    coord coor = get_coord(bot);
+    int bot_speed = bot->speed;
+    int move_time = (int) (move/bot_speed);
+    printf("%d / %d = %d\n", move, bot_speed, move_time);
+    msg message = {bot->id,2};
 
-      /* Envoi headers/requêtes
-        mq_send(...)
-
-        while(mq_recieve(...))
-
-
-        */
-
-  }
-  /* while (bot->pos->x != coor.x && bot->pos->y != coor.y) {
-    code
-  }*/
+    for (int i = 0; i < move_time; i++) {
+        switch (dir) {
+            case 0:
+                coor.y -= bot_speed;
+                break;
+            case 1:
+                coor.x += bot_speed;
+                break;
+            case 2:
+                coor.y += bot_speed;
+                break;
+            case 3:
+                coor.x -= bot_speed;
+                break;
+        }
+        char* tmp_msg = malloc(sizeof(msg)+sizeof(coord));
+        str_concat(tmp_msg, (char*) &message, sizeof(msg), (char*) &coor, sizeof(coord));
+        mq_send(server, tmp_msg, sizeof(msg)+sizeof(coord), 1);
+        mq_receive(client,buffer,taille,NULL);
+        while (((msg*) buffer)->action != 2) {
+            if (((msg*) buffer)->action == 0) {
+                bot->pv = 0;
+            }else if (((msg*) buffer)->action == 1) {
+                bot->pv = *((int*) &buffer[sizeof(msg)]);
+            }
+            mq_receive(client,buffer,taille,NULL);
+        }
+        if ( ((coord*) &buffer[sizeof(msg)])->x == bot->pos.x && ((coord*) &buffer[sizeof(msg)])->y == bot->pos.y) {
+            return;
+        }else{
+            bot->pos = *((coord*) &buffer[sizeof(msg)]);
+        }
+        struct timespec tp;
+        clock_gettime(CLOCK_REALTIME, &tp);
+        tp.tv_nsec+= 1000*1000;
+        sleep(1);
+    }
 }
 
 void rammasser(robot *bot, char obj, mqd_t serveur, mqd_t client){
   // demande a rammasser un objet de type 'obj' au serveur
   // attente de d'une reponse serveur
   // reponse_serveur = reponse - 1
-  switch (obj) {
-    case "C":
+  if (strcmp(&obj, "C") == 0) {
       // bot->inventory->money += reponse_serveur;
-      break;
-    case "A":
-      // bot->inventory->armor += reponse_serveur;
-      break;
-    case "B":
-      // bot->inventory->nb_bullet += reponse_serveur;
-      break;
+  }
+  if (strcmp(&obj, "A") == 0) {
+      // bot->inventory->money += reponse_serveur;
+  }
+  if (strcmp(&obj, "B") == 0) {
+      // bot->inventory->money += reponse_serveur;
   }
 }
 
-void touner(robot *bot, short direc, mqd_t serveur, mqd_t client){
-  // demande de changement de direction vers 'direc' au serveur
+void tourner(robot *bot, short direc, mqd_t server){
+    // informe le server du changement de direction
+    printf("coucou\n");
+    bot->direction = (bot->direction + direc) % 4;
+    msg message = {bot->id,3};
+    char* tmp_msg = malloc(sizeof(msg) + sizeof(char));
+    str_concat(tmp_msg, (char*) &message, sizeof(msg), &(bot->direction), sizeof(char));
+    mq_send(server,tmp_msg,sizeof(msg)+sizeof(char),1);
 }
 
 void tirer(robot *bot, float angle, mqd_t serveur, mqd_t client){
@@ -90,14 +107,4 @@ void tirer(robot *bot, float angle, mqd_t serveur, mqd_t client){
     //demande de tir au reponse_serveur
     bot->inventory->nb_bullet -= 1;
   }
-}
-
-
-
-int main(int argc, char const *argv[]) {
-  robot bot = {NULL,2,{0.0,0.0},1,100,42,350,3};
-
-  printf("coord %f %f, direction %d, pv %d, money %d\n",get_coord(&bot).x,get_coord(&bot).y,get_direction(&bot),get_pv(&bot),get_money(&bot) );
-
-  return 0;
 }

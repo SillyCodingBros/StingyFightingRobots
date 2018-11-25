@@ -16,18 +16,6 @@ int main(int argc, char const *argv[]) {
 }
 
 
-//fonction qui test si un robot est present au coordonnées x, y
-int isBot(int x, int y, robot* bot_list, int nb_bot){
-    for (int r = 0; r < nb_bot; r++) {
-        if((int) bot_list[r].pos.x == x && (int) bot_list[r].pos.y == y){
-            return 1;
-        break;
-        }
-    }
-    return 0;
-}
-
-
 //fonction pour gerer le server
 int server(int nbclient){
     mqd_t server;  //definition de la file_de_message server
@@ -69,9 +57,130 @@ int server(int nbclient){
     listOfBot = malloc(nbclient * sizeof(robot));
     demande = NULL;
     mq_list = init(listOfBot, nbclient, mapOfGame.spawn, mapOfGame.nbSpawn, server, demande, buffer, taille);
+
+    //attendre que les clients soient pret
+    start_game(server, buffer, taille, nbclient);
+    //boucle principal du server
+    unsigned long long int nsec = 0;
+    while (win(listOfBot, nbclient) < 0) {
+        //printf("%llu\n", nsec);
+        nsec++;
+        struct timespec tp;
+        clock_gettime(CLOCK_REALTIME, &tp);
+        tp.tv_nsec+= 1;
+        if(mq_timedreceive(server, buffer, taille, NULL, &tp) > 0){
+            msg message = *((msg*) buffer);
+            //analyse et reponse des messages envoyer par les clients
+            switch (message.action) {
+                case 2:
+                    //regarde si il y a un mur devant le joueur "client"
+                    if (mapOfGame.map[(int) ((coord*) &buffer[sizeof(msg)])->y * mapOfGame.width + (int) ((coord*) &buffer[sizeof(msg)])->x] == 'w') {
+                        //si oui renvois les coord du "client"
+                        char* tmp_msg = malloc(sizeof(msg)+sizeof(coord));
+                        str_concat(tmp_msg, (char*) &message, sizeof(msg), (char*) &listOfBot[(int) message.client].pos, sizeof(coord));
+                        mq_send(mq_list[(int) message.client], tmp_msg, sizeof(msg)+sizeof(coord), 2);
+                    }else{
+                        //si non renvoie et modifie avec les coord envoyer
+                        char* tmp_msg = malloc(sizeof(msg)+sizeof(coord));
+                        listOfBot[(int) message.client].pos = *((coord*) &buffer[sizeof(msg)]);
+                        str_concat(tmp_msg, (char*) &message, sizeof(msg), (char*) &listOfBot[(int) message.client].pos, sizeof(coord));
+                        mq_send(mq_list[(int) message.client], tmp_msg, sizeof(msg)+sizeof(coord), 2);
+                    }
+                    break;
+                case 3:
+                    listOfBot[(int) message.client].direction = buffer[sizeof(msg)];
+                default:
+                    break;
+            }
+        }
+        if (nsec > 10000) {
+            printf("%llu\n", nsec);
+            affichage(mapOfGame, listOfBot, nbclient);
+            nsec = 0;
+        }
+    }
+
     mq_unlink("/server");
     return 0;
-  }
+}
+
+
+//fonction d'affichage printf()
+void affichage(map mapOfGame, robot* listOfBot, int nbclient){
+    for (int y = 0; y < mapOfGame.height; y++) {
+        for (int x = 0; x < mapOfGame.width; x++) {
+            robot* tmp = isBot(x, y, listOfBot, nbclient);
+            if (tmp != NULL) {
+                switch (tmp->direction) {
+                    case 0:
+                        printf("^");
+                        break;
+                    case 1:
+                        printf(">");
+                        break;
+                    case 2:
+                        printf("v");
+                        break;
+                    case 3:
+                        printf("<");
+                        break;
+                }
+            }else{
+                printf("%c", mapOfGame.map[y*mapOfGame.width+x]);
+            }
+        }
+        printf("\n");
+    }
+}
+
+
+//fonction qui test si un robot est present au coordonnées x, y
+robot* isBot(int x, int y, robot* bot_list, int nb_bot){
+    for (int r = 0; r < nb_bot; r++) {
+        if((int) bot_list[r].pos.x == x && (int) bot_list[r].pos.y == y){
+            return &bot_list[r];
+        break;
+        }
+    }
+    return NULL;
+}
+
+
+//fonction pour detecter quelle joueur a gagner
+int win(robot* bot_list, int nb_bot){
+    int nblivebot = 0;
+    for (int i = 0; i < nb_bot; i++) {
+        if (bot_list[i].pv < 0) nblivebot++;
+        if (nblivebot > 1) return -1;;
+    }
+    for (int i = 0; i < nb_bot; i++) {
+        if (bot_list[i].pv < 0) return bot_list[i].id;
+    }
+    return -1;
+}
+
+
+//fonction pour attendre que les clients soient pret
+void start_game(mqd_t server, char* buffer, int taille, int nb_bot){
+    char* tmp_bot = calloc(0,nb_bot);
+    int client_ready = 0;
+    while (client_ready == 0) {
+        mq_receive(server, buffer, taille, NULL);
+        if ( ((msg*) buffer)->action == 1) {
+            tmp_bot[ (int) (((msg*) buffer)->client) ] = 1;
+        }
+        int i;
+        for (i = 0; i < nb_bot; i++) {
+            if (!tmp_bot[i]) {
+                break;
+            }
+        }
+        if (i == nb_bot) {
+            client_ready++;
+        }
+        printf("%d sur %d\n", i, nb_bot);
+    }
+}
 
 
 //fonction de creation de la map
@@ -138,12 +247,12 @@ mqd_t* init(robot* bot_list, int nb_bot, coord* spawn, int nb_spawn, mqd_t serve
     for (int i = 0; i < nb_bot; i++) {
         demande = (msg*) buffer;
         mq_receive(server, buffer, taille, NULL);
-        if(demande->action == 1){
+        if(demande->action == 0){
             printf("message recue\n");
             int* strSize = (int*) &buffer[sizeof(msg)];
             char* name = malloc(*strSize * sizeof(char));
             name = &buffer[sizeof(msg)+sizeof(int)];
-            bot_list[i] = create_robot(name,i,spawn[i]);
+            bot_list[i] = create_robot(name,i,spawn[i],NULL);
             printf("name %s, id %d, coord (%f,%f)\n",bot_list[i].name, bot_list[i].id, bot_list[i].pos.x, bot_list[i].pos.y );
             sprintf(buffer,"%d",i);
             char* id = malloc(3 * sizeof(char) );
@@ -158,6 +267,9 @@ mqd_t* init(robot* bot_list, int nb_bot, coord* spawn, int nb_spawn, mqd_t serve
         }
         buffer = NULL;
         buffer = malloc(taille);
+    }
+    if (mq_close(new_Client)) {
+        perror("mq_close");
     }
     if (mq_unlink("/new_Client")) {
         perror("mq_unlink");

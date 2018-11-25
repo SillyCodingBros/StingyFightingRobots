@@ -15,8 +15,8 @@ INCLUDES =
 LIBS = -lrt
 
 # define the C source files
-CLIENT = client.c
-SERVER = server.c
+CLIENT = client.c fct_mini.c game.c
+SERVER = server.c game.c
 
 # define the C object files
 #

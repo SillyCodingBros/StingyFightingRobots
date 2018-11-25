@@ -7,6 +7,8 @@
 #include <mqueue.h>
 #include <stdlib.h>
 #include <stdio.h>
+#include <time.h>
+#include <string.h>
 
 #define NB_MAX_SPAWN 10
 
@@ -21,15 +23,30 @@ typedef struct chest chest;
 //fonction de server.c
 int create_map(char* path_file, map* new_map);
 mqd_t* init(robot* bot_list, int nb_bot, coord* spawn, int nb_spawn, mqd_t server, msg* demande, char* buffer, int taille);
-int isBot(int x, int y, robot* bot_list, int nb_bot);
+robot* isBot(int x, int y, robot* bot_list, int nb_bot);
 int server(int nbclient);
+void start_game(mqd_t server, char* buffer, int taille, int nb_bot);
+int win(robot* bot_list, int nb_bot);
+void affichage(map mapOfGame, robot* listOfBot, int nbclient);
 
 //fonction de client.c
-char* init_client(robot* bot, mqd_t server, mqd_t* ptrclient, char* name, int nameSize);
+char* init_client(robot* bot, inventaire* inventaire, mqd_t server, mqd_t* ptrclient, char* name, int nameSize);
 int client(char* name);
+int interprete(char* commande, mqd_t server, mqd_t client, robot* bot, char* buffer, int taille);
 
-//fonction de game.h
-robot create_robot(char* name, char id, coord spawn);
+//fonction fct_mini.c
+coord get_coord(robot *bot);
+short get_direction(robot *bot);
+short get_pv(robot *bot);
+unsigned long long get_money(robot *bot);
+short get_nb_bullet(robot *bot);
+short get_armor(robot *bot);
+void avancer(robot *bot, int move, mqd_t serveur, mqd_t client, char* buffer, int taille);
+void start(robot* bot, mqd_t server);
+void tourner(robot *bot, short direc, mqd_t server);
+
+//fonction de game.c
+robot create_robot(char* name, char id, coord spawn, inventaire* inventaire);
 void str_concat(char* str, char* elem1, int t_elem1, char* elem2, int t_elem2);
 
 //structure pour stocker les coordonnées des elements sur la map
@@ -53,12 +70,12 @@ struct robot{
     char id;                 // num de la file_de_message
     char size;               // taille du robot
     coord pos;               // position
-    char direction;          // N=1 E=2 S=3 O=4
+    char direction;          // N=0 E=1 S=2 O=3
     char pv;                 // points de vie
     int speed;               // vitesse de déplacemment mm/s a diviser par 1000
     char bullet_damage;      // puissance de l'attaque à distance
     int speed_bullet;        // vitesse de la balle pour le robot basique mm/s a diviser par 1000
-    int money;               // L'ARGENT !!!!!!!
+    inventaire* inventory;    // inventaire du robot
 };
 
 
@@ -90,32 +107,5 @@ struct message{
     char client;  //id du client qui envoie le message
     char action;  //action demander par le client
 };
-
-//fonction de creation des robots
-robot create_robot(char* name, char id, coord spawn){
-    robot new_robot;
-    new_robot.name = name;
-    new_robot.id = id;
-    new_robot.size = 2;
-    new_robot.pos = spawn;
-    new_robot.direction = 1;
-    new_robot.pv = 100;
-    new_robot.speed = 500;
-    new_robot.bullet_damage = 33;
-    new_robot.speed_bullet = 1000;
-    new_robot.money = 0;
-    return new_robot;
-}
-
-//fonction pour concat les msgs avant de les envoyer
-void str_concat(char* str, char* elem1, int t_elem1, char* elem2, int t_elem2){
-    for (int i = 0; i < t_elem1+t_elem2; i++) {
-        if(i<t_elem1){
-            str[i] = elem1[i];
-        }else{
-            str[i] = elem2[i-t_elem1];
-        }
-    }
-}
 
 #endif  // GAME_H_
