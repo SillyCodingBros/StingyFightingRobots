@@ -68,18 +68,17 @@ int client(char* name){
     while(bot.pv > 0){
         char* com_scan = malloc(40);
         printf("commande robot %d : ",bot.id);
-        //pour l'instant sur stdin mais peut etre sur client avec mq_receive()
         fgets(com_scan,40,stdin);
-        printf("%s\n", com_scan);
         interprete(com_scan, server, client, &bot, buffer, taille);
         free(com_scan);
+
         /*attendre commande dans stdin
         recup commande (chaine de charactere)
         separer, analyser (au debut seul start() et script(nom_du_script) autoriser)
         executer
         */
     }
-
+    printf("game over\n");
     //fermeture de la file_de_message
     if (mq_unlink(FdeM)) {
       perror("mq_unlink");
@@ -91,56 +90,48 @@ int client(char* name){
 
 //fonction d'analyser et d'exec des commande recup sur stdin
 int interprete(char* commande, mqd_t server, mqd_t client, robot* bot, char* buffer, int taille) {
-    char* exec_com = malloc(20);
-    char* arg = malloc(20);
-    if (commande == NULL) return 1;
-    //sscanf(commande,"%s %s",exec_com ,arg);
+    //actualisation des messages pendant inactivité du client
+    struct timespec tp;
+    clock_gettime(CLOCK_REALTIME, &tp);
+    tp.tv_nsec+= 1;
+    if(mq_timedreceive(client, buffer, taille, NULL, &tp) > 0){
+        if (((msg*) buffer)->action == 0) {
+            bot->pv = 0;
+            return EXIT_FAILURE;
+        }else if (((msg*) buffer)->action == 1) {
+            bot->pv = *((int*) &buffer[sizeof(msg)]);
+        }
+    }
+    //traitement de la commande saisi par le client
+    char* exec_com;
+    char* arg;
+    if (commande == NULL) return EXIT_FAILURE;
     exec_com = strtok(commande, " \n");
-    printf("%s\n", exec_com);
     if (strcmp(exec_com, "start") == 0) {  /* exec fct start */
-        printf("commande start\n");
         start(bot,server);
-        return 0;
-    }
-    if (strcmp(exec_com, "get_pv") == 0) {  /* exec fct get_pv */
+    }else if (strcmp(exec_com, "get_pv") == 0) {  /* exec fct get_pv */
         printf("pv = %d\n", get_pv(bot));
-        return 0;
-    }
-    if (strcmp(exec_com, "get_money") == 0) {  /* exec fct get_money */
+    }else if (strcmp(exec_com, "get_money") == 0) {  /* exec fct get_money */
         printf("money = %llu\n", get_money(bot));
-        return 0;
-    }
-    if (strcmp(exec_com, "get_coord") == 0) {  /* exec fct get_coord */
+    }else if (strcmp(exec_com, "get_coord") == 0) {  /* exec fct get_coord */
         printf("coord = (%f,%f)\n", get_coord(bot).x ,get_coord(bot).y);
-        return 0;
-    }
-    if (strcmp(exec_com, "get_armor") == 0) {  /* exec fct get_armor */
+    }else if (strcmp(exec_com, "get_armor") == 0) {  /* exec fct get_armor */
         printf("armor = %d\n", get_armor(bot));
-        return 0;
-    }
-    if (strcmp(exec_com, "avancer") == 0) {  /* exec fct avancer */
+    }else if (strcmp(exec_com, "avancer") == 0) {  /* exec fct avancer */
         arg = strtok(NULL, " ");
-        printf("%s\n", arg);
         avancer(bot,atoi(arg),server,client,buffer,taille);
-        return 0;
-    }
-    if (strcmp(exec_com, "tourner") == 0) {  /* exec fct tourner */
+    }else if (strcmp(exec_com, "tourner") == 0) {  /* exec fct tourner */
         arg = strtok(NULL, " ");
-        printf("%s\n", arg);
-        printf("coucou\n");
         tourner(bot,atoi(arg),server);
-        return 0;
+    }else if (strcmp(exec_com, "rammasser") == 0) {  /* exec fct rammasser */
+    }else if (strcmp(exec_com, "tirer") == 0) {  /* exec fct tirer */
+    }else if (strcmp(exec_com, "quitter") == 0) {  /* exec fct quitter */
+        bot->pv = 0;
+        msg message = {bot->id,6};
+        mq_send(server, (char*) &message, sizeof(msg), 1);
+    }else{
+        printf("unknown commande\n");
     }
-    if (strcmp(exec_com, "rammasser") == 0) {  /* exec fct rammasser */
-        return 0;
-    }
-    if (strcmp(exec_com, "tirer") == 0) {  /* exec fct tirer */
-        return 0;
-    }
-    if (strcmp(exec_com, "quitter") == 0) {  /* exec fct quitter */
-        return 0;
-    }
-    printf("unknown commande\n");
     return 0;
 }
 
@@ -171,6 +162,7 @@ char* init_client(robot* bot, inventaire* inventaire, mqd_t server, mqd_t* ptrcl
     str_concat(concat_msg ,(char*) &message ,sizeof(msg) ,(char*) &nameSize ,sizeof(int));
     str_concat(concat_msg ,concat_msg ,sizeof(msg)+sizeof(int) ,name ,nameSize);
     mq_send(server, concat_msg, msg_size, 1);
+    free(concat_msg);
 
     //changement de la file_de_message client sur file_de_message dedié au client
     char* FdeM = malloc(3 * sizeof(char));

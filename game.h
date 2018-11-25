@@ -25,8 +25,8 @@ int create_map(char* path_file, map* new_map);
 mqd_t* init(robot* bot_list, int nb_bot, coord* spawn, int nb_spawn, mqd_t server, msg* demande, char* buffer, int taille);
 robot* isBot(int x, int y, robot* bot_list, int nb_bot);
 int server(int nbclient);
+int win(robot* bot_list, int nbclient);
 void start_game(mqd_t server, char* buffer, int taille, int nb_bot);
-int win(robot* bot_list, int nb_bot);
 void affichage(map mapOfGame, robot* listOfBot, int nbclient);
 
 //fonction de client.c

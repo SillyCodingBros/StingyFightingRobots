@@ -25,6 +25,7 @@ int server(int nbclient){
     robot* listOfBot;  //tableau des robots presents dans le jeu
     int nbBullet;  //nombre d'element dans le tableau des balles
     bullet* listOfBullet; //tableau des balles presentes dans le jeu
+    int nb_bot = nbclient;
     struct mq_attr attr;  //recuperatione de la taille du buffer pour la file_de_message
     int taille;
     char* buffer;  //definition du buffer pour la file_de_message
@@ -62,8 +63,7 @@ int server(int nbclient){
     start_game(server, buffer, taille, nbclient);
     //boucle principal du server
     unsigned long long int nsec = 0;
-    while (win(listOfBot, nbclient) < 0) {
-        //printf("%llu\n", nsec);
+    while (nb_bot > 1) {
         nsec++;
         struct timespec tp;
         clock_gettime(CLOCK_REALTIME, &tp);
@@ -89,6 +89,11 @@ int server(int nbclient){
                     break;
                 case 3:
                     listOfBot[(int) message.client].direction = buffer[sizeof(msg)];
+                    break;
+                case 6:
+                    listOfBot[ (int) message.client].pv = 0;
+                    nb_bot--;
+                    break;
                 default:
                     break;
             }
@@ -99,7 +104,10 @@ int server(int nbclient){
             nsec = 0;
         }
     }
-
+    int jw = win(listOfBot, nbclient);
+    msg message = {jw,0};
+    mq_send(mq_list[jw], (char*) &message, sizeof(msg), 1);
+    printf("LE JOUEUR %d A GAGNER\n", jw);
     mq_unlink("/server");
     return 0;
 }
@@ -147,16 +155,11 @@ robot* isBot(int x, int y, robot* bot_list, int nb_bot){
 
 
 //fonction pour detecter quelle joueur a gagner
-int win(robot* bot_list, int nb_bot){
-    int nblivebot = 0;
-    for (int i = 0; i < nb_bot; i++) {
-        if (bot_list[i].pv < 0) nblivebot++;
-        if (nblivebot > 1) return -1;;
+int win(robot* bot_list, int nbclient){
+    for (int i = 0; i < nbclient; i++) {
+        if (bot_list[i].pv > 0) return i;
     }
-    for (int i = 0; i < nb_bot; i++) {
-        if (bot_list[i].pv < 0) return bot_list[i].id;
-    }
-    return -1;
+    return EXIT_FAILURE;
 }
 
 
