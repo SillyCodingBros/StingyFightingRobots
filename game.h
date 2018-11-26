@@ -1,3 +1,7 @@
+//*#ifndef _POSIX_C_SOURCE
+//*#define _POSIX_C_SOURCE 199309L
+//*#endif // _POSIX_C_SOURCE
+
 #ifndef GAME_H_
 #define GAME_H_
 
@@ -10,6 +14,7 @@
 #include <time.h>
 #include <string.h>
 
+//
 #define NB_MAX_SPAWN 10
 
 typedef struct message msg;
@@ -43,7 +48,7 @@ int client(char* name);
 int interprete(char* commande, mqd_t server, mqd_t client, robot* bot, char* buffer, int taille);
 
 //fonction fct_mini.c
-float get_coord(robot *bot, char axis);
+float get_coord(robot *bot, char *axis);
 short get_direction(robot *bot);
 short get_pv(robot *bot);
 unsigned long long get_money(robot *bot);

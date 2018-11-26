@@ -114,7 +114,7 @@ int interprete(char* commande, mqd_t server, mqd_t client, robot* bot, char* buf
     }else if (strcmp(exec_com, "get_money") == 0) {  /* exec fct get_money */
         printf("money = %llu\n", get_money(bot));
     }else if (strcmp(exec_com, "get_coord") == 0) {  /* exec fct get_coord */
-        printf("coord = (%f,%f)\n", get_coord(bot,'x') ,get_coord(bot,'y'));
+        printf("coord = (%f,%f)\n", get_coord(bot,"x") ,get_coord(bot,"y"));
     }else if (strcmp(exec_com, "get_bullet") == 0) {  /* exec fct get_coord */
         printf("nb bullet = %d\n", get_nb_bullet(bot) );
     }else if (strcmp(exec_com, "get_armor") == 0) {  /* exec fct get_armor */
