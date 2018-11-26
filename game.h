@@ -35,7 +35,7 @@ int client(char* name);
 int interprete(char* commande, mqd_t server, mqd_t client, robot* bot, char* buffer, int taille);
 
 //fonction fct_mini.c
-coord get_coord(robot *bot);
+float get_coord(robot *bot, char axis);
 short get_direction(robot *bot);
 short get_pv(robot *bot);
 unsigned long long get_money(robot *bot);

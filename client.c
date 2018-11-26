@@ -1,6 +1,6 @@
 #include "game.h"
 
-int main(int argc, char const *argv[]) {
+int main(int argc, char *argv[]) {
     //verification des arguments
     if (argc != 2) {
         fprintf(stderr, "usage: %s joueur_name\n", argv[0]);
@@ -17,7 +17,7 @@ int main(int argc, char const *argv[]) {
 
 
 //fonction qui gere le client
-int client(char* name){
+int client(char *name){
 
     mqd_t server, client;
     robot bot;
@@ -111,7 +111,7 @@ int interprete(char* commande, mqd_t server, mqd_t client, robot* bot, char* buf
         return 0;
     }
     if (strcmp(exec_com, "get_coord") == 0) {  /* exec fct get_coord */
-        printf("coord = (%f,%f)\n", get_coord(bot).x ,get_coord(bot).y);
+        printf("coord = (%f,%f)\n", get_coord(bot,0) ,get_coord(bot,1));
         return 0;
     }
     if (strcmp(exec_com, "get_armor") == 0) {  /* exec fct get_armor */
