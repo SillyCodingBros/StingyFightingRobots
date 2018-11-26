@@ -30,8 +30,8 @@ COBJS = $(CLIENT:.c=.o)
 SOBJS = $(SERVER:.c=.o)
 
 # define the executable file
-CLIENTEXEC = client
-SERVEREXEC = server
+CLIENTEXEC = client.out
+SERVEREXEC = server.out
 
 #
 # The following part of the makefile is generic; it can be used to
@@ -42,7 +42,7 @@ SERVEREXEC = server
 .PHONY: depend clean
 
 all:	$(CLIENTEXEC) $(SERVEREXEC)
-	@echo  Success executable files has been named \'client and server\'
+	@echo  Success executable files has been named \'client.out\' and \'server.out\'\'
 
 $(SERVEREXEC): $(SOBJS)
 	$(CC) $(CFLAGS) $(INCLUDES) -o $(SERVEREXEC) $(SOBJS) $(LFLAGS) $(LIBS)

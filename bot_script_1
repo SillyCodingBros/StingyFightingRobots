@@ -1,0 +1,6 @@
+tourner 1
+avancer 25
+tourner 1
+avancer 15
+get_pv
+get_coord
