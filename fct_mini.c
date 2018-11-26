@@ -2,10 +2,10 @@
 
 float get_coord(robot *bot, char axis){
   //float x = bot->pos->x
-  if (axis == 0)
-  return bot->pos.x;
+  if (axis == "x")
+    return bot->pos.x;
   else
-  return bot->pos.y;
+    return bot->pos.y;
 }
 
 short get_direction(robot *bot){
@@ -59,6 +59,7 @@ void avancer(robot *bot, int move, mqd_t server, mqd_t client, char* buffer, int
         char* tmp_msg = malloc(sizeof(msg)+sizeof(coord));
         str_concat(tmp_msg, (char*) &message, sizeof(msg), (char*) &coor, sizeof(coord));
         mq_send(server, tmp_msg, sizeof(msg)+sizeof(coord), 1);
+        free(tmp_msg);
         mq_receive(client,buffer,taille,NULL);
         while (((msg*) buffer)->action != 2) {
             if (((msg*) buffer)->action == 0) {
@@ -73,9 +74,6 @@ void avancer(robot *bot, int move, mqd_t server, mqd_t client, char* buffer, int
         }else{
             bot->pos = *((coord*) &buffer[sizeof(msg)]);
         }
-        struct timespec tp;
-        clock_gettime(CLOCK_REALTIME, &tp);
-        tp.tv_nsec+= 1000*1000;
         sleep(1);
     }
 }
@@ -97,12 +95,12 @@ void rammasser(robot *bot, char obj, mqd_t serveur, mqd_t client){
 
 void tourner(robot *bot, short direc, mqd_t server){
     // informe le server du changement de direction
-    printf("coucou\n");
     bot->direction = (bot->direction + direc) % 4;
     msg message = {bot->id,3};
     char* tmp_msg = malloc(sizeof(msg) + sizeof(char));
     str_concat(tmp_msg, (char*) &message, sizeof(msg), &(bot->direction), sizeof(char));
     mq_send(server,tmp_msg,sizeof(msg)+sizeof(char),1);
+    free(tmp_msg);
 }
 
 void tirer(robot *bot, float angle, mqd_t serveur, mqd_t client){

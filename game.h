@@ -16,18 +16,26 @@ typedef struct message msg;
 typedef struct coordonnees coord;
 typedef struct map map;
 typedef struct robot robot;
+typedef struct elem_robot elem_robot;
+typedef struct elem_robot* robot_liste;
 typedef struct inventaire inventaire;
 typedef struct bullet bullet;
+typedef struct elem_bullet elem_bullet;
+typedef struct elem_bullet* bullet_liste;
 typedef struct chest chest;
 
 //fonction de server.c
 int create_map(char* path_file, map* new_map);
-mqd_t* init(robot* bot_list, int nb_bot, coord* spawn, int nb_spawn, mqd_t server, msg* demande, char* buffer, int taille);
-robot* isBot(int x, int y, robot* bot_list, int nb_bot);
+mqd_t* init(robot_liste* bot_list, int nb_bot, coord* spawn, int nb_spawn, mqd_t server, msg* demande, char* buffer, int taille);
+robot* isBot(int x, int y, robot_liste listOfBot);
+int isBullet(int x, int y, bullet_liste listOfBullet);
 int server(int nbclient);
+int win(robot_liste bot_list);
 void start_game(mqd_t server, char* buffer, int taille, int nb_bot);
-int win(robot* bot_list, int nb_bot);
-void affichage(map mapOfGame, robot* listOfBot, int nbclient);
+void affichage(map mapOfGame, robot_liste listOfBot, bullet_liste listOfBullet);
+void move_bullet(bullet_liste* list_bullet, robot_liste* bot_list, map mapOfGame, mqd_t* mq_list);
+
+void test(robot_liste listOfBot);
 
 //fonction de client.c
 char* init_client(robot* bot, inventaire* inventaire, mqd_t server, mqd_t* ptrclient, char* name, int nameSize);
@@ -48,6 +56,11 @@ void tourner(robot *bot, short direc, mqd_t server);
 //fonction de game.c
 robot create_robot(char* name, char id, coord spawn, inventaire* inventaire);
 void str_concat(char* str, char* elem1, int t_elem1, char* elem2, int t_elem2);
+int add_bot(robot bot, robot_liste* listOfBot);
+int suppr_bot(char id, robot_liste* listOfBot);
+int add_bullet(bullet bullet, bullet_liste* listOfBullet);
+int suppr_bullet(bullet bullet, bullet_liste* listOfBullet);
+robot* search_robot(char id, robot_liste listOfBot);
 
 //structure pour stocker les coordonnées des elements sur la map
 struct coordonnees{
@@ -78,6 +91,10 @@ struct robot{
     inventaire* inventory;    // inventaire du robot
 };
 
+struct elem_robot{
+    robot element;
+    robot_liste suite;
+};
 
 struct inventaire{
     short nb_bullet;
@@ -89,10 +106,15 @@ struct inventaire{
 struct bullet{
     char size;            //  taille de la balle
     coord pos;            // position
-    int speed;            // vitesse de la balle
     float speed_x;        // vitesse de la balle en x
     float speed_y;        // vitesse de la balle en y
     char damage;          // dégats de la balle
+};
+
+
+struct elem_bullet{
+    bullet element;
+    bullet_liste suite;
 };
 
 
