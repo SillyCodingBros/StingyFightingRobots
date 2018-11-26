@@ -71,9 +71,6 @@ void avancer(robot *bot, int move, mqd_t server, mqd_t client, char* buffer, int
         }else{
             bot->pos = *((coord*) &buffer[sizeof(msg)]);
         }
-        struct timespec tp;
-        clock_gettime(CLOCK_REALTIME, &tp);
-        tp.tv_nsec+= 1000*1000;
         sleep(1);
     }
 }

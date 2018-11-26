@@ -18,17 +18,17 @@ int main(int argc, char const *argv[]) {
 
 //fonction pour gerer le server
 int server(int nbclient){
-    mqd_t server;  //definition de la file_de_message server
-    mqd_t* mq_list; //liste des file_de_message client
-    msg* demande;  //definition de la structure message a recup dans la file_de_message
-    map mapOfGame;  //definition de la map du jeu
-    robot* listOfBot;  //tableau des robots presents dans le jeu
-    int nbBullet;  //nombre d'element dans le tableau des balles
-    bullet* listOfBullet; //tableau des balles presentes dans le jeu
-    int nb_bot = nbclient;
-    struct mq_attr attr;  //recuperatione de la taille du buffer pour la file_de_message
-    int taille;
-    char* buffer;  //definition du buffer pour la file_de_message
+    mqd_t server;                  //definition de la file_de_message server
+    mqd_t* mq_list;                //liste des file_de_message client
+    msg* demande;                  //definition de la structure message a recup dans la file_de_message
+    map mapOfGame;                 //definition de la map du jeu
+    robot_liste listOfBot;         //tableau des robots presents dans le jeu
+    bullet_liste listOfBullet;      //tableau des balles presentes dans le jeu
+    struct mq_attr attr;           //recuperatione de la taille du buffer pour la file_de_message
+    int taille;                    //taille du buffer pour les file_de_message
+    char* buffer;                  //definition du buffer pour la file_de_message
+    unsigned int nsec;             //nombre de tour de boucle avant affichage
+    int mvp;                       //id du joueur gagnant
 
     //creation de la map
     if(create_map("map_type_1",&mapOfGame)<0){
@@ -55,15 +55,19 @@ int server(int nbclient){
       fprintf(stderr, "trop de joueur\n");
       return -1;
     }
-    listOfBot = malloc(nbclient * sizeof(robot));
+    listOfBot = NULL;
+    listOfBullet = NULL;
     demande = NULL;
-    mq_list = init(listOfBot, nbclient, mapOfGame.spawn, mapOfGame.nbSpawn, server, demande, buffer, taille);
+    mq_list = init(&listOfBot, nbclient, mapOfGame.spawn, mapOfGame.nbSpawn, server, demande, buffer, taille);
+    printf("%p\n", listOfBot);
 
     //attendre que les clients soient pret
     start_game(server, buffer, taille, nbclient);
     //boucle principal du server
-    unsigned long long int nsec = 0;
-    while (nb_bot > 1) {
+    nsec = 0;
+    listOfBullet = NULL;
+    mvp = -1;
+    while (mvp < 0) {
         nsec++;
         struct timespec tp;
         clock_gettime(CLOCK_REALTIME, &tp);
@@ -73,51 +77,55 @@ int server(int nbclient){
             //analyse et reponse des messages envoyer par les clients
             switch (message.action) {
                 case 2:
+                    printf("deplacement\n");
                     //regarde si il y a un mur devant le joueur "client"
                     if (mapOfGame.map[(int) ((coord*) &buffer[sizeof(msg)])->y * mapOfGame.width + (int) ((coord*) &buffer[sizeof(msg)])->x] == 'w') {
                         //si oui renvois les coord du "client"
                         char* tmp_msg = malloc(sizeof(msg)+sizeof(coord));
-                        str_concat(tmp_msg, (char*) &message, sizeof(msg), (char*) &listOfBot[(int) message.client].pos, sizeof(coord));
+                        str_concat(tmp_msg, (char*) &message, sizeof(msg), (char*) &(search_robot(message.client,listOfBot)->pos), sizeof(coord));
                         mq_send(mq_list[(int) message.client], tmp_msg, sizeof(msg)+sizeof(coord), 2);
+                        free(tmp_msg);
                     }else{
                         //si non renvoie et modifie avec les coord envoyer
                         char* tmp_msg = malloc(sizeof(msg)+sizeof(coord));
-                        listOfBot[(int) message.client].pos = *((coord*) &buffer[sizeof(msg)]);
-                        str_concat(tmp_msg, (char*) &message, sizeof(msg), (char*) &listOfBot[(int) message.client].pos, sizeof(coord));
+                        search_robot(message.client,listOfBot)->pos = *((coord*) &buffer[sizeof(msg)]);
+                        str_concat(tmp_msg, (char*) &message, sizeof(msg), (char*) &(search_robot(message.client,listOfBot)->pos), sizeof(coord));
                         mq_send(mq_list[(int) message.client], tmp_msg, sizeof(msg)+sizeof(coord), 2);
+                        free(tmp_msg);
                     }
                     break;
                 case 3:
-                    listOfBot[(int) message.client].direction = buffer[sizeof(msg)];
+                    search_robot(message.client,listOfBot)->direction = buffer[sizeof(msg)];
                     break;
                 case 6:
-                    listOfBot[ (int) message.client].pv = 0;
-                    nb_bot--;
+                    printf("exit\n");
+                    suppr_bot(message.client, &listOfBot);
                     break;
                 default:
                     break;
             }
         }
+        mvp = win(listOfBot);
         if (nsec > 10000) {
-            printf("%llu\n", nsec);
-            affichage(mapOfGame, listOfBot, nbclient);
+            printf("%u\n", nsec);
+            affichage(mapOfGame, listOfBot, listOfBullet);
+            test(listOfBot);
             nsec = 0;
         }
     }
-    int jw = win(listOfBot, nbclient);
-    msg message = {jw,0};
-    mq_send(mq_list[jw], (char*) &message, sizeof(msg), 1);
-    printf("LE JOUEUR %d A GAGNER\n", jw);
+    msg message = {mvp,0};
+    mq_send(mq_list[mvp], (char*) &message, sizeof(msg), 1);
+    printf("LE JOUEUR %d A GAGNER\n", mvp);
     mq_unlink("/server");
     return 0;
 }
 
 
 //fonction d'affichage printf()
-void affichage(map mapOfGame, robot* listOfBot, int nbclient){
+void affichage(map mapOfGame, robot_liste listOfBot, bullet_liste listOfBullet){
     for (int y = 0; y < mapOfGame.height; y++) {
         for (int x = 0; x < mapOfGame.width; x++) {
-            robot* tmp = isBot(x, y, listOfBot, nbclient);
+            robot* tmp = isBot(x, y, listOfBot);
             if (tmp != NULL) {
                 switch (tmp->direction) {
                     case 0:
@@ -133,6 +141,8 @@ void affichage(map mapOfGame, robot* listOfBot, int nbclient){
                         printf("<");
                         break;
                 }
+            }else if (isBullet(x,y,listOfBullet)) {
+                printf("*");
             }else{
                 printf("%c", mapOfGame.map[y*mapOfGame.width+x]);
             }
@@ -142,24 +152,71 @@ void affichage(map mapOfGame, robot* listOfBot, int nbclient){
 }
 
 
-//fonction qui test si un robot est present au coordonnées x, y
-robot* isBot(int x, int y, robot* bot_list, int nb_bot){
-    for (int r = 0; r < nb_bot; r++) {
-        if((int) bot_list[r].pos.x == x && (int) bot_list[r].pos.y == y){
-            return &bot_list[r];
-        break;
+//fonction test
+void test(robot_liste test){
+    robot_liste print = test;
+    while (print != NULL) {
+        printf(" name %s, id %d, addr %p --->",print->element.name, print->element.id, &print->element);
+        print = print->suite;
+    }
+    printf(" NULL\n");
+}
+
+
+//fonction de deplacement des bullets
+void move_bullet(bullet_liste* list_bullet, robot_liste* bot_list, map mapOfGame, mqd_t* mq_list){
+    bullet_liste tmp_list = *list_bullet;
+    while (tmp_list) {
+        coord tmp_coord = {tmp_list->element.pos.x = tmp_list->element.speed_x , tmp_list->element.pos.y = tmp_list->element.speed_y};
+        robot* tmp_bot = isBot((int) tmp_coord.x, (int)tmp_coord.y, *bot_list);
+        if(tmp_bot){
+            tmp_bot->pv -= tmp_list->element.damage;
+            suppr_bullet(tmp_list->element,list_bullet);
+            if (tmp_bot->pv > 0) {
+                msg message = {tmp_bot->id,1};
+                char* tmp_msg = malloc(sizeof(msg)+sizeof(char));
+                str_concat(tmp_msg, (char*) &message, sizeof(msg), &(tmp_list->element.damage), sizeof(char));
+                mq_send(mq_list[(int) (tmp_bot->id)], tmp_msg, sizeof(msg)+sizeof(char), 1);
+            }else{
+                suppr_bot(tmp_bot->id, bot_list);
+                msg message = {tmp_bot->id,0};
+                mq_send(mq_list[(int) (tmp_bot->id)], (char*) &message, sizeof(msg), 1);
+            }
+        }else if (mapOfGame.map[((int) tmp_coord.y)*mapOfGame.width+((int) tmp_coord.y)] == 'w' ) {
+            suppr_bullet(tmp_list->element,list_bullet);
+        }else{
+            tmp_list->element.pos = tmp_coord;
         }
+        tmp_list = tmp_list->suite;
+    }
+}
+
+
+//fonction qui test si un robot est present au coordonnées x, y
+robot* isBot(int x, int y, robot_liste listOfBot){
+    robot_liste tmp_list = listOfBot;
+    while (tmp_list != NULL) {
+        if ( (int) (tmp_list->element.pos.x) == x && (int) (tmp_list->element.pos.y) == y ) return &(tmp_list->element);
+        tmp_list = tmp_list->suite;
     }
     return NULL;
 }
 
 
-//fonction pour detecter quelle joueur a gagner
-int win(robot* bot_list, int nbclient){
-    for (int i = 0; i < nbclient; i++) {
-        if (bot_list[i].pv > 0) return i;
+//fonction qui test si il y a une balle au coordonnées x,y;
+int isBullet(int x, int y, bullet_liste listOfBullet){
+    bullet_liste tmp_list = listOfBullet;
+    while (tmp_list != NULL) {
+        if ( (int) (tmp_list->element.pos.x) == x && (int) (tmp_list->element.pos.y) == y ) return 1;
+        tmp_list = tmp_list->suite;
     }
-    return EXIT_FAILURE;
+    return 0;
+}
+
+//fonction pour detecter quelle joueur a gagner
+int win(robot_liste listOfBot){
+    if (listOfBot->suite == NULL) return listOfBot->element.id;
+    return -1;
 }
 
 
@@ -181,7 +238,7 @@ void start_game(mqd_t server, char* buffer, int taille, int nb_bot){
         if (i == nb_bot) {
             client_ready++;
         }
-        printf("%d sur %d\n", i, nb_bot);
+        printf("ready = %d\n", client_ready);
     }
 }
 
@@ -240,7 +297,7 @@ int create_map(char* path_file, map* new_map){
 
 
 //fonction d'initialisation des clients
-mqd_t* init(robot* bot_list, int nb_bot, coord* spawn, int nb_spawn, mqd_t server, msg* demande, char* buffer, int taille){
+mqd_t* init(robot_liste* bot_list, int nb_bot, coord* spawn, int nb_spawn, mqd_t server, msg* demande, char* buffer, int taille){
     mqd_t new_Client;
     new_Client = mq_open("/new_Client", O_WRONLY | O_CREAT, 0600, NULL);
     mqd_t* mq_list;
@@ -255,8 +312,8 @@ mqd_t* init(robot* bot_list, int nb_bot, coord* spawn, int nb_spawn, mqd_t serve
             int* strSize = (int*) &buffer[sizeof(msg)];
             char* name = malloc(*strSize * sizeof(char));
             name = &buffer[sizeof(msg)+sizeof(int)];
-            bot_list[i] = create_robot(name,i,spawn[i],NULL);
-            printf("name %s, id %d, coord (%f,%f)\n",bot_list[i].name, bot_list[i].id, bot_list[i].pos.x, bot_list[i].pos.y );
+            add_bot(create_robot(name,i,spawn[i],NULL),bot_list);
+            printf("name %s, id %d, coord (%f,%f)\n",(*bot_list)->element.name, (*bot_list)->element.id, (*bot_list)->element.pos.x, (*bot_list)->element.pos.y );
             sprintf(buffer,"%d",i);
             char* id = malloc(3 * sizeof(char) );
             id[0] = '/';
@@ -265,12 +322,14 @@ mqd_t* init(robot* bot_list, int nb_bot, coord* spawn, int nb_spawn, mqd_t serve
             mq_list[i] = mq_open(id, O_WRONLY | O_CREAT, 0600, NULL);
             mq_send(new_Client, (char*) id, sizeof(id), 1);
             char* concat_msg = malloc(sizeof(coord) + sizeof(char));
-            str_concat(concat_msg, (char*) &bot_list[i].pos, sizeof(coord), &(bot_list[i].id), sizeof(char));
+            str_concat(concat_msg, (char*) &(*bot_list)->element.pos, sizeof(coord), &((*bot_list)->element.id), sizeof(char));
             mq_send(mq_list[i], concat_msg, sizeof(coord) + sizeof(char), 1);
         }
         buffer = NULL;
         buffer = malloc(taille);
     }
+
+    test(*bot_list);
     if (mq_close(new_Client)) {
         perror("mq_close");
     }

@@ -25,7 +25,7 @@ int client(char* name){
     int taille;
     char* buffer;
     struct mq_attr attr;
-    inventaire inventaire;
+    inventaire inventaire = {10,0,0};
 
     //ouverture de la file_de_message server en ecriture
     server = mq_open("/server", O_WRONLY, 0600, NULL);
@@ -115,6 +115,8 @@ int interprete(char* commande, mqd_t server, mqd_t client, robot* bot, char* buf
         printf("money = %llu\n", get_money(bot));
     }else if (strcmp(exec_com, "get_coord") == 0) {  /* exec fct get_coord */
         printf("coord = (%f,%f)\n", get_coord(bot).x ,get_coord(bot).y);
+    }else if (strcmp(exec_com, "get_bullet") == 0) {  /* exec fct get_coord */
+        printf("nb bullet = %d\n", get_nb_bullet(bot) );
     }else if (strcmp(exec_com, "get_armor") == 0) {  /* exec fct get_armor */
         printf("armor = %d\n", get_armor(bot));
     }else if (strcmp(exec_com, "avancer") == 0) {  /* exec fct avancer */
