@@ -1,8 +1,11 @@
 #include "game.h"
 
-coord get_coord(robot *bot){
+float get_coord(robot *bot, char axis){
   //float x = bot->pos->x
-  return bot->pos;
+  if (axis == 0)
+    return bot->pos.x;
+  else
+    return bot->pos.y;
 }
 
 short get_direction(robot *bot){
@@ -32,7 +35,7 @@ void start(robot* bot, mqd_t server){
 
 void avancer(robot *bot, int move, mqd_t server, mqd_t client, char* buffer, int taille) {
     short dir = get_direction(bot);
-    coord coor = get_coord(bot);
+    coord coor = {get_coord(bot,0),get_coord(bot,1)};
     int bot_speed = bot->speed;
     int move_time = (int) (move/bot_speed);
     printf("%d / %d = %d\n", move, bot_speed, move_time);
