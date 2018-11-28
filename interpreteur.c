@@ -1,13 +1,5 @@
 #include "game.h"
 
-typedef struct commande cmd;
-struct commande {
-    char* name;     //le nom de la commande
-    int nb_args;    //nombre d'arguments
-    int nb_subcom;  //nombre de sous commande
-    cmd* subcom;    //tableau des sous commande (pour la fonction "basic", exemple: avancer, le tableau vaut NULL)
-};
-
 char* get_line(FILE *fd){
   int ch,i = 0;
   char *ligne = malloc(100);
@@ -92,6 +84,7 @@ void glup(cmd com){
   }
 }
 
+/*
 int main() {
   FILE *fd = fopen("bot_script_1", "r");
 
@@ -106,6 +99,7 @@ int main() {
 
   return 0;
 }
+*/
 
 
 

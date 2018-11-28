@@ -29,6 +29,7 @@ typedef struct bullet bullet;
 typedef struct elem_bullet elem_bullet;
 typedef struct elem_bullet* bullet_liste;
 typedef struct chest chest;
+typedef struct commande cmd;
 
 //fonction de server.c
 int create_map(char* path_file, map* new_map);
@@ -140,5 +141,14 @@ struct message{
     char client;  //id du client qui envoie le message
     char action;  //action demander par le client
 };
+
+//structure des commandes pour l'interpréteur
+struct commande {
+    char* name;     //le nom de la commande
+    int nb_args;    //nombre d'arguments
+    int nb_subcom;  //nombre de sous commandes
+    cmd* subcom;    //tableau des sous commandes
+};
+
 
 #endif  // GAME_H_
