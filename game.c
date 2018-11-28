@@ -7,7 +7,7 @@ robot create_robot(char* name, char id, coord spawn, inventaire* inventaire){
     robot new_robot;
     new_robot.name = name;
     new_robot.id = id;
-    new_robot.size = 2;
+    //new_robot.reach = 10;
     new_robot.pos = spawn;
     new_robot.direction = 0;
     new_robot.pv = 100;
