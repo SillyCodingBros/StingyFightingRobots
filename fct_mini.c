@@ -141,3 +141,66 @@ void tirer(robot *bot, float angle, mqd_t server){
         mq_send(server, tmp_msg, sizeof(msg)+sizeof(coord), 1);
     }
 }
+
+void script(robot *bot, char *name, mqd_t server, mqd_t client, char* buffer, int taille){
+  FILE *fd = fopen(name, "r");
+  cmd com = create_cmd(NULL, fd);
+  //printf("name %s, nb_args %d, nb_subcom %d\n", com.name, com.nb_args, com.nb_subcom);
+  //for (int i = 0; i < com.nb_subcom; ++i) {
+  //  printf("\t");
+  //  glup(com.subcom[i+com.nb_args]);
+  //}
+  for (int i = 0; i < com.nb_subcom; ++i) {
+    printf("\t");
+    cmd sub_com = com.subcom[i+com.nb_args];
+    if (sub_com.nb_subcom == 0){
+      if (sub_com.nb_args == 0){
+        if(strcmp(sub_com.name, "pv") == 0)
+          printf("pv = %d\n", get_pv(bot));
+        else if(strcmp(sub_com.name, "steer") == 0)
+          printf("steer = %d\n", get_direction(bot));
+        else if(strcmp(sub_com.name, "money") == 0)
+          printf("money = %llu\n", get_money(bot));
+        else if(strcmp(sub_com.name, "nb_bullet") == 0)
+          printf("nb_bullet = %d\n", get_nb_bullet(bot));
+        else if(strcmp(sub_com.name, "armor") == 0)
+          printf("armor = %d\n", get_armor(bot));
+      }
+      else if (sub_com.nb_args == 1){
+        if(strcmp(sub_com.name, "coord") == 0)
+          printf("coord %s = %f\n", sub_com.subcom->name, get_coord(bot,sub_com.subcom->name));
+        else if(strcmp(sub_com.name, "move") == 0)
+          avancer(bot,atoi(sub_com.subcom->name),server,client,buffer,taille);
+        else if(strcmp(sub_com.name, "pick") == 0){
+          //rammasser sub_com.subcom->name
+        }
+        else if(strcmp(sub_com.name, "turn") == 0){
+          tourner(bot,atoi(sub_com.subcom->name),server);
+        }
+        else if(strcmp(sub_com.name, "shoot") == 0)
+          tirer(bot,atoi(sub_com.subcom->name),server);
+      }
+      else{
+        //regarder (seek)
+      }
+
+    }
+
+    //printf("name %s, nb_args %d, nb_subcom %d\n", com.name, com.nb_args, com.nb_subcom);
+  }
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

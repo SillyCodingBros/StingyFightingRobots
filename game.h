@@ -61,6 +61,7 @@ void avancer(robot *bot, int move, mqd_t serveur, mqd_t client, char* buffer, in
 void start(robot* bot, mqd_t server);
 void tourner(robot *bot, short direc, mqd_t server);
 void tirer(robot *bot, float angle, mqd_t serveur);
+void script(robot *bot, char *name, mqd_t server, mqd_t client, char* buffer, int taille);
 
 //fonctions de game.c
 robot create_robot(char* name, char id, coord spawn, inventaire* inventaire);
@@ -74,8 +75,9 @@ int add_bullet(bullet bullet, bullet_liste* listOfBullet);
 int suppr_bullet(bullet bullet, bullet_liste* listOfBullet);
 robot* search_robot(char id, robot_liste listOfBot);
 
-// fonction de interpreteur.c
+// fonctions de interpreteur.c
 cmd create_cmd(char *ligne, FILE *fd);
+void glup(cmd com);
 
 //structure pour stocker les coordonnées des elements sur la map
 struct coordonnees{

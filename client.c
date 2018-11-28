@@ -110,12 +110,15 @@ int interprete(char* commande, mqd_t server, mqd_t client, robot* bot, char* buf
     exec_com = str_tok(&com, " \n");
     if (strcmp(exec_com, "start") == 0) {  /* exec fct start */
         start(bot,server);
+    }else if (strcmp(exec_com, "script") == 0) {  /* exec fct script */
+        script(bot,str_tok(&com, " \n"),server,client,buffer,taille);
+        //printf("pv = %d\n", get_pv(bot));
     }else if (strcmp(exec_com, "get_pv") == 0) {  /* exec fct get_pv */
         printf("pv = %d\n", get_pv(bot));
     }else if (strcmp(exec_com, "get_money") == 0) {  /* exec fct get_money */
         printf("money = %llu\n", get_money(bot));
     }else if (strcmp(exec_com, "get_coord") == 0) {  /* exec fct get_coord */
-        printf("coord = (%f,%f)\n", get_coord(bot,"x") ,get_coord(bot,"y"));
+        printf("coord %s = %f\n", str_tok(&com, " \n"), get_coord(bot,str_tok(&com, " \n")));
     }else if (strcmp(exec_com, "get_bullet") == 0) {  /* exec fct get_coord */
         printf("nb bullet = %d\n", get_nb_bullet(bot) );
     }else if (strcmp(exec_com, "get_armor") == 0) {  /* exec fct get_armor */

@@ -77,7 +77,7 @@ cmd create_cmd(char *ligne, FILE *fd){
 }
 
 void glup(cmd com){
-  printf("name %s, nb_args %d, nb_subcom %d\n", com.name, com.nb_args, com.nb_subcom);
+  printf("name %s, nb_args %d, nb_subcom %d, name subcom %s\n", com.name, com.nb_args, com.nb_subcom, com.subcom->name);
   for (int i = 0; i < com.nb_subcom; ++i) {
     printf("\t");
     glup(com.subcom[i+com.nb_args]);
