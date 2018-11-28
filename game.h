@@ -31,7 +31,7 @@ typedef struct elem_bullet* bullet_liste;
 typedef struct chest chest;
 typedef struct commande cmd;
 
-//fonction de server.c
+//fonctions de server.c
 int create_map(char* path_file, map* new_map);
 mqd_t* init(robot_liste* bot_list, int nb_bot, coord* spawn, int nb_spawn, mqd_t server, msg* demande, char* buffer, int taille);
 robot* isBot(int x, int y, robot_liste listOfBot);
@@ -45,12 +45,12 @@ void move_bullet(bullet_liste* list_bullet, robot_liste* bot_list, map mapOfGame
 void test(robot_liste listOfBot);
 void test2(bullet_liste test);
 
-//fonction de client.c
+//fonctions de client.c
 char* init_client(robot* bot, inventaire* inventaire, mqd_t server, mqd_t* ptrclient, char* name, int nameSize);
 int client(char* name);
 int interprete(char* commande, mqd_t server, mqd_t client, robot* bot, char* buffer, int taille);
 
-//fonction fct_mini.c
+//fonctions fct_mini.c
 float get_coord(robot *bot, char *axis);
 short get_direction(robot *bot);
 short get_pv(robot *bot);
@@ -62,7 +62,7 @@ void start(robot* bot, mqd_t server);
 void tourner(robot *bot, short direc, mqd_t server);
 void tirer(robot *bot, float angle, mqd_t serveur);
 
-//fonction de game.c
+//fonctions de game.c
 robot create_robot(char* name, char id, coord spawn, inventaire* inventaire);
 bullet create_bullet(robot *bot, float speed_x, float speed_y);
 void str_concat(char* str, char* elem1, int t_elem1, char* elem2, int t_elem2);
@@ -73,6 +73,9 @@ int suppr_bot(char id, robot_liste* listOfBot);
 int add_bullet(bullet bullet, bullet_liste* listOfBullet);
 int suppr_bullet(bullet bullet, bullet_liste* listOfBullet);
 robot* search_robot(char id, robot_liste listOfBot);
+
+// fonction de interpreteur.c
+cmd create_cmd(char *ligne, FILE *fd);
 
 //structure pour stocker les coordonnées des elements sur la map
 struct coordonnees{
