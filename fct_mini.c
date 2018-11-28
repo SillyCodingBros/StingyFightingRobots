@@ -79,10 +79,29 @@ void avancer(robot *bot, int move, mqd_t server, mqd_t client, char* buffer, int
     }
 }
 
-void rammasser(robot *bot, char obj, mqd_t serveur, mqd_t client){
+void seek(robot *bot, char obj, char axis, mqd_t server, mqd_t client){
+  // demande si un objet de type 'obj' est à porté du robot au serveur
+  // attente de d'une reponse serveur
+  // reponse_serveur
+  if (strcmp(&obj, "C") == 0) {
+      // return reponse_serveur;
+      // si x ou si y
+  }
+  if (strcmp(&obj, "A") == 0) {
+        // return reponse_serveur;
+        // si x ou si y
+  }
+  if (strcmp(&obj, "B") == 0) {
+        // return reponse_serveur;
+        // si x ou si y
+  }
+}
+
+void rammasser(robot *bot, char obj, mqd_t server, mqd_t client){
   // demande a rammasser un objet de type 'obj' au serveur
   // attente de d'une reponse serveur
-  // reponse_serveur = reponse - 1
+  // reponse_serveur
+  // reponse_serveur si rien -1,-1
   if (strcmp(&obj, "C") == 0) {
       // bot->inventory->money += reponse_serveur;
   }

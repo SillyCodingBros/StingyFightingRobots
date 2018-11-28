@@ -92,7 +92,7 @@ struct map{
 struct robot{
     char* name;              // nom du script du robot
     char id;                 // num de la file_de_message
-    char size;               // taille du robot
+    char reach;               // taille du robot
     coord pos;               // position
     char direction;          // N=0 E=1 S=2 O=3
     char pv;                 // points de vie
