@@ -1,0 +1,14 @@
+turn 1
+move 25
+turn 1
+move 15
+shoot 90
+shoot 180
+shoot 0
+get_pv
+while TRUE {
+  turn 1
+  move 5
+}
+get_coord x
+get_coord y
