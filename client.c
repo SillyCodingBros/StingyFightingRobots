@@ -104,9 +104,10 @@ int interprete(char* commande, mqd_t server, mqd_t client, robot* bot, char* buf
     }
     //traitement de la commande saisi par le client
     char* exec_com;
-    char* arg;
+    char* com = malloc(strlen(commande));
+    strcpy(com,commande);
     if (commande == NULL) return EXIT_FAILURE;
-    exec_com = strtok(commande, " \n");
+    exec_com = str_tok(&com, " \n");
     if (strcmp(exec_com, "start") == 0) {  /* exec fct start */
         start(bot,server);
     }else if (strcmp(exec_com, "get_pv") == 0) {  /* exec fct get_pv */
@@ -120,13 +121,12 @@ int interprete(char* commande, mqd_t server, mqd_t client, robot* bot, char* buf
     }else if (strcmp(exec_com, "get_armor") == 0) {  /* exec fct get_armor */
         printf("armor = %d\n", get_armor(bot));
     }else if (strcmp(exec_com, "avancer") == 0) {  /* exec fct avancer */
-        arg = strtok(NULL, " ");
-        avancer(bot,atoi(arg),server,client,buffer,taille);
+        avancer(bot,atoi(str_tok(&com, " \n")),server,client,buffer,taille);
     }else if (strcmp(exec_com, "tourner") == 0) {  /* exec fct tourner */
-        arg = strtok(NULL, " ");
-        tourner(bot,atoi(arg),server);
+        tourner(bot,atoi(str_tok(&com, " \n")),server);
     }else if (strcmp(exec_com, "rammasser") == 0) {  /* exec fct rammasser */
     }else if (strcmp(exec_com, "tirer") == 0) {  /* exec fct tirer */
+        tirer(bot,atoi(str_tok(&com, " \n")),server);
     }else if (strcmp(exec_com, "quitter") == 0) {  /* exec fct quitter */
         bot->pv = 0;
         msg message = {bot->id,6};

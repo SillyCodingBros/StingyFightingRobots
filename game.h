@@ -13,9 +13,10 @@
 #include <stdio.h>
 #include <time.h>
 #include <string.h>
+#include <math.h>
 
-//
 #define NB_MAX_SPAWN 10
+#define RAD (3.14159265/180)
 
 typedef struct message msg;
 typedef struct coordonnees coord;
@@ -41,6 +42,7 @@ void affichage(map mapOfGame, robot_liste listOfBot, bullet_liste listOfBullet);
 void move_bullet(bullet_liste* list_bullet, robot_liste* bot_list, map mapOfGame, mqd_t* mq_list);
 
 void test(robot_liste listOfBot);
+void test2(bullet_liste test);
 
 //fonction de client.c
 char* init_client(robot* bot, inventaire* inventaire, mqd_t server, mqd_t* ptrclient, char* name, int nameSize);
@@ -57,10 +59,14 @@ short get_armor(robot *bot);
 void avancer(robot *bot, int move, mqd_t serveur, mqd_t client, char* buffer, int taille);
 void start(robot* bot, mqd_t server);
 void tourner(robot *bot, short direc, mqd_t server);
+void tirer(robot *bot, float angle, mqd_t serveur);
 
 //fonction de game.c
 robot create_robot(char* name, char id, coord spawn, inventaire* inventaire);
+bullet create_bullet(robot *bot, float speed_x, float speed_y);
 void str_concat(char* str, char* elem1, int t_elem1, char* elem2, int t_elem2);
+char* str_tok(char** test, char* delim);
+char search(char* string, char element);
 int add_bot(robot bot, robot_liste* listOfBot);
 int suppr_bot(char id, robot_liste* listOfBot);
 int add_bullet(bullet bullet, bullet_liste* listOfBullet);

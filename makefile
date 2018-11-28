@@ -12,7 +12,7 @@ CFLAGS = -Wall -g
 INCLUDES =
 
 # define any libraries to link into executable:
-LIBS = -lrt
+LIBS = -lrt -lm
 
 # define the C source files
 CLIENT = client.c fct_mini.c game.c

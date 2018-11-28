@@ -75,41 +75,41 @@ int server(int nbclient){
         if(mq_timedreceive(server, buffer, taille, NULL, &tp) > 0){
             msg message = *((msg*) buffer);
             //analyse et reponse des messages envoyer par les clients
-            switch (message.action) {
-                case 2:
-                    printf("deplacement\n");
-                    //regarde si il y a un mur devant le joueur "client"
-                    if (mapOfGame.map[(int) ((coord*) &buffer[sizeof(msg)])->y * mapOfGame.width + (int) ((coord*) &buffer[sizeof(msg)])->x] == 'w') {
-                        //si oui renvois les coord du "client"
-                        char* tmp_msg = malloc(sizeof(msg)+sizeof(coord));
-                        str_concat(tmp_msg, (char*) &message, sizeof(msg), (char*) &(search_robot(message.client,listOfBot)->pos), sizeof(coord));
-                        mq_send(mq_list[(int) message.client], tmp_msg, sizeof(msg)+sizeof(coord), 2);
-                        free(tmp_msg);
-                    }else{
-                        //si non renvoie et modifie avec les coord envoyer
-                        char* tmp_msg = malloc(sizeof(msg)+sizeof(coord));
-                        search_robot(message.client,listOfBot)->pos = *((coord*) &buffer[sizeof(msg)]);
-                        str_concat(tmp_msg, (char*) &message, sizeof(msg), (char*) &(search_robot(message.client,listOfBot)->pos), sizeof(coord));
-                        mq_send(mq_list[(int) message.client], tmp_msg, sizeof(msg)+sizeof(coord), 2);
-                        free(tmp_msg);
-                    }
-                    break;
-                case 3:
-                    search_robot(message.client,listOfBot)->direction = buffer[sizeof(msg)];
-                    break;
-                case 6:
-                    printf("exit\n");
-                    suppr_bot(message.client, &listOfBot);
-                    break;
-                default:
-                    break;
+            if (message.action == 2) {
+                printf("deplacement\n");
+                //regarde si il y a un mur devant le joueur "client"
+                if (mapOfGame.map[(int) ((coord*) &buffer[sizeof(msg)])->y * mapOfGame.width + (int) ((coord*) &buffer[sizeof(msg)])->x] == 'w') {
+                    //si oui renvois les coord du "client"
+                    char* tmp_msg = malloc(sizeof(msg)+sizeof(coord));
+                    str_concat(tmp_msg, (char*) &message, sizeof(msg), (char*) &(search_robot(message.client,listOfBot)->pos), sizeof(coord));
+                    mq_send(mq_list[(int) message.client], tmp_msg, sizeof(msg)+sizeof(coord), 2);
+                    free(tmp_msg);
+                }else{
+                    //si non renvoie et modifie avec les coord envoyer
+                    char* tmp_msg = malloc(sizeof(msg)+sizeof(coord));
+                    search_robot(message.client,listOfBot)->pos = *((coord*) &buffer[sizeof(msg)]);
+                    str_concat(tmp_msg, (char*) &message, sizeof(msg), (char*) &(search_robot(message.client,listOfBot)->pos), sizeof(coord));
+                    mq_send(mq_list[(int) message.client], tmp_msg, sizeof(msg)+sizeof(coord), 2);
+                    free(tmp_msg);
+                }
+            } else if (message.action == 3) {
+                search_robot(message.client,listOfBot)->direction = buffer[sizeof(msg)];
+            } else if (message.action == 5) {
+                coord tmp_speed = *((coord*) &(buffer[sizeof(msg)]));
+                bullet new_bullet = create_bullet(search_robot(message.client,listOfBot), tmp_speed.x, tmp_speed.y);
+                add_bullet(new_bullet, &listOfBullet);
+            } else if (message.action == 6) {
+                printf("exit\n");
+                suppr_bot(message.client, &listOfBot);
             }
         }
+        move_bullet(&listOfBullet, &listOfBot, mapOfGame, mq_list);
         mvp = win(listOfBot);
         if (nsec > 10000) {
             printf("%u\n", nsec);
             affichage(mapOfGame, listOfBot, listOfBullet);
             test(listOfBot);
+            test2(listOfBullet);
             nsec = 0;
         }
     }
@@ -152,11 +152,22 @@ void affichage(map mapOfGame, robot_liste listOfBot, bullet_liste listOfBullet){
 }
 
 
-//fonction test
+//fonction test les robots
 void test(robot_liste test){
     robot_liste print = test;
     while (print != NULL) {
-        printf(" name %s, id %d, addr %p --->",print->element.name, print->element.id, &print->element);
+        printf(" name %s, pos (%f,%f), addr %p --->",print->element.name, print->element.pos.x, print->element.pos.y, &print->element);
+        print = print->suite;
+    }
+    printf(" NULL\n");
+}
+
+
+//fonction test les bullet
+void test2(bullet_liste test){
+    bullet_liste print = test;
+    while (print != NULL) {
+        printf(" pos (%f,%f), addr %p --->",print->element.pos.x, print->element.pos.y, &print->element);
         print = print->suite;
     }
     printf(" NULL\n");
@@ -167,7 +178,7 @@ void test(robot_liste test){
 void move_bullet(bullet_liste* list_bullet, robot_liste* bot_list, map mapOfGame, mqd_t* mq_list){
     bullet_liste tmp_list = *list_bullet;
     while (tmp_list) {
-        coord tmp_coord = {tmp_list->element.pos.x = tmp_list->element.speed_x , tmp_list->element.pos.y = tmp_list->element.speed_y};
+        coord tmp_coord = {tmp_list->element.pos.x + tmp_list->element.speed_x , tmp_list->element.pos.y + tmp_list->element.speed_y};
         robot* tmp_bot = isBot((int) tmp_coord.x, (int)tmp_coord.y, *bot_list);
         if(tmp_bot){
             tmp_bot->pv -= tmp_list->element.damage;

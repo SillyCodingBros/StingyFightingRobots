@@ -104,9 +104,15 @@ void tourner(robot *bot, short direc, mqd_t server){
     free(tmp_msg);
 }
 
-void tirer(robot *bot, float angle, mqd_t serveur, mqd_t client){
-  if (bot->inventory->nb_bullet > 0) {
-    //demande de tir au reponse_serveur
-    bot->inventory->nb_bullet -= 1;
-  }
+void tirer(robot *bot, float angle, mqd_t server){
+    printf("demande de tir\n");
+    if (bot->inventory->nb_bullet > 0) {
+        bot->inventory->nb_bullet -= 1;
+        coord speed = { (float) cos(angle*RAD)/10000, (float) sin(angle*RAD)/10000};
+        printf("speed %f , %f\n", speed.x,speed.y);
+        msg message = {bot->id,5};
+        char* tmp_msg = malloc(sizeof(msg)+sizeof(coord));
+        str_concat(tmp_msg, (char*) &message, sizeof(msg), (char*) &speed, sizeof(coord));
+        mq_send(server, tmp_msg, sizeof(msg)+sizeof(coord), 1);
+    }
 }

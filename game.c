@@ -18,6 +18,17 @@ robot create_robot(char* name, char id, coord spawn, inventaire* inventaire){
     return new_robot;
 }
 
+bullet create_bullet(robot *bot, float speed_x, float speed_y){
+    bullet new_bullet;
+    new_bullet.size = 0;
+    new_bullet.speed_x = speed_x;
+    new_bullet.speed_y = speed_y;
+    new_bullet.pos.x = (int) ((bot->pos.x + 10000*speed_x)+0.5);
+    new_bullet.pos.y = (int) ((bot->pos.y + 10000*speed_y)+0.5);
+    new_bullet.damage = bot->bullet_damage;
+    return new_bullet;
+}
+
 //fonction pour concat les msgs avant de les envoyer
 void str_concat(char* str, char* elem1, int t_elem1, char* elem2, int t_elem2){
     for (int i = 0; i < t_elem1+t_elem2; i++) {
@@ -27,6 +38,35 @@ void str_concat(char* str, char* elem1, int t_elem1, char* elem2, int t_elem2){
             str[i] = elem2[i-t_elem1];
         }
     }
+}
+
+//fonction utiliser par str_tok detecter la presence d'un caractere dans un string
+char search(char* string, char element){
+	for(int i = 0; i < strlen(string); i++){
+		if(string[i] == element) return 0;
+	}
+	return 1;
+}
+
+//fonction qui separe la string selon des separateur
+char* str_tok(char** str, char* delim){
+	char* start_str = NULL;
+	int i = 0;
+	if (str == NULL) return NULL;
+	if (*str == NULL) return NULL;
+	while (*(*str+i) != '\0') {
+		if (search(delim, *(*str+i)) != 0 && start_str == NULL) {
+			start_str = *str+i;
+		}
+		if (search(delim, *(*str+i)) == 0 && start_str != NULL) {
+			*(*str+i) = '\0';
+			*str = *str+i+1;
+			return start_str;
+		}
+		i++;
+	}
+	*str = NULL;
+	return start_str;
 }
 
 //fonction pour ajouter des robot a la liste
