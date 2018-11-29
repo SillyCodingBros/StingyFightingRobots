@@ -41,7 +41,7 @@ cmd create_cmd(char *ligne, FILE *fd){
   if(strcmp(name_cmd,"turn")==0){
     new_cmd.nb_args = 1;
   }
-  if(strcmp(name_cmd,"get_coord")==0){
+  if(strcmp(name_cmd,"coord")==0){
     new_cmd.nb_args = 1;
   }
   if(strcmp(name_cmd,"shoot")==0){
