@@ -31,12 +31,16 @@ cmd create_cmd(char *ligne, FILE *fd){
   char *name_cmd = str_tok(&ligne," ");
   cmd new_cmd = {name_cmd,0,0,NULL};
 
-  if(strcmp(name_cmd,"move")==0){
-    new_cmd.nb_args = 1;
-  }
   if(strcmp(name_cmd,"while")==0){
     new_cmd.nb_args = 1;
     new_cmd.nb_subcom = 1;
+    new_cmd.subcom = realloc(new_cmd.subcom,(new_cmd.nb_args)*sizeof(cmd));
+    new_cmd.subcom[0] = create_cmd(ligne,fd);
+    ligne = get_line(fd);
+    //printf("la ligne post while : %s\n", ligne);
+  }
+  if(strcmp(name_cmd,"move")==0){
+    new_cmd.nb_args = 1;
   }
   if(strcmp(name_cmd,"turn")==0){
     new_cmd.nb_args = 1;
@@ -50,43 +54,60 @@ cmd create_cmd(char *ligne, FILE *fd){
   if(strcmp(name_cmd,"if")==0){
     new_cmd.nb_args = 1;
     new_cmd.nb_subcom = 1;
+    new_cmd.subcom = realloc(new_cmd.subcom,(new_cmd.nb_args)*sizeof(cmd));
+    new_cmd.subcom[0] = create_cmd(ligne,fd);
+    ligne = get_line(fd);
   }
   if(strcmp(name_cmd,"affect")==0){
     new_cmd.nb_args = 3;
   }
-
-  new_cmd.subcom = malloc(new_cmd.nb_args*sizeof(cmd));
-  for (int i = 0; i < new_cmd.nb_args; ++i) {
-    new_cmd.subcom[i] = create_cmd(ligne,fd);
+  if(strcmp(name_cmd,"!=")==0){
+    new_cmd.nb_args = 2;
   }
 
   if (new_cmd.nb_subcom != 0) {
     new_cmd.nb_subcom = 0;
-    if (strcmp(str_tok(&ligne," "), "{")) {
+    //printf("la ligne entre les crochets : %s\n", ligne);
+    while (strcmp(ligne,"}")) {
+      new_cmd.subcom = realloc(new_cmd.subcom,(new_cmd.nb_args+new_cmd.nb_subcom+1)*sizeof(cmd));
+      //printf("la ligne qui est ajouter en subcom : %s\n", ligne);
+      new_cmd.subcom[new_cmd.nb_args+new_cmd.nb_subcom] = create_cmd(ligne,fd);
+      ++new_cmd.nb_subcom;
+      //printf("l'index new_cmd.nb_subcom ++ : %d\n", new_cmd.nb_subcom);
       ligne = get_line(fd);
-      while (strcmp(ligne,"}")) {
-        new_cmd.subcom = realloc(new_cmd.subcom,(new_cmd.nb_args+new_cmd.nb_subcom+1)*sizeof(cmd));
-        new_cmd.subcom[new_cmd.nb_args+new_cmd.nb_subcom] = create_cmd(ligne,fd);
-        ++new_cmd.nb_subcom;
-        ligne = get_line(fd);
-      }
+      //printf("la ligne suivante : %s\n", ligne);
+    }
+
+  }else{
+    new_cmd.subcom = malloc(new_cmd.nb_args*sizeof(cmd));
+    for (int i = 0; i < new_cmd.nb_args; ++i) {
+      new_cmd.subcom[i] = create_cmd(ligne,fd);
     }
   }
+
   return new_cmd;
 
 }
 
 void glup(cmd com){
   printf("name %s, nb_args %d, nb_subcom %d, name subcom %s\n", com.name, com.nb_args, com.nb_subcom, com.subcom->name);
-  for (int i = 0; i < com.nb_subcom; ++i) {
+  for (int i = 0; i < com.nb_subcom && com.nb_args == 0; ++i) {
     printf("\t");
+    /*for (int j = 0; j <= com.nb_subcom+com.nb_args && com.nb_args == 1; j++) {
+      printf("\t");
+      glup(com.subcom->subcom[j]);
+    }*/
     glup(com.subcom[i+com.nb_args]);
   }
 }
 
-/*
+void printw(cmd w){
+  printf("name 1 : %s, name 2 : %s, name 3 : %s\n", w.subcom[0].name,w.subcom[1].name,w.subcom[2].name);
+}
+
+
 int main() {
-  FILE *fd = fopen("bot_script_1", "r");
+  FILE *fd = fopen("bot_1", "r");
 
   if (fd == NULL){
     printf("There's no file in here !\n");
@@ -97,9 +118,10 @@ int main() {
 
   glup(script);
 
+  printw(script.subcom[4]);
+
   return 0;
 }
-*/
 
 
 
