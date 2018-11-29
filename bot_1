@@ -1,14 +1,9 @@
-pv
-steer
-money
-nb_bullet
-armor
 turn 1
-move 25
-move 15
 shoot 90
-shoot 180
-shoot 0
 coord x
 coord y
-turn 1
+while != nb_bullet 5{
+    shoot 135
+    shoot 90
+}
+move 5
