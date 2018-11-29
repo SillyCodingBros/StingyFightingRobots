@@ -1,8 +1,8 @@
 turn 1
-shoot 90
+move 2
 coord x
 coord y
-while != nb_bullet 5{
+while != nb_bullet 5 {
     shoot 135
     shoot 90
 }
