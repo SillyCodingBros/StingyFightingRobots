@@ -39,7 +39,7 @@ int isBullet(int x, int y, bullet_liste listOfBullet);
 //int server(int nbclient);
 int server(char* map_name);
 int win(robot_liste bot_list);
-void start_game(mqd_t server, char* buffer, int taille, int nb_bot);
+coord observer(map mapOfGame, robot* bot, char* buffer);
 void affichage(map mapOfGame, robot_liste listOfBot, bullet_liste listOfBullet);
 void move_bullet(bullet_liste* list_bullet, robot_liste* bot_list, map mapOfGame, mqd_t* mq_list);
 
@@ -61,7 +61,8 @@ short get_pv(robot *bot);
 unsigned long long get_money(robot *bot);
 short get_nb_bullet(robot *bot);
 short get_armor(robot *bot);
-//void avancer(robot *bot, int move, mqd_t serveur, mqd_t client, char* buffer, int taille);
+int seek(robot *bot, char obj, char *axis, mqd_t server, mqd_t client, char* buffer, int taille);
+int rammasser(robot *bot, mqd_t server, mqd_t client, char* buffer, int taille);
 int avancer(robot *bot, int move, mqd_t server, mqd_t client, char* buffer, int taille);
 void tourner(robot *bot, short direc, mqd_t server);
 void tirer(robot *bot, float angle, mqd_t serveur);

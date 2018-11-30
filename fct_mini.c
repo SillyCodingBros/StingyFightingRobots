@@ -63,6 +63,7 @@ int avancer(robot *bot, int move, mqd_t server, mqd_t client, char* buffer, int 
     for (float i = 0; i < (float) fabs(move)/bot->speed; i++) {
         last_pos = bot->pos;
         *modif_axis += speed;
+        printf("bot pos : (%f,%f)\n",bot->pos.x,bot->pos.y);
         str_concat(concat_msg,(char*) &message,sizeof(msg),(char*) &(bot->pos),sizeof(coord));
         mq_send(server,concat_msg,sizeof(msg)+sizeof(coord),1);
         recep = reception(client,&buffer,taille,bot,2);
@@ -77,44 +78,55 @@ int avancer(robot *bot, int move, mqd_t server, mqd_t client, char* buffer, int 
 }
 
 
-void seek(robot *bot, char obj, char *axis, mqd_t server, mqd_t client){
-  // demande si un objet de type 'obj' est à porté du robot au serveur
-  // attente de d'une reponse serveur
-  // reponse_serveur (x,y)
-  // reponse_serveur si rien (-1,-1)
-  if (strcmp(&obj, "C") == 0) {
-    //if (strcmp(axis,"x")==0)
-      //reponse_serveur x
-    //else if (strcmp(axis,"y")==0)
-      //reponse_serveur y
-  }
-  if (strcmp(&obj, "A") == 0) {
-    //if (strcmp(axis,"x")==0)
-      //reponse_serveur x
-    //else if (strcmp(axis,"y")==0)
-      //reponse_serveur y
-  }
-  if (strcmp(&obj, "B") == 0) {
-    //if (strcmp(axis,"x")==0)
-      //reponse_serveur x
-    //else if (strcmp(axis,"y")==0)
-      //reponse_serveur y
-  }
+int seek(robot *bot, char obj, char *axis, mqd_t server, mqd_t client, char* buffer, int taille){
+    msg message;
+    char concat_msg[sizeof(msg)+1];
+    coord pos_object;
+    int recep;
+
+    message.client = bot->id;
+    message.action = 6;
+
+    str_concat(concat_msg,(char*) &message,sizeof(msg),&obj,1);
+    // demande si un objet de type 'obj' est à porté du robot au serveur
+    mq_send(server,concat_msg,sizeof(msg)+1,1);
+    // attente de d'une reponse serveur
+    recep = reception(client,&buffer,taille,bot,6);
+    if (recep != 1) return recep;
+    // reponse_serveur (x,y)
+    pos_object = *((coord*) &(buffer[sizeof(msg)]));
+    printf("l'objet %c est en (%f,%f)\n",obj,pos_object.x,pos_object.y );
+    // reponse_serveur si rien (-1,-1)
+    if (strcmp(axis, "x") == 0) {
+        return pos_object.x;
+    }else if (strcmp(axis, "y") == 0) {
+        return pos_object.y;
+    }
+    return -1;
 }
 
-void rammasser(robot *bot, char obj, mqd_t server, mqd_t client){
-  // demande a rammasser un objet de type 'obj' au serveur
-  // attente de d'une reponse serveur
-  // reponse_serveur = reponse - 1
-  if (strcmp(&obj, "C") == 0) {
-      // bot->inventory->money += reponse_serveur;
-  }
-  if (strcmp(&obj, "A") == 0) {
-      // bot->inventory->money += reponse_serveur;
-  }
-  if (strcmp(&obj, "B") == 0) {
-      // bot->inventory->money += reponse_serveur;
-  }
+int rammasser(robot *bot, mqd_t server, mqd_t client, char* buffer, int taille){
+    int recep;
+    msg message;
+
+    message.client = bot->id;
+    message.action = 3;
+    // demande a rammasser un objet de type 'obj' au serveur
+    mq_send(server,(char*) &message,sizeof(msg),1);
+    // attente de d'une reponse serveur
+    recep = reception(client,&buffer,taille,bot,3);
+    if (recep != 1) return recep;
+    // reponse_serveur = reponse - 1
+    if (buffer[sizeof(msg)] == 'C' ) {
+        bot->inventory->money += *((int*) &(buffer[sizeof(msg)+1]));
+    }
+    if (buffer[sizeof(msg)] == 'A') {
+        bot->inventory->armor += *((int*) &(buffer[sizeof(msg)+1]));
+    }
+    if (buffer[sizeof(msg)] == 'B') {
+        bot->inventory->nb_bullet += *((int*) &(buffer[sizeof(msg)+1]));
+    }
+    return 1;
 }
 
 void tourner(robot *bot, short direc, mqd_t server){

@@ -71,6 +71,11 @@ int server(char* map_name){
                     char* id = calloc(0,((int) (mapOfGame.nbSpawn/10))+1);
                     id[0] = '/';
                     sprintf(id+1,"%d",add);
+                    mq_list[add] = mq_open(id,O_WRONLY,0600,NULL);
+                    if (mq_list[add] != -1) {
+                        close(mq_list[add]);
+                        mq_unlink(id);
+                    }
                     mq_list[add] = mq_open(id,O_WRONLY | O_CREAT,0600,NULL);
                     cur_bot = malloc(sizeof(robot));
                     *cur_bot = create_robot(buffer+sizeof(msg),add,mapOfGame.spawn[add],NULL);
@@ -97,6 +102,7 @@ int server(char* map_name){
                     nbclient -=1;
                 }else if (demande.action == 2) {
                     new_pos = *((coord*) &(buffer[sizeof(msg)]));
+                    printf("bot pos : (%f,%f)\n",new_pos.x,new_pos.y);
                     if (mapOfGame.map[((int) new_pos.y)*mapOfGame.width+((int) new_pos.x)] != 'w') {
                         cur_bot->pos = new_pos;
                     }
@@ -104,14 +110,23 @@ int server(char* map_name){
                     mq_send(mq_list[(int) demande.client],concat_msg,sizeof(msg)+sizeof(coord),1);
                 }else if (demande.action == 3) {
                     printf("ramasser\n");
-                    demande.action = mapOfGame.map[((int) cur_bot->pos.y)*mapOfGame.width+((int) cur_bot->pos.x)];
-                    mq_send(mq_list[(int) demande.client],(char*) &demande,sizeof(msg),1);
+                    char* tmp_msg = malloc(sizeof(msg)+1);
+                    add = (int)(rand() / (double)RAND_MAX * (10 - 1));
+                    str_concat(tmp_msg,(char*) &demande,sizeof(msg),&mapOfGame.map[((int) cur_bot->pos.y)*mapOfGame.width+((int) cur_bot->pos.x)],1);
+                    str_concat(concat_msg,tmp_msg,sizeof(msg)+1,(char*) &add,sizeof(int));
+                    mq_send(mq_list[(int) demande.client],concat_msg,sizeof(msg)+1+sizeof(int),1);
+                    mapOfGame.map[((int) cur_bot->pos.y)*mapOfGame.width+((int) cur_bot->pos.x)] = ' ';
                 }else if (demande.action == 4) {
                     printf("tourner\n");
                     cur_bot->direction = buffer[sizeof(msg)];
                 }else if (demande.action == 5) {
                     printf("tirer\n");
                     add_bullet(create_bullet(cur_bot,((coord*) &(buffer[sizeof(msg)]))->x,((coord*) &(buffer[sizeof(msg)]))->y),&listOfBullet);
+                }else if (demande.action == 6) {
+                    printf("observer : %c\n",buffer[sizeof(msg)]);
+                    new_pos = observer(mapOfGame,cur_bot,buffer);
+                    str_concat(concat_msg,(char*) &demande,sizeof(msg),(char*) &new_pos,sizeof(coord));
+                    mq_send(mq_list[(int) demande.client],concat_msg,sizeof(msg)+sizeof(coord),1);
                 }
             }
         }
@@ -137,11 +152,26 @@ int server(char* map_name){
     return 0;
 }
 
+//fonction d'observation
+coord observer(map mapOfGame, robot* bot, char* buffer){
+    coord pos_object = {-1,-1};
+    for (int i = bot->pos.y-(bot->reach/2); i < bot->pos.y+(bot->reach/2); i++) {
+        for (int j = bot->pos.x-(bot->reach/2); j < bot->pos.x+(bot->reach/2); j++) {
+            if (mapOfGame.map[i*mapOfGame.width+j] == buffer[sizeof(msg)]) {
+                pos_object.x = j;
+                pos_object.y = i;
+                return pos_object;
+            }
+        }
+    }
+    return pos_object;
+}
+
 //fonction test les robots
 void test(robot_liste test){
     robot_liste print = test;
     while (print != NULL) {
-        printf(" name %s, pos (%f,%f), addr %p --->",print->element.name, print->element.pos.x, print->element.pos.y, &print->element);
+        printf(" name %s, pos (%f,%f), pv %d,addr %p --->\n",print->element.name, print->element.pos.x, print->element.pos.y, print->element.pv, &print->element);
         print = print->suite;
     }
     printf(" NULL\n");
@@ -190,19 +220,23 @@ void affichage(map mapOfGame, robot_liste listOfBot, bullet_liste listOfBullet){
         for (int x = 0; x < mapOfGame.width; x++) {
             robot* tmp = isBot(x, y, listOfBot);
             if (tmp != NULL) {
-                switch (tmp->direction) {
-                    case 0:
-                        printf("^");
-                        break;
-                    case 1:
-                        printf(">");
-                        break;
-                    case 2:
-                        printf("v");
-                        break;
-                    case 3:
-                        printf("<");
-                        break;
+                if (tmp->pv < 0) {
+                    printf("O");
+                }else{
+                    switch (tmp->direction) {
+                        case 0:
+                            printf("^");
+                            break;
+                        case 1:
+                            printf(">");
+                            break;
+                        case 2:
+                            printf("v");
+                            break;
+                        case 3:
+                            printf("<");
+                            break;
+                    }
                 }
             }else if (isBullet(x,y,listOfBullet)) {
                 printf("*");
@@ -236,10 +270,17 @@ int isBullet(int x, int y, bullet_liste listOfBullet){
 
 //fonction pour detecter quelle joueur a gagner
 int win(robot_liste listOfBot){
-    if (listOfBot != NULL) {
-        if (listOfBot->suite == NULL) return listOfBot->element.id;
+    int winner = -1;
+    while (listOfBot != NULL) {
+        if (winner == -1 && listOfBot->element.pv > 0) {
+            winner = listOfBot->element.id;
+        }else if (listOfBot->element.pv > 0) {
+            winner = -1;
+            break;
+        }
+        listOfBot = listOfBot->suite;
     }
-    return -1;
+    return winner;
 }
 
 int search_place(char* place,int nb_place){
@@ -273,7 +314,7 @@ int create_map(char* path_file, map* new_map){
 
     //remplir le tableau avec le file
     int i = 0, j = 0;
-    coord spawn[NB_MAX_SPAWN];
+    new_map->spawn = malloc(sizeof(coord));
     new_map->nbSpawn = 0;
     fseek(f,0,SEEK_SET);
     c = fgetc(f);
@@ -282,21 +323,17 @@ int create_map(char* path_file, map* new_map){
             i++;
             j=0;
         }else{
-            new_map->map[(i * new_map->width) + j] = c;
             if(c == 'S'){
                 coord tmp = {j,i};
-                spawn[new_map->nbSpawn] = tmp;
+                new_map->spawn = realloc(new_map->spawn,(new_map->nbSpawn+1)*sizeof(coord));
+                new_map->spawn[new_map->nbSpawn] = tmp;
                 new_map->nbSpawn++;
+                c = ' ';
             }
+            new_map->map[(i * new_map->width) + j] = c;
             j++;
         }
         c = fgetc(f);
-    }
-
-    //remplir le tableau de spawn
-    new_map->spawn = malloc(new_map->nbSpawn * sizeof(coord));
-    for (int i = 0; i < new_map->nbSpawn; i++) {
-        new_map->spawn[i] = spawn[i];
     }
     if(fclose(f)) return -1;
     return 0;
