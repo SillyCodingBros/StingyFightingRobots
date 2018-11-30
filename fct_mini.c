@@ -134,3 +134,120 @@ void tirer(robot *bot, float angle, mqd_t server){
         mq_send(server, tmp_msg, sizeof(msg)+sizeof(coord), 1);
     }
 }
+
+int not_equals(int a, int b){
+  if (a==b)
+    return 0;
+  else
+    return 1;
+}
+
+int equals(int a, int b){
+  return !not_equals(a,b);
+}
+
+void mini_2_c(cmd sub_com, robot *bot, mqd_t server, mqd_t client, char* buffer, int taille){
+  if(strcmp(sub_com.name, "move") == 0)
+    avancer(bot,atoi(sub_com.subcom->name),server,client,buffer,taille);
+  else if(strcmp(sub_com.name, "pick") == 0){
+    //rammasser sub_com.subcom->name
+  }
+  else if(strcmp(sub_com.name, "turn") == 0){
+    tourner(bot,atoi(sub_com.subcom->name),server);
+  }
+  else if(strcmp(sub_com.name, "shoot") == 0)
+    tirer(bot,atoi(sub_com.subcom->name),server);
+  else {
+    //regarder (seek)
+  }
+
+}
+
+/* évalue tous ce qui returne une valeur */
+short eval(cmd sub_com, robot *bot){
+  if(strcmp(sub_com.name, "pv") == 0)
+    return get_pv(bot);
+
+  else if(strcmp(sub_com.name, "steer") == 0)
+    return get_direction(bot);
+
+  else if(strcmp(sub_com.name, "money") == 0)
+    return get_money(bot);
+
+  else if(strcmp(sub_com.name, "nb_bullet") == 0)
+    return get_nb_bullet(bot);
+
+  else if(strcmp(sub_com.name, "armor") == 0)
+    return get_armor(bot);
+
+  else if(strcmp(sub_com.name, "coord") == 0)
+    return get_coord(bot,sub_com.subcom->name);
+
+  else if(strcmp(sub_com.name, "!=") == 0)
+    return eval(sub_com.subcom[0],bot) != eval(sub_com.subcom[1],bot);
+
+  else if(strcmp(sub_com.name, "==") == 0)
+    return eval(sub_com.subcom[0],bot) == eval(sub_com.subcom[1],bot);
+
+  else if(strcmp(sub_com.name, ">") == 0)
+    return eval(sub_com.subcom[0],bot) > eval(sub_com.subcom[1],bot);
+
+  else if(strcmp(sub_com.name, "<") == 0)
+    return eval(sub_com.subcom[0],bot) < eval(sub_com.subcom[1],bot);
+
+  else if(strcmp(sub_com.name, ">=") == 0)
+    return eval(sub_com.subcom[0],bot) >= eval(sub_com.subcom[1],bot);
+
+  else if(strcmp(sub_com.name, "<=") == 0){
+    return eval(sub_com.subcom[0],bot) <= eval(sub_com.subcom[1],bot);
+  }
+  return atoi(sub_com.subcom->name);
+}
+
+void interp (cmd com, robot *bot, mqd_t server, mqd_t client, char* buffer, int taille){
+  for (int i = 0; i < com.nb_subcom; ++i) {
+    cmd sub_com = com.subcom[i+com.nb_args];
+    if (sub_com.nb_subcom == 0){
+      mini_2_c(sub_com,bot,server,client,buffer,taille);
+    }
+    else {
+      if(strcmp(sub_com.name, "while") == 0){
+        while (eval(sub_com.subcom[0],bot)) {
+          for (int i = 1; i <= sub_com.nb_subcom; ++i) {
+            interp(sub_com.subcom[i],bot,server,client,buffer,taille);
+          }
+        }
+      }
+    }
+
+    //printf("name %s, nb_args %d, nb_subcom %d\n", com.name, com.nb_args, com.nb_subcom);
+  }
+}
+
+void script(robot *bot, char *name, mqd_t server, mqd_t client, char* buffer, int taille){
+  FILE *fd = fopen(name, "r");
+  cmd com = create_cmd(NULL, fd);
+  /*
+  printf("name %s, nb_args %d, nb_subcom %d\n", com.name, com.nb_args, com.nb_subcom);
+  for (int i = 0; i < com.nb_subcom; ++i) {
+    printf("\t");
+    glup(com.subcom[i+com.nb_args]);
+  }
+  */
+  interp(com,bot,server,client,buffer,taille);
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
