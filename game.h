@@ -76,7 +76,7 @@ int suppr_bullet(bullet bullet, bullet_liste* listOfBullet);
 robot* search_robot(char id, robot_liste listOfBot);
 
 // fonctions de interpreteur.c
-cmd create_cmd(char *ligne, FILE *fd);
+cmd create_cmd(char **ligne, FILE *fd);
 void glup(cmd com);
 
 //structure pour stocker les coordonnées des elements sur la map

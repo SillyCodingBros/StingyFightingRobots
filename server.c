@@ -193,7 +193,7 @@ void move_bullet(bullet_liste* list_bullet, robot_liste* bot_list, map mapOfGame
                 msg message = {tmp_bot->id,0};
                 mq_send(mq_list[(int) (tmp_bot->id)], (char*) &message, sizeof(msg), 1);
             }
-        }else if (mapOfGame.map[((int) tmp_coord.y)*mapOfGame.width+((int) tmp_coord.y)] == 'w' ) {
+        }else if (mapOfGame.map[((int) tmp_coord.y)*mapOfGame.width+((int) tmp_coord.x)] == 'w' ) {
             suppr_bullet(tmp_list->element,list_bullet);
         }else{
             tmp_list->element.pos = tmp_coord;
