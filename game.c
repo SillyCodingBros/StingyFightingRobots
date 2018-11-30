@@ -5,9 +5,9 @@
 //fonction de creation des robots
 robot create_robot(char* name, char id, coord spawn, inventaire* inventaire){
     robot new_robot;
-    new_robot.name = name;
+    new_robot.name = malloc(strlen(name));
+    strcpy(new_robot.name, name);
     new_robot.id = id;
-    //new_robot.reach = 10;
     new_robot.pos = spawn;
     new_robot.direction = 0;
     new_robot.pv = 100;
@@ -129,11 +129,23 @@ int suppr_bullet(bullet bullet, bullet_liste* listOfBullet){
 
 //fonction pour chercher un robot avec l'id
 robot* search_robot(char id, robot_liste listOfBot){
-    if (listOfBot->element.id == id) return &(listOfBot->element);
-    robot_liste tmp_list = listOfBot;
-    while (tmp_list->suite) {
-        if (tmp_list->suite->element.id != id) tmp_list = tmp_list->suite;
-        else return &(tmp_list->suite->element);
+    if (listOfBot != NULL) {
+        if (listOfBot->element.id == id) return &(listOfBot->element);
+        robot_liste tmp_list = listOfBot;
+        while (tmp_list->suite) {
+            if (tmp_list->suite->element.id != id) tmp_list = tmp_list->suite;
+            else return &(tmp_list->suite->element);
+        }
     }
     return NULL;
+}
+
+//fonction pour chercher un robot avec l'id
+int nb_bot(robot_liste listOfBot){
+    int nb_bot = 0;
+    while (listOfBot){
+        listOfBot = listOfBot->suite;
+        nb_bot++;
+    }
+    return nb_bot;
 }

@@ -36,11 +36,14 @@ int create_map(char* path_file, map* new_map);
 mqd_t* init(robot_liste* bot_list, int nb_bot, coord* spawn, int nb_spawn, mqd_t server, msg* demande, char* buffer, int taille);
 robot* isBot(int x, int y, robot_liste listOfBot);
 int isBullet(int x, int y, bullet_liste listOfBullet);
-int server(int nbclient);
+//int server(int nbclient);
+int server(char* map_name);
 int win(robot_liste bot_list);
 void start_game(mqd_t server, char* buffer, int taille, int nb_bot);
 void affichage(map mapOfGame, robot_liste listOfBot, bullet_liste listOfBullet);
 void move_bullet(bullet_liste* list_bullet, robot_liste* bot_list, map mapOfGame, mqd_t* mq_list);
+
+int search_place(char* place,int nb_place);
 
 void test(robot_liste listOfBot);
 void test2(bullet_liste test);
@@ -49,6 +52,7 @@ void test2(bullet_liste test);
 char* init_client(robot* bot, inventaire* inventaire, mqd_t server, mqd_t* ptrclient, char* name, int nameSize);
 int client(char* name);
 int interprete(char* commande, mqd_t server, mqd_t client, robot* bot, char* buffer, int taille);
+int reception(mqd_t fdem, char** buffer, int taille, robot* bot, char obj);
 
 //fonctions fct_mini.c
 float get_coord(robot *bot, char *axis);
@@ -57,8 +61,8 @@ short get_pv(robot *bot);
 unsigned long long get_money(robot *bot);
 short get_nb_bullet(robot *bot);
 short get_armor(robot *bot);
-void avancer(robot *bot, int move, mqd_t serveur, mqd_t client, char* buffer, int taille);
-void start(robot* bot, mqd_t server);
+//void avancer(robot *bot, int move, mqd_t serveur, mqd_t client, char* buffer, int taille);
+int avancer(robot *bot, int move, mqd_t server, mqd_t client, char* buffer, int taille);
 void tourner(robot *bot, short direc, mqd_t server);
 void tirer(robot *bot, float angle, mqd_t serveur);
 
@@ -73,6 +77,7 @@ int suppr_bot(char id, robot_liste* listOfBot);
 int add_bullet(bullet bullet, bullet_liste* listOfBullet);
 int suppr_bullet(bullet bullet, bullet_liste* listOfBullet);
 robot* search_robot(char id, robot_liste listOfBot);
+int nb_bot(robot_liste listOfBot);
 
 // fonction de interpreteur.c
 cmd create_cmd(char *ligne, FILE *fd);

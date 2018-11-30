@@ -29,55 +29,45 @@ short get_armor(robot *bot){
   return bot->inventory->armor;
 }
 
-void start(robot* bot, mqd_t server){
-    msg message = {bot->id,1};
-    mq_send(server, (char*) &message, sizeof(msg), 1);
-}
 
-void avancer(robot *bot, int move, mqd_t server, mqd_t client, char* buffer, int taille) {
-    short dir = get_direction(bot);
-    coord coor = {get_coord(bot,"x"),get_coord(bot,"y")};
-    int bot_speed = bot->speed;
-    int move_time = (int) (move/bot_speed);
-    printf("%d / %d = %d\n", move, bot_speed, move_time);
-    msg message = {bot->id,2};
+int avancer(robot *bot, int move, mqd_t server, mqd_t client, char* buffer, int taille) {
+    float* modif_axis;
+    msg message;
+    char concat_msg[sizeof(msg)+sizeof(coord)];
+    int recep;
+    coord last_pos;
 
-    for (int i = 0; i < move_time; i++) {
-        switch (dir) {
-            case 0:
-                coor.y -= bot_speed;
-                break;
-            case 1:
-                coor.x += bot_speed;
-                break;
-            case 2:
-                coor.y += bot_speed;
-                break;
-            case 3:
-                coor.x -= bot_speed;
-                break;
-        }
-        char* tmp_msg = malloc(sizeof(msg)+sizeof(coord));
-        str_concat(tmp_msg, (char*) &message, sizeof(msg), (char*) &coor, sizeof(coord));
-        mq_send(server, tmp_msg, sizeof(msg)+sizeof(coord), 1);
-        free(tmp_msg);
-        mq_receive(client,buffer,taille,NULL);
-        while (((msg*) buffer)->action != 2) {
-            if (((msg*) buffer)->action == 0) {
-                bot->pv = 0;
-            }else if (((msg*) buffer)->action == 1) {
-                bot->pv = *((int*) &buffer[sizeof(msg)]);
-            }
-            mq_receive(client,buffer,taille,NULL);
-        }
-        if ( ((coord*) &buffer[sizeof(msg)])->x == bot->pos.x && ((coord*) &buffer[sizeof(msg)])->y == bot->pos.y) {
-            return;
-        }else{
-            bot->pos = *((coord*) &buffer[sizeof(msg)]);
+    message.client = bot->id;
+    message.action = 2;
+
+    switch (bot->direction) {
+        case 0:
+            modif_axis = &(bot->pos.y);
+            move *= -1;
+        case 1:
+            modif_axis = &(bot->pos.x);
+        case 2:
+            modif_axis = &(bot->pos.y);
+        case 3:
+            modif_axis = &(bot->pos.x);
+            move *= -1;
+    }
+    for (float i = 0; i < (float) fabs(move)/bot->speed; i++) {
+        last_pos = bot->pos;
+        *modif_axis += bot->speed;
+        str_concat(concat_msg,(char*) &message,sizeof(msg),(char*) &(bot->pos),sizeof(coord));
+        mq_send(server,concat_msg,sizeof(msg)+sizeof(coord),1);
+        recep = reception(client,&buffer,taille,bot,2);
+        if (recep != 1) return recep;
+        bot->pos = *((coord*) &(buffer[sizeof(msg)]));
+        if (bot->pos.x == last_pos.x && bot->pos.y == last_pos.y) {
+            return 0;
         }
         sleep(1);
     }
+    return 0;
 }
+
 
 void seek(robot *bot, char obj, char *axis, mqd_t server, mqd_t client){
   // demande si un objet de type 'obj' est à porté du robot au serveur
@@ -122,7 +112,10 @@ void rammasser(robot *bot, char obj, mqd_t server, mqd_t client){
 void tourner(robot *bot, short direc, mqd_t server){
     // informe le server du changement de direction
     bot->direction = (bot->direction + direc) % 4;
-    msg message = {bot->id,3};
+    if (bot->direction < 0) {
+        bot->direction = 4 + bot->direction;
+    }
+    msg message = {bot->id,4};
     char* tmp_msg = malloc(sizeof(msg) + sizeof(char));
     str_concat(tmp_msg, (char*) &message, sizeof(msg), &(bot->direction), sizeof(char));
     mq_send(server,tmp_msg,sizeof(msg)+sizeof(char),1);
@@ -133,7 +126,7 @@ void tirer(robot *bot, float angle, mqd_t server){
     printf("demande de tir\n");
     if (bot->inventory->nb_bullet > 0) {
         bot->inventory->nb_bullet -= 1;
-        coord speed = { (float) cos(angle*RAD)/10000, (float) sin(angle*RAD)/10000};
+        coord speed = { (float) cos((angle+bot->direction*90-90)*RAD)/10000, (float) sin((angle+bot->direction*90-90)*RAD)/10000};
         printf("speed %f , %f\n", speed.x,speed.y);
         msg message = {bot->id,5};
         char* tmp_msg = malloc(sizeof(msg)+sizeof(coord));
