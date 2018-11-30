@@ -18,6 +18,7 @@ int main(int argc, char *argv[]) {
 
 //fonction qui traite les infos de la file de message
 int reception(mqd_t fdem, char** buffer, int taille, robot* bot, char obj){
+    printf("reception\n");
     msg message;
     char done;
     struct timespec tw;
@@ -27,6 +28,7 @@ int reception(mqd_t fdem, char** buffer, int taille, robot* bot, char obj){
     while (done) {
         if (mq_timedreceive(fdem,*buffer,taille,NULL,&tw) > 0){
             message = *((msg*) *buffer);
+            printf("{%d,%d}\n",message.client,message.action);
             if (message.client == -1) {
                 bot->pv -= message.action;
                 if (bot->pv <= 0) {

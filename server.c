@@ -89,6 +89,7 @@ int server(char* map_name){
                     printf("suppr\n");
                     mq_close(mq_list[(int) demande.client]);
                     suppr_bot(demande.client,&listOfBot);
+                    place[(int) demande.client] = 0;
                     if (nbclient == 2) {
                         nbclient++;
                     }
@@ -127,7 +128,8 @@ int server(char* map_name){
     }
     demande.client = mvp;
     demande.action = 0;
-    mq_send(mq_list[mvp],(char*) &demande,sizeof(msg),1);
+    printf("{%d,%d}\n",demande.client,demande.action);
+    if (mq_send(mq_list[mvp],(char*) &demande,sizeof(msg),1) < 0) perror("mq_send");
     cur_bot = search_robot(mvp,listOfBot);
     printf("%s A GAGNER\n", cur_bot->name);
     mq_unlink("/server");
