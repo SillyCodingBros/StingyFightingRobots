@@ -117,7 +117,14 @@ int client(char* name){
             break;
         }
         if (exec_com != NULL) {
-            if (strcmp(exec_com, "get_pv") == 0) {
+            if (strcmp(exec_com, "script") == 0) {
+                arg = str_tok(&com_scan, " \n");
+                if (arg != NULL){
+                    script(&bot,arg,server,client,buffer,taille);
+                }
+            }else if (strcmp(exec_com, "get_dir") == 0) {
+                printf("direction = %d\n", get_direction(&bot));
+            }else if (strcmp(exec_com, "get_pv") == 0) {
                 printf("pv = %d\n", get_pv(&bot));
             }else if (strcmp(exec_com, "get_money") == 0) {
                 printf("money = %llu\n", get_money(&bot));
@@ -152,45 +159,7 @@ int client(char* name){
             }
         }
     }
-<<<<<<< HEAD
     mq_close(client);
     mq_unlink(FdeM);
-=======
-    //traitement de la commande saisi par le client
-    char* exec_com;
-    char* com = malloc(strlen(commande));
-    strcpy(com,commande);
-    if (commande == NULL) return EXIT_FAILURE;
-    exec_com = str_tok(&com, " \n");
-    if (strcmp(exec_com, "start") == 0) {  /* exec fct start */
-        start(bot,server);
-    }else if (strcmp(exec_com, "script") == 0) {  /* exec fct script */
-        script(bot,str_tok(&com, " \n"),server,client,buffer,taille);
-        //printf("pv = %d\n", get_pv(bot));
-    }else if (strcmp(exec_com, "get_pv") == 0) {  /* exec fct get_pv */
-        printf("pv = %d\n", get_pv(bot));
-    }else if (strcmp(exec_com, "get_money") == 0) {  /* exec fct get_money */
-        printf("money = %llu\n", get_money(bot));
-    }else if (strcmp(exec_com, "get_coord") == 0) {  /* exec fct get_coord */
-        printf("coord %s = %f\n", str_tok(&com, " \n"), get_coord(bot,str_tok(&com, " \n")));
-    }else if (strcmp(exec_com, "get_bullet") == 0) {  /* exec fct get_coord */
-        printf("nb bullet = %d\n", get_nb_bullet(bot) );
-    }else if (strcmp(exec_com, "get_armor") == 0) {  /* exec fct get_armor */
-        printf("armor = %d\n", get_armor(bot));
-    }else if (strcmp(exec_com, "avancer") == 0) {  /* exec fct avancer */
-        avancer(bot,atoi(str_tok(&com, " \n")),server,client,buffer,taille);
-    }else if (strcmp(exec_com, "tourner") == 0) {  /* exec fct tourner */
-        tourner(bot,atoi(str_tok(&com, " \n")),server);
-    }else if (strcmp(exec_com, "rammasser") == 0) {  /* exec fct rammasser */
-    }else if (strcmp(exec_com, "tirer") == 0) {  /* exec fct tirer */
-        tirer(bot,atoi(str_tok(&com, " \n")),server);
-    }else if (strcmp(exec_com, "quitter") == 0) {  /* exec fct quitter */
-        bot->pv = 0;
-        msg message = {bot->id,6};
-        mq_send(server, (char*) &message, sizeof(msg), 1);
-    }else{
-        printf("unknown commande\n");
-    }
->>>>>>> d2c202ac679b0d819ff6b548a58685bb277da5eb
     return 0;
 }

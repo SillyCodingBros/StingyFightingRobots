@@ -36,25 +36,33 @@ int avancer(robot *bot, int move, mqd_t server, mqd_t client, char* buffer, int 
     char concat_msg[sizeof(msg)+sizeof(coord)];
     int recep;
     coord last_pos;
+    int speed;
 
     message.client = bot->id;
     message.action = 2;
+    speed = bot->speed;
 
     switch (bot->direction) {
         case 0:
             modif_axis = &(bot->pos.y);
-            move *= -1;
+            speed = (int) (-1 * speed * move)/fabs(move);
+            break;
         case 1:
             modif_axis = &(bot->pos.x);
+            speed = (int) (speed * move)/fabs(move);
+            break;
         case 2:
             modif_axis = &(bot->pos.y);
+            speed = (int) (speed * move)/fabs(move);
+            break;
         case 3:
             modif_axis = &(bot->pos.x);
-            move *= -1;
+            speed = (int) (-1 * speed * move)/fabs(move);
+            break;
     }
     for (float i = 0; i < (float) fabs(move)/bot->speed; i++) {
         last_pos = bot->pos;
-        *modif_axis += bot->speed;
+        *modif_axis += speed;
         str_concat(concat_msg,(char*) &message,sizeof(msg),(char*) &(bot->pos),sizeof(coord));
         mq_send(server,concat_msg,sizeof(msg)+sizeof(coord),1);
         recep = reception(client,&buffer,taille,bot,2);
@@ -236,18 +244,3 @@ void script(robot *bot, char *name, mqd_t server, mqd_t client, char* buffer, in
   */
   interp(com,bot,server,client,buffer,taille);
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

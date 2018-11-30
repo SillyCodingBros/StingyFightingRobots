@@ -60,6 +60,7 @@ int server(char* map_name){
         nsec++;
         if (mq_timedreceive(server,buffer,taille,NULL,&tw) > 0) {
             demande = *((msg*) buffer);
+            printf("{%d,%d}\n",demande.client,demande.action);
             cur_bot = search_robot(demande.client,listOfBot);
             if (cur_bot == NULL && demande.action == -1) {
                 add = search_place(place,mapOfGame.nbSpawn);
@@ -95,7 +96,6 @@ int server(char* map_name){
                     }
                     nbclient -=1;
                 }else if (demande.action == 2) {
-                    printf("move\n");
                     new_pos = *((coord*) &(buffer[sizeof(msg)]));
                     if (mapOfGame.map[((int) new_pos.y)*mapOfGame.width+((int) new_pos.x)] != 'w') {
                         cur_bot->pos = new_pos;
@@ -121,8 +121,8 @@ int server(char* map_name){
         }
         if (nsec > 10000) {
             affichage(mapOfGame,listOfBot,listOfBullet);
-            test(listOfBot);
-            test2(listOfBullet);
+            //test(listOfBot);
+            //test2(listOfBullet);
             nsec = 0;
         }
     }
@@ -172,7 +172,6 @@ void move_bullet(bullet_liste* list_bullet, robot_liste* bot_list, map mapOfGame
                 str_concat(tmp_msg, (char*) &message, sizeof(msg), &(tmp_list->element.damage), sizeof(char));
                 mq_send(mq_list[(int) (tmp_bot->id)], tmp_msg, sizeof(msg)+sizeof(char), 1);
             }else{
-                suppr_bot(tmp_bot->id, bot_list);
                 msg message = {tmp_bot->id,0};
                 mq_send(mq_list[(int) (tmp_bot->id)], (char*) &message, sizeof(msg), 1);
             }
