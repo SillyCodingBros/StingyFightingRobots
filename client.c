@@ -57,7 +57,7 @@ int client(char* name){
     msg message;
     int taille;
     char *buffer, *FdeM, *concat_msg;
-    char *com_scan, *arg, *exec_com;
+    char *com_scan;
     struct mq_attr attr;
     struct timespec tw;
     robot bot;
@@ -106,7 +106,6 @@ int client(char* name){
     inventory.armor = 0;
     bot = create_robot(name, message.client, *((coord*) &(buffer[sizeof(msg)])), &inventory);
     com_scan = malloc(40);
-    arg = malloc(40);
     while (bot.pv > 0) {
         printf("commande robot %d : ",bot.id);
         com_scan = realloc(0,40);
@@ -116,7 +115,7 @@ int client(char* name){
             printf("GAGNÉ\n");
             break;
         }
-        interp(create_cmd(&com_scan,NULL),&bot,server,client,buffer,taille);
+        printf("return %d\n", interp(create_cmd(&com_scan,NULL),&bot,server,client,buffer,taille));
     }
     mq_close(client);
     mq_unlink(FdeM);

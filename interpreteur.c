@@ -33,7 +33,7 @@ cmd create_cmd(char **ligne, FILE *fd){
     return new_cmd;
   }
   //printf("\nligne avant strtok name : \"%s\" at %p\n", *ligne,ligne);
-  char *name_cmd = str_tok(ligne," ");
+  char *name_cmd = str_tok(ligne," \n");
   //printf("name of cmd : \"%s\"\n", name_cmd);
   //printf("ligne après strtok name : \"%s\" at %p\n", *ligne, ligne);
   cmd new_cmd = {name_cmd,0,0,NULL};
@@ -94,7 +94,7 @@ cmd create_cmd(char **ligne, FILE *fd){
   if(strcmp(name_cmd,"/")==0)
     new_cmd.nb_args = 2;
 
-  if(strcmp(name_cmd,"%%")==0)
+  if(strcmp(name_cmd,"mod")==0)
       new_cmd.nb_args = 2;
 
   new_cmd.subcom = malloc(new_cmd.nb_args*sizeof(cmd));
@@ -119,9 +119,7 @@ cmd create_cmd(char **ligne, FILE *fd){
       }
     }
   }
-
   return new_cmd;
-
 }
 
 void glup(cmd com){

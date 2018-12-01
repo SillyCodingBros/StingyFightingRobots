@@ -153,7 +153,7 @@ int server(char* map_name){
 
 //fonction d'observation
 coord observer(map mapOfGame, robot* bot, char* buffer){
-    coord pos_object = {-1,-1};
+    coord pos_object = {bot->pos.x,bot->pos.y};
     for (int i = bot->pos.y-(bot->reach/2); i < bot->pos.y+(bot->reach/2); i++) {
         for (int j = bot->pos.x-(bot->reach/2); j < bot->pos.x+(bot->reach/2); j++) {
             if (mapOfGame.map[i*mapOfGame.width+j] == buffer[sizeof(msg)]) {
