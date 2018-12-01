@@ -104,22 +104,22 @@ int seek(robot *bot, char *obj, char *axis, mqd_t server, mqd_t client, char* bu
     message.action = 6;
 
     str_concat(concat_msg,(char*) &message,sizeof(msg),obj,1);
-      // demande si un objet de type 'obj' est à porté du robot au serveur
-      mq_send(server,concat_msg,sizeof(msg)+1,1);
-      // attente de d'une reponse serveur
-      recep = reception(client,&buffer,taille,bot,6);
-      if (recep != 1) return recep;
-      // reponse_serveur (x,y)
-      pos_object = *((coord*) &(buffer[sizeof(msg)]));
-      // reponse_serveur si rien (-1,-1)
-      if (strcmp(axis, "x") == 0) {
-          //printf("axis : %s\n",axis);
-          return pos_object.x;
-      }else if (strcmp(axis, "y") == 0) {
-          //printf("axis : %s\n",axis);
-          return pos_object.y;
-      }
-      return 0;
+    // demande si un objet de type 'obj' est à porté du robot au serveur
+    mq_send(server,concat_msg,sizeof(msg)+1,1);
+    // attente de d'une reponse serveur
+    recep = reception(client,&buffer,taille,bot,6);
+    if (recep != 1) return recep;
+    // reponse_serveur (x,y)
+    pos_object = *((coord*) &(buffer[sizeof(msg)]));
+    // reponse_serveur si rien (-1,-1)
+    if (strcmp(axis, "x") == 0) {
+        //printf("axis : %s\n",axis);
+        return pos_object.x;
+    }else if (strcmp(axis, "y") == 0) {
+        //printf("axis : %s\n",axis);
+        return pos_object.y;
+    }
+    return 0;
 }
 
 int ramasser(robot *bot, mqd_t server, mqd_t client, char* buffer, int taille){
@@ -230,7 +230,7 @@ short eval(cmd sub_com, robot *bot){
   else if(strcmp(sub_com.name, "/") == 0)
     return eval(sub_com.subcom[0],bot) / eval(sub_com.subcom[1],bot);
 
-  else if(strcmp(sub_com.name, "mod") == 0)
+  else if(strcmp(sub_com.name, "%%") == 0)
     return eval(sub_com.subcom[0],bot) % eval(sub_com.subcom[1],bot);
 
   return atoi(sub_com.name);

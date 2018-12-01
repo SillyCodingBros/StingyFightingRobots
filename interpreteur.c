@@ -139,9 +139,7 @@ cmd create_cmd(char **ligne, FILE *fd){
       }
     }
   }
-
   return new_cmd;
-
 }
 
 void glup(cmd com){
