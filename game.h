@@ -42,6 +42,8 @@ coord observer(map mapOfGame, robot* bot, char* buffer);
 void affichage(map mapOfGame, robot_liste listOfBot, bullet_liste listOfBullet);
 void move_bullet(bullet_liste* list_bullet, robot_liste* bot_list, map mapOfGame, mqd_t* mq_list);
 int search_place(char* place,int nb_place);
+int in_range(coord pos,robot_liste listOfBot);
+void start(mqd_t* mq_list);
 
 //debug
 void test(robot_liste listOfBot);
@@ -82,6 +84,7 @@ int add_bullet(bullet bullet, bullet_liste* listOfBullet);
 int suppr_bullet(bullet bullet, bullet_liste* listOfBullet);
 robot* search_robot(char id, robot_liste listOfBot);
 int nb_bot(robot_liste listOfBot);
+float distance(coord p1, coord p2);
 
 // fonctions de interpreteur.c
 cmd create_cmd(char **ligne, FILE *fd);
