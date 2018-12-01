@@ -51,7 +51,6 @@ void test2(bullet_liste test);
 //fonctions de client.c
 char* init_client(robot* bot, inventaire* inventaire, mqd_t server, mqd_t* ptrclient, char* name, int nameSize);
 int client(char* name);
-int interprete(char* commande, mqd_t server, mqd_t client, robot* bot, char* buffer, int taille);
 int reception(mqd_t fdem, char** buffer, int taille, robot* bot, char obj);
 
 //fonctions fct_mini.c
@@ -67,6 +66,7 @@ int avancer(robot *bot, int move, mqd_t server, mqd_t client, char* buffer, int 
 void tourner(robot *bot, short direc, mqd_t server);
 void tirer(robot *bot, float angle, mqd_t serveur);
 void script(robot *bot, char *name, mqd_t server, mqd_t client, char* buffer, int taille);
+void interp(cmd sub_com, robot *bot, mqd_t server, mqd_t client, char* buffer, int taille);
 
 //fonctions de game.c
 robot create_robot(char* name, char id, coord spawn, inventaire* inventaire);

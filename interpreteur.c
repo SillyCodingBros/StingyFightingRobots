@@ -104,6 +104,10 @@ cmd create_cmd(char **ligne, FILE *fd){
 
   if (new_cmd.nb_subcom != 0) {
     new_cmd.nb_subcom = 0;
+    if (fd == NULL) {
+        cmd null = {NULL,0,0,NULL};
+        return null;
+    }
     if (strcmp(*ligne, "{")==0) {
       //printf("lecture bloc cmd\n");
       *ligne = get_line(fd);
@@ -172,5 +176,3 @@ int main() {
   return 0;
 }
 */
-
-

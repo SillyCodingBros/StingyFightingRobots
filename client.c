@@ -111,59 +111,12 @@ int client(char* name){
         printf("commande robot %d : ",bot.id);
         com_scan = realloc(0,40);
         fgets(com_scan,40,stdin);
-        exec_com = str_tok(&com_scan, " \n");
+        //exec_com = str_tok(&com_scan, " \n");
         if (reception(server,&buffer,taille,&bot,0) == 2){
             printf("GAGNÉ\n");
             break;
         }
-        if (exec_com != NULL) {
-            if (strcmp(exec_com, "script") == 0) {
-                arg = str_tok(&com_scan, " \n");
-                if (arg != NULL){
-                    script(&bot,arg,server,client,buffer,taille);
-                }
-            }else if (strcmp(exec_com, "get_dir") == 0) {
-                printf("direction = %d\n", get_direction(&bot));
-            }else if (strcmp(exec_com, "get_pv") == 0) {
-                printf("pv = %d\n", get_pv(&bot));
-            }else if (strcmp(exec_com, "get_money") == 0) {
-                printf("money = %llu\n", get_money(&bot));
-            }else if (strcmp(exec_com, "get_coord") == 0) {
-                printf("coord = (%f,%f)\n", get_coord(&bot,"x") ,get_coord(&bot,"y"));
-            }else if (strcmp(exec_com, "get_bullet") == 0) {
-                printf("nb bullet = %d\n", get_nb_bullet(&bot) );
-            }else if (strcmp(exec_com, "get_armor") == 0) {
-                printf("armor = %d\n", get_armor(&bot));
-            }else if (strcmp(exec_com, "avancer") == 0) {
-                arg = str_tok(&com_scan, " \n");
-                if (arg != NULL){
-                    avancer(&bot,atoi(arg),server,client,buffer,taille);
-                }
-            }else if (strcmp(exec_com, "observer") == 0) {
-                arg = str_tok(&com_scan, " \n");
-                if (arg != NULL){
-                    printf("l'objet %c est en (%d,%d)\n",arg[0],seek(&bot,&arg[0],"x",server,client,buffer,taille),seek(&bot,&arg[0],"y",server,client,buffer,taille));
-                }
-            }else if (strcmp(exec_com, "tourner") == 0) {
-                arg = str_tok(&com_scan, " \n");
-                if (arg != NULL){
-                    tourner(&bot,atoi(arg),server);
-                }
-            }else if (strcmp(exec_com, "ramasser") == 0) {
-                ramasser(&bot,server,client,buffer,taille);
-            }else if (strcmp(exec_com, "tirer") == 0) {
-                arg = str_tok(&com_scan, " \n");
-                if (arg != NULL){
-                    tirer(&bot,atoi(arg),server);
-                }
-            }else if (strcmp(exec_com, "quitter") == 0) {
-                msg message = {bot.id,1};
-                mq_send(server, (char*) &message, sizeof(msg), 1);
-                break;
-            }else{
-                printf("unknown commande\n");
-            }
-        }
+        interp(create_cmd(&com_scan,NULL),&bot,server,client,buffer,taille);
     }
     mq_close(client);
     mq_unlink(FdeM);
