@@ -78,7 +78,7 @@ int avancer(robot *bot, int move, mqd_t server, mqd_t client, char* buffer, int 
             if (recep != 1) return recep;
             bot->pos = *((coord*) &(buffer[sizeof(msg)]));
             if (bot->pos.x == last_pos.x && bot->pos.y == last_pos.y) {
-              return 0;
+              return -1;
             }
             nsec = 0;
         }
@@ -95,30 +95,31 @@ int avancer(robot *bot, int move, mqd_t server, mqd_t client, char* buffer, int 
 
 
 int seek(robot *bot, char *obj, char *axis, mqd_t server, mqd_t client, char* buffer, int taille){
-  msg message;
-  char concat_msg[sizeof(msg)+1];
-  coord pos_object;
-  int recep;
+    msg message;
+    char concat_msg[sizeof(msg)+1];
+    coord pos_object;
+    int recep;
 
-  message.client = bot->id;
-  message.action = 6;
+    message.client = bot->id;
+    message.action = 6;
 
-  str_concat(concat_msg,(char*) &message,sizeof(msg),obj,1);
-  // demande si un objet de type 'obj' est à porté du robot au serveur
-  mq_send(server,concat_msg,sizeof(msg)+1,1);
-  // attente de d'une reponse serveur
-  recep = reception(client,&buffer,taille,bot,6);
-  if (recep != 1) return recep;
-  // reponse_serveur (x,y)
-  pos_object = *((coord*) &(buffer[sizeof(msg)]));
-  //printf("l'objet %c est en (%f,%f)\n",obj,pos_object.x,pos_object.y );
-  // reponse_serveur si rien (-1,-1)
-  if (strcmp(axis, "x") == 0) {
-    return pos_object.x;
-  }else if (strcmp(axis, "y") == 0) {
-    return pos_object.y;
-  }
-  return -1;
+    str_concat(concat_msg,(char*) &message,sizeof(msg),obj,1);
+      // demande si un objet de type 'obj' est à porté du robot au serveur
+      mq_send(server,concat_msg,sizeof(msg)+1,1);
+      // attente de d'une reponse serveur
+      recep = reception(client,&buffer,taille,bot,6);
+      if (recep != 1) return recep;
+      // reponse_serveur (x,y)
+      pos_object = *((coord*) &(buffer[sizeof(msg)]));
+      // reponse_serveur si rien (-1,-1)
+      if (strcmp(axis, "x") == 0) {
+          //printf("axis : %s\n",axis);
+          return pos_object.x;
+      }else if (strcmp(axis, "y") == 0) {
+          //printf("axis : %s\n",axis);
+          return pos_object.y;
+      }
+      return 0;
 }
 
 int ramasser(robot *bot, mqd_t server, mqd_t client, char* buffer, int taille){
@@ -136,17 +137,20 @@ int ramasser(robot *bot, mqd_t server, mqd_t client, char* buffer, int taille){
   // reponse_serveur = reponse - 1
   if (buffer[sizeof(msg)] == 'C' ) {
     bot->inventory->money += *((int*) &(buffer[sizeof(msg)+1]));
+    return 0;
   }
   if (buffer[sizeof(msg)] == 'A') {
     bot->inventory->armor += *((int*) &(buffer[sizeof(msg)+1]));
+    return 0;
   }
   if (buffer[sizeof(msg)] == 'B') {
     bot->inventory->nb_bullet += *((int*) &(buffer[sizeof(msg)+1]));
+    return 0;
   }
-  return 1;
+  return -1;
 }
 
-void tourner(robot *bot, short direc, mqd_t server){
+int tourner(robot *bot, short direc, mqd_t server){
   // informe le server du changement de direction
   bot->direction = (bot->direction + direc) % 4;
   if (bot->direction < 0) {
@@ -157,9 +161,10 @@ void tourner(robot *bot, short direc, mqd_t server){
   str_concat(tmp_msg, (char*) &message, sizeof(msg), &(bot->direction), sizeof(char));
   mq_send(server,tmp_msg,sizeof(msg)+sizeof(char),1);
   free(tmp_msg);
+  return 0;
 }
 
-void tirer(robot *bot, float angle, mqd_t server){
+int tirer(robot *bot, float angle, mqd_t server){
     int cycle = CYCLE*100;
     printf("demande de tir\n");
     if (bot->inventory->nb_bullet > 0) {
@@ -170,7 +175,9 @@ void tirer(robot *bot, float angle, mqd_t server){
         char* tmp_msg = malloc(sizeof(msg)+sizeof(coord));
         str_concat(tmp_msg, (char*) &message, sizeof(msg), (char*) &speed, sizeof(coord));
         mq_send(server, tmp_msg, sizeof(msg)+sizeof(coord), 1);
+        return 0;
     }
+    return -1;
 }
 
 /* évalue tous ce qui returne une valeur */
@@ -223,50 +230,52 @@ short eval(cmd sub_com, robot *bot){
   else if(strcmp(sub_com.name, "/") == 0)
     return eval(sub_com.subcom[0],bot) / eval(sub_com.subcom[1],bot);
 
-  else if(strcmp(sub_com.name, "%%") == 0)
+  else if(strcmp(sub_com.name, "mod") == 0)
     return eval(sub_com.subcom[0],bot) % eval(sub_com.subcom[1],bot);
 
   return atoi(sub_com.name);
 }
 
-void mini_2_c(cmd sub_com, robot *bot, mqd_t server, mqd_t client, char* buffer, int taille){
-  if(strcmp(sub_com.name, "move") == 0)
-    avancer(bot,eval(*sub_com.subcom, bot),server,client,buffer,taille);
-  else if(strcmp(sub_com.name, "pick") == 0)
-    ramasser(bot, server, client, buffer, taille);
-  else if(strcmp(sub_com.name, "turn") == 0)
-    tourner(bot,eval(*sub_com.subcom, bot),server);
-  else if(strcmp(sub_com.name, "shoot") == 0)
-    tirer(bot,eval(*sub_com.subcom, bot),server);
-  else if(strcmp(sub_com.name, "seek") == 0)
-    seek(bot, sub_com.subcom[0].name, sub_com.subcom[1].name, server, client, buffer, taille);
+int mini_2_c(cmd sub_com, robot *bot, mqd_t server, mqd_t client, char* buffer, int taille){
+    if(strcmp(sub_com.name, "move") == 0)
+        return avancer(bot,eval(*sub_com.subcom, bot),server,client,buffer,taille);
+    else if(strcmp(sub_com.name, "pick") == 0)
+        return ramasser(bot, server, client, buffer, taille);
+    else if(strcmp(sub_com.name, "turn") == 0)
+        return tourner(bot,eval(*sub_com.subcom, bot),server);
+    else if(strcmp(sub_com.name, "shoot") == 0)
+        return tirer(bot,eval(*sub_com.subcom, bot),server);
+    else if(strcmp(sub_com.name, "seek") == 0)
+        return seek(bot, sub_com.subcom[0].name, sub_com.subcom[1].name, server, client, buffer, taille);
+    return -1;
 }
 
-void interp(cmd sub_com, robot *bot, mqd_t server, mqd_t client, char* buffer, int taille){
+int interp(cmd sub_com, robot *bot, mqd_t server, mqd_t client, char* buffer, int taille){
   if (sub_com.nb_subcom > 0 && sub_com.nb_args == 0) {
     for (int i = 0; i < sub_com.nb_subcom+sub_com.nb_args; ++i) {
-      interp(sub_com.subcom[i],bot,server,client,buffer,taille);
+      return interp(sub_com.subcom[i],bot,server,client,buffer,taille);
     }
   }
   if (sub_com.nb_subcom == 0){
-    mini_2_c(sub_com,bot,server,client,buffer,taille);
+    return mini_2_c(sub_com,bot,server,client,buffer,taille);
   }
   else {
     if(strcmp(sub_com.name, "while") == 0){
       while (eval(sub_com.subcom[0],bot)) {
         for (int i = 1; i <= sub_com.nb_subcom; ++i) {
-          interp(sub_com.subcom[i],bot,server,client,buffer,taille);
+          return interp(sub_com.subcom[i],bot,server,client,buffer,taille);
         }
       }
     }
     if(strcmp(sub_com.name, "if") == 0){
       if (eval(sub_com.subcom[0],bot)) {
         for (int i = 1; i <= sub_com.nb_subcom; ++i) {
-          interp(sub_com.subcom[i],bot,server,client,buffer,taille);
+          return interp(sub_com.subcom[i],bot,server,client,buffer,taille);
         }
       }
     }
   }
+  return -1;
 }
 
 void script(robot *bot, char *name, mqd_t server, mqd_t client, char* buffer, int taille){
