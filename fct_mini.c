@@ -266,13 +266,6 @@ void interp(cmd sub_com, robot *bot, mqd_t server, mqd_t client, char* buffer, i
         }
       }
     }
-    if(strcmp(sub_com.name, "else") == 0){
-      if (!eval(sub_com.subcom[0],bot)) {
-        for (int i = 1; i <= sub_com.nb_subcom; ++i) {
-          interp(sub_com.subcom[i],bot,server,client,buffer,taille);
-        }
-      }
-    }
   }
 }
 
