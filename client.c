@@ -57,7 +57,7 @@ int client(char* name){
     msg message;
     int taille;
     char *buffer, *FdeM, *concat_msg;
-    char *com_scan;
+    char *com_scan, *exec_com;
     struct mq_attr attr;
     struct timespec tw;
     robot bot;
@@ -110,12 +110,13 @@ int client(char* name){
         printf("commande robot %d : ",bot.id);
         com_scan = realloc(0,40);
         fgets(com_scan,40,stdin);
-        //exec_com = str_tok(&com_scan, " \n");
+        exec_com = malloc(strlen(com_scan));
+        strcpy(exec_com,com_scan);
         if (reception(server,&buffer,taille,&bot,0) == 2){
             printf("GAGNÉ\n");
             break;
         }
-        printf("return %d\n", interp(create_cmd(&com_scan,NULL),&bot,server,client,buffer,taille));
+        printf("return %d\n", interp(create_cmd(&exec_com,NULL),&bot,server,client,buffer,taille));
     }
     mq_close(client);
     mq_unlink(FdeM);

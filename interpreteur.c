@@ -41,8 +41,8 @@ cmd create_cmd(char **ligne, FILE *fd){
   cmd if_args;
 
   if(strcmp(name_cmd,"script")==0){
-    FILE *fd2 = fopen(*ligne, "r");
-    printf("%s\n", *ligne);
+    char* name_file = str_tok(ligne," \n");
+    FILE *fd2 = fopen(name_file, "r");
     cmd tmp = create_cmd(NULL,fd2);
     fclose(fd2);
     return(tmp);
@@ -142,15 +142,20 @@ cmd create_cmd(char **ligne, FILE *fd){
   return new_cmd;
 }
 
-void glup(cmd com){
-  printf("name %s, nb_args %d, nb_subcom %d, name subcom %s\n", com.name, com.nb_args, com.nb_subcom, com.subcom->name);
-  for (int i = 0; i < com.nb_subcom && com.nb_args == 0; ++i) {
+void glup(cmd com, int nb_tab){
+  int i;
+  for (int i = 0; i < nb_tab; i++) {
     printf("\t");
-    /*for (int j = 0; j <= com.nb_subcom+com.nb_args && com.nb_args == 1; j++) {
-      printf("\t");
-      glup(com.subcom->subcom[j]);
-    }*/
-    glup(com.subcom[i+com.nb_args]);
+  }
+  i = 0;
+  printf("com %s : ", com.name);
+  for (i = 0; i < com.nb_args; i++) {
+    printf("%s ",com.subcom[i].name);
+  }
+  printf("\n");
+  while(i < com.nb_args+com.nb_subcom) {
+    glup(com.subcom[i],nb_tab+1);
+    i++;
   }
 }
 
@@ -162,9 +167,11 @@ void printw(cmd w){
     printf("com %d name : %s\n", i, w.subcom[i].name);
     cmd y = w.subcom[i];
     for (int j = 0; j < y.nb_args+y.nb_subcom; ++j) {
+      printf("\t");
       printf("subcom %d name : %s\n", j, y.subcom[j].name);
       cmd x = y.subcom[j];
       for (int k = 0; k < x.nb_args+x.nb_subcom; ++k) {
+        printf("\t\t");
         printf("sub subcom %d name : %s\n", k, x.subcom[k].name);
       }
     }
@@ -173,7 +180,7 @@ void printw(cmd w){
   }
 }
 
-
+/*
 int main() {
   FILE *fd = fopen("bot_1", "r");
 
@@ -181,22 +188,13 @@ int main() {
     printf("There's no file in here !\n");
     return 1;
   }
+  char* user_com = "script bot_1";
+  char* com = malloc(13);
+  strcpy(com,user_com);
+  printf("%s\n", com);
+  cmd script = create_cmd(&com,NULL);
 
-  cmd script = create_cmd(NULL,fd);
-
-  glup(script);
-  for (int i = 0; i < script.nb_subcom; i++) {
-    if (script.subcom[i].name == "script") {
-      glup(script.subcom[i]);
-    }
-  }
-
-
-  for (int i = 0; i < script.nb_subcom; i++) {
-    printw(script.subcom[i]);
-  }
-
+  glup(script,0);
 
   return 0;
-}
-
+}*/

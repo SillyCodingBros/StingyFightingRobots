@@ -42,7 +42,7 @@ void str_concat(char* str, char* elem1, int t_elem1, char* elem2, int t_elem2){
 }
 
 //fonction utiliser par str_tok detecter la presence d'un caractere dans un string
-char search(char* string, char element){
+int search(char* string, char element){
 	for(int i = 0; i < strlen(string); i++){
 		if(string[i] == element) return 0;
 	}

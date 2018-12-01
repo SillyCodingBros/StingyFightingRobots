@@ -180,7 +180,7 @@ void test(robot_liste test){
 void test2(bullet_liste test){
     bullet_liste print = test;
     while (print != NULL) {
-        printf(" pos (%f,%f), addr %p --->",print->element.pos.x, print->element.pos.y, &print->element);
+        printf(" pos (%f,%f), speed : (%f,%f) addr %p --->",print->element.pos.x, print->element.pos.y, print->element.speed_x, print->element.speed_y, &print->element);
         print = print->suite;
     }
     printf(" NULL\n");
@@ -204,7 +204,7 @@ void move_bullet(bullet_liste* list_bullet, robot_liste* bot_list, map mapOfGame
                 msg message = {tmp_bot->id,0};
                 mq_send(mq_list[(int) (tmp_bot->id)], (char*) &message, sizeof(msg), 1);
             }
-        }else if (mapOfGame.map[((int) tmp_coord.y)*mapOfGame.width+((int) tmp_coord.x)] == 'w' ) {
+        }else if (search("wW",mapOfGame.map[((int) tmp_coord.y)*mapOfGame.width+((int) tmp_coord.x)]) == 0) {
             suppr_bullet(tmp_list->element,list_bullet);
         }else{
             tmp_list->element.pos = tmp_coord;
