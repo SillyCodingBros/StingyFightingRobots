@@ -53,6 +53,12 @@ cmd create_cmd(char **ligne, FILE *fd){
   if(strcmp(name_cmd,"seek")==0)
     new_cmd.nb_args = 2;
 
+  if(strcmp(name_cmd,"script")==0){
+    FILE *fd2 = fopen(*ligne, "r");
+    cmd tmp = create_cmd(ligne,fd2);
+    fclose(fd2);
+    return(tmp);
+  }
   if(strcmp(name_cmd,"while")==0){
     new_cmd.nb_args = 1;
     new_cmd.nb_subcom = 1;
