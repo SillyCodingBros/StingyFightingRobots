@@ -38,7 +38,6 @@ cmd create_cmd(char **ligne, FILE *fd){
   //printf("name of cmd : \"%s\"\n", name_cmd);
   //printf("ligne après strtok name : \"%s\" at %p\n", *ligne, ligne);
   cmd new_cmd = {name_cmd,0,0,NULL};
-  cmd if_args;
 
   if(strcmp(name_cmd,"script")==0){
     char* name_file = str_tok(ligne," \n");
@@ -68,10 +67,6 @@ cmd create_cmd(char **ligne, FILE *fd){
     new_cmd.nb_subcom = 1;
   }
   else if(strcmp(name_cmd,"if")==0){
-    new_cmd.nb_args = 1;
-    new_cmd.nb_subcom = 1;
-  }
-  else if(strcmp(name_cmd,"else")==0){
     new_cmd.nb_args = 1;
     new_cmd.nb_subcom = 1;
   }
@@ -117,12 +112,6 @@ cmd create_cmd(char **ligne, FILE *fd){
   }
 
   if (new_cmd.nb_subcom != 0) {
-    if (strcmp(new_cmd.name, "if")==0) {
-      if_args = new_cmd.subcom[0];
-    }
-    if (strcmp(new_cmd.name, "else")==0) {
-      new_cmd.subcom[0] = if_args;
-    }
     new_cmd.nb_subcom = 0;
     if (fd == NULL) {
         cmd null = {NULL,0,0,NULL};

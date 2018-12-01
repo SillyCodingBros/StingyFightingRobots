@@ -1,10 +1,6 @@
-script bot_2
 if == nb_bullet * 5 2 {
   turn 1
   move + 4 1
-}
-else do {
-  move 2
 }
 while > nb_bullet 5 {
   shoot 0
@@ -15,3 +11,4 @@ while > nb_bullet 5 {
 if == nb_bullet mod 8 6 {
   turn / 1 1
 }
+script bot_2

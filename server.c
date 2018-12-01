@@ -132,12 +132,12 @@ int server(char* map_name){
             if(listOfBot != NULL) {
               demande.client = listOfBot->element.id;
               demande.action = -1;
+
               mq_send(mq_list[(int) demande.client],(char*) &demande,sizeof(msg),1);
             }
           }
         }
       }
-      //printf("%d : %d\n",nsec,nbclient);
       move_bullet(&listOfBullet,&listOfBot,mapOfGame,mq_list);
       if (nbclient > 1) {
         mvp = win(listOfBot);
