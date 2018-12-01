@@ -257,7 +257,14 @@ int interp(cmd sub_com, robot *bot, mqd_t server, mqd_t client, char* buffer, in
     }
   }
   if (sub_com.nb_subcom == 0){
-    return mini_2_c(sub_com,bot,server,client,buffer,taille);
+    if (strcmp(sub_com.name, "script") == 0) {
+      printf("je suis un script\n");
+      for (int i = 0; i < sub_com.nb_subcom+sub_com.nb_args; ++i) {
+        return interp(sub_com.subcom[i],bot,server,client,buffer,taille);
+      }
+    }
+    else
+      return mini_2_c(sub_com,bot,server,client,buffer,taille);
   }
   else {
     if(strcmp(sub_com.name, "while") == 0){
@@ -271,6 +278,13 @@ int interp(cmd sub_com, robot *bot, mqd_t server, mqd_t client, char* buffer, in
       if (eval(sub_com.subcom[0],bot)) {
         for (int i = 1; i <= sub_com.nb_subcom; ++i) {
           return interp(sub_com.subcom[i],bot,server,client,buffer,taille);
+        }
+      }
+    }
+    if(strcmp(sub_com.name, "else") == 0){
+      if (eval(sub_com.subcom[0],bot)==0) {
+        for (int i = 1; i <= sub_com.nb_subcom; ++i) {
+          interp(sub_com.subcom[i],bot,server,client,buffer,taille);
         }
       }
     }

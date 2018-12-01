@@ -40,73 +40,75 @@ cmd create_cmd(char **ligne, FILE *fd){
   cmd new_cmd = {name_cmd,0,0,NULL};
   cmd if_args;
 
-  if(strcmp(name_cmd,"move")==0)
-    new_cmd.nb_args = 1;
-
-  if(strcmp(name_cmd,"turn")==0)
-    new_cmd.nb_args = 1;
-
-  if(strcmp(name_cmd,"coord")==0)
-    new_cmd.nb_args = 1;
-
-  if(strcmp(name_cmd,"shoot")==0)
-    new_cmd.nb_args = 1;
-
-  if(strcmp(name_cmd,"seek")==0)
-    new_cmd.nb_args = 2;
-
   if(strcmp(name_cmd,"script")==0){
     FILE *fd2 = fopen(*ligne, "r");
-    cmd tmp = create_cmd(ligne,fd2);
+    printf("%s\n", *ligne);
+    cmd tmp = create_cmd(NULL,fd2);
     fclose(fd2);
     return(tmp);
   }
-  if(strcmp(name_cmd,"while")==0){
+
+  else if(strcmp(name_cmd,"move")==0)
+    new_cmd.nb_args = 1;
+
+  else if(strcmp(name_cmd,"turn")==0)
+    new_cmd.nb_args = 1;
+
+  else if(strcmp(name_cmd,"coord")==0)
+    new_cmd.nb_args = 1;
+
+  else if(strcmp(name_cmd,"shoot")==0)
+    new_cmd.nb_args = 1;
+
+  else if(strcmp(name_cmd,"seek")==0)
+    new_cmd.nb_args = 2;
+
+  else if(strcmp(name_cmd,"while")==0){
     new_cmd.nb_args = 1;
     new_cmd.nb_subcom = 1;
   }
-  if(strcmp(name_cmd,"if")==0){
+  else if(strcmp(name_cmd,"if")==0){
     new_cmd.nb_args = 1;
     new_cmd.nb_subcom = 1;
   }
-  if(strcmp(name_cmd,"else")==0){
+  else if(strcmp(name_cmd,"else")==0){
     new_cmd.nb_args = 1;
     new_cmd.nb_subcom = 1;
   }
-  if(strcmp(name_cmd,"affect")==0)
+  else if(strcmp(name_cmd,"affect")==0)
     new_cmd.nb_args = 3;
 
-  if(strcmp(name_cmd,"!=")==0)
+  else if(strcmp(name_cmd,"!=")==0)
     new_cmd.nb_args = 2;
 
-  if(strcmp(name_cmd,"==")==0)
+  else if(strcmp(name_cmd,"==")==0)
     new_cmd.nb_args = 2;
 
-  if(strcmp(name_cmd,"<=")==0)
+  else if(strcmp(name_cmd,"<=")==0)
     new_cmd.nb_args = 2;
 
-  if(strcmp(name_cmd,">=")==0)
+  else if(strcmp(name_cmd,">=")==0)
     new_cmd.nb_args = 2;
 
-  if(strcmp(name_cmd,"<")==0)
+  else if(strcmp(name_cmd,"<")==0)
     new_cmd.nb_args = 2;
 
-  if(strcmp(name_cmd,">")==0)
+  else if(strcmp(name_cmd,">")==0)
     new_cmd.nb_args = 2;
 
-  if(strcmp(name_cmd,"+")==0)
+  else if(strcmp(name_cmd,"+")==0)
     new_cmd.nb_args = 2;
 
-  if(strcmp(name_cmd,"-")==0)
+  else if(strcmp(name_cmd,"-")==0)
     new_cmd.nb_args = 2;
 
-  if(strcmp(name_cmd,"*")==0)
+  else if(strcmp(name_cmd,"*")==0)
     new_cmd.nb_args = 2;
 
-  if(strcmp(name_cmd,"/")==0)
+  else if(strcmp(name_cmd,"/")==0)
     new_cmd.nb_args = 2;
 
-  if(strcmp(name_cmd,"mod")==0)
+  else if(strcmp(name_cmd,"mod")==0)
       new_cmd.nb_args = 2;
 
   new_cmd.subcom = malloc(new_cmd.nb_args*sizeof(cmd));
@@ -116,8 +118,6 @@ cmd create_cmd(char **ligne, FILE *fd){
 
   if (new_cmd.nb_subcom != 0) {
     if (strcmp(new_cmd.name, "if")==0) {
-      printf("c'est un if\n");
-      printw(new_cmd.subcom[0]);
       if_args = new_cmd.subcom[0];
     }
     if (strcmp(new_cmd.name, "else")==0) {
@@ -185,6 +185,12 @@ int main() {
   cmd script = create_cmd(NULL,fd);
 
   glup(script);
+  for (int i = 0; i < script.nb_subcom; i++) {
+    if (script.subcom[i].name == "script") {
+      glup(script.subcom[i]);
+    }
+  }
+
 
   for (int i = 0; i < script.nb_subcom; i++) {
     printw(script.subcom[i]);
