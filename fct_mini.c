@@ -30,50 +30,67 @@ short get_armor(robot *bot){
 
 
 int avancer(robot *bot, int move, mqd_t server, mqd_t client, char* buffer, int taille) {
-  float* modif_axis;
-  msg message;
-  char concat_msg[sizeof(msg)+sizeof(coord)];
-  int recep;
-  coord last_pos;
-  int speed;
+    float* modif_axis, speed;
+    msg message;
+    char concat_msg[sizeof(msg)+sizeof(coord)];
+    int recep, nsec, cycle, distance;
+    coord last_pos, init_pos;
 
-  message.client = bot->id;
-  message.action = 2;
-  speed = bot->speed;
+    message.client = bot->id;
+    message.action = 2;
+    cycle = CYCLE*100;
+    speed = ((float) bot->speed) / cycle;
+    nsec = 0;
 
-  switch (bot->direction) {
-    case 0:
-      modif_axis = &(bot->pos.y);
-      speed = (int) (-1 * speed * move)/fabs(move);
-      break;
-    case 1:
-      modif_axis = &(bot->pos.x);
-      speed = (int) (speed * move)/fabs(move);
-      break;
-    case 2:
-      modif_axis = &(bot->pos.y);
-      speed = (int) (speed * move)/fabs(move);
-      break;
-    case 3:
-      modif_axis = &(bot->pos.x);
-      speed = (int) (-1 * speed * move)/fabs(move);
-      break;
-  }
-  for (float i = 0; i < (float) fabs(move)/bot->speed; i++) {
-    last_pos = bot->pos;
-    *modif_axis += speed;
-    printf("bot pos : (%f,%f)\n",bot->pos.x,bot->pos.y);
+    switch (bot->direction) {
+      case 0:
+        modif_axis = &(bot->pos.y);
+        speed = (-1 * speed * move)/fabs(move);
+        distance = fabs((bot->pos.y-move)-bot->pos.y);
+        break;
+      case 1:
+        modif_axis = &(bot->pos.x);
+        speed = (speed * move)/fabs(move);
+        distance = fabs((bot->pos.y+move)-bot->pos.y);
+        break;
+      case 2:
+        modif_axis = &(bot->pos.y);
+        speed = (speed * move)/fabs(move);
+        distance = fabs((bot->pos.y+move)-bot->pos.y);
+        break;
+      case 3:
+        modif_axis = &(bot->pos.x);
+        speed = (-1 * speed * move)/fabs(move);
+        distance = fabs((bot->pos.x-move)-bot->pos.x);
+        move *= -1;
+        break;
+    }
+
+    init_pos = bot->pos;
+    while(sqrt(pow((bot->pos.x-init_pos.x),2)+pow((bot->pos.y-init_pos.y),2)) < distance) {
+        last_pos = bot->pos;
+        *modif_axis += speed;
+        printf("(%f,%f)\n", bot->pos.x,bot->pos.y);
+        if (nsec == CYCLE) {
+            str_concat(concat_msg,(char*) &message,sizeof(msg),(char*) &(bot->pos),sizeof(coord));
+            mq_send(server,concat_msg,sizeof(msg)+sizeof(coord),1);
+            recep = reception(client,&buffer,taille,bot,2);
+            if (recep != 1) return recep;
+            bot->pos = *((coord*) &(buffer[sizeof(msg)]));
+            if (bot->pos.x == last_pos.x && bot->pos.y == last_pos.y) {
+              return 0;
+            }
+            nsec = 0;
+        }
+        nsec++;
+    }
+
     str_concat(concat_msg,(char*) &message,sizeof(msg),(char*) &(bot->pos),sizeof(coord));
     mq_send(server,concat_msg,sizeof(msg)+sizeof(coord),1);
     recep = reception(client,&buffer,taille,bot,2);
     if (recep != 1) return recep;
     bot->pos = *((coord*) &(buffer[sizeof(msg)]));
-    if (bot->pos.x == last_pos.x && bot->pos.y == last_pos.y) {
-      return 0;
-    }
-    sleep(1);
-  }
-  return 0;
+    return 0;
 }
 
 
@@ -143,16 +160,17 @@ void tourner(robot *bot, short direc, mqd_t server){
 }
 
 void tirer(robot *bot, float angle, mqd_t server){
-  printf("demande de tir\n");
-  if (bot->inventory->nb_bullet > 0) {
-    bot->inventory->nb_bullet -= 1;
-    coord speed = { (float) cos((angle+bot->direction*90-90)*RAD)/10000, (float) sin((angle+bot->direction*90-90)*RAD)/10000};
-    printf("speed %f , %f\n", speed.x,speed.y);
-    msg message = {bot->id,5};
-    char* tmp_msg = malloc(sizeof(msg)+sizeof(coord));
-    str_concat(tmp_msg, (char*) &message, sizeof(msg), (char*) &speed, sizeof(coord));
-    mq_send(server, tmp_msg, sizeof(msg)+sizeof(coord), 1);
-  }
+    int cycle = CYCLE*100;
+    printf("demande de tir\n");
+    if (bot->inventory->nb_bullet > 0) {
+        bot->inventory->nb_bullet -= 1;
+        coord speed = { (float) cos((angle+bot->direction*90-90)*RAD)/cycle*bot->speed_bullet, (float) sin((angle+bot->direction*90-90)*RAD)/cycle*bot->speed_bullet};
+        printf("speed %f , %f\n", speed.x,speed.y);
+        msg message = {bot->id,5};
+        char* tmp_msg = malloc(sizeof(msg)+sizeof(coord));
+        str_concat(tmp_msg, (char*) &message, sizeof(msg), (char*) &speed, sizeof(coord));
+        mq_send(server, tmp_msg, sizeof(msg)+sizeof(coord), 1);
+    }
 }
 
 /* évalue tous ce qui returne une valeur */

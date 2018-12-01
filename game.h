@@ -15,7 +15,7 @@
 #include <string.h>
 #include <math.h>
 
-#define NB_MAX_SPAWN 10
+#define CYCLE 10000
 #define RAD (3.14159265/180)
 
 typedef struct message msg;

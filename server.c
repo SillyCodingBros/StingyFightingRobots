@@ -60,7 +60,7 @@ int server(char* map_name){
         nsec++;
         if (mq_timedreceive(server,buffer,taille,NULL,&tw) > 0) {
             demande = *((msg*) buffer);
-            printf("{%d,%d}\n",demande.client,demande.action);
+            //printf("{%d,%d}\n",demande.client,demande.action);
             cur_bot = search_robot(demande.client,listOfBot);
             if (cur_bot == NULL && demande.action == -1) {
                 add = search_place(place,mapOfGame.nbSpawn);
@@ -102,7 +102,6 @@ int server(char* map_name){
                     nbclient -=1;
                 }else if (demande.action == 2) {
                     new_pos = *((coord*) &(buffer[sizeof(msg)]));
-                    printf("bot pos : (%f,%f)\n",new_pos.x,new_pos.y);
                     if (mapOfGame.map[((int) new_pos.y)*mapOfGame.width+((int) new_pos.x)] != 'w') {
                         cur_bot->pos = new_pos;
                     }
@@ -117,10 +116,10 @@ int server(char* map_name){
                     mq_send(mq_list[(int) demande.client],concat_msg,sizeof(msg)+1+sizeof(int),1);
                     mapOfGame.map[((int) cur_bot->pos.y)*mapOfGame.width+((int) cur_bot->pos.x)] = ' ';
                 }else if (demande.action == 4) {
-                    printf("tourner\n");
+                    //printf("tourner\n");
                     cur_bot->direction = buffer[sizeof(msg)];
                 }else if (demande.action == 5) {
-                    printf("tirer\n");
+                    //printf("tirer\n");
                     add_bullet(create_bullet(cur_bot,((coord*) &(buffer[sizeof(msg)]))->x,((coord*) &(buffer[sizeof(msg)]))->y),&listOfBullet);
                 }else if (demande.action == 6) {
                     printf("observer : %c\n",buffer[sizeof(msg)]);
@@ -134,7 +133,7 @@ int server(char* map_name){
         if (nbclient > 1) {
             mvp = win(listOfBot);
         }
-        if (nsec > 10000) {
+        if (nsec > CYCLE) {
             affichage(mapOfGame,listOfBot,listOfBullet);
             //test(listOfBot);
             //test2(listOfBullet);
@@ -252,7 +251,7 @@ void affichage(map mapOfGame, robot_liste listOfBot, bullet_liste listOfBullet){
 robot* isBot(int x, int y, robot_liste listOfBot){
     robot_liste tmp_list = listOfBot;
     while (tmp_list != NULL) {
-        if ( (int) (tmp_list->element.pos.x) == x && (int) (tmp_list->element.pos.y) == y ) return &(tmp_list->element);
+        if ( (int) (tmp_list->element.pos.x+0.5) == x && (int) (tmp_list->element.pos.y+0.5) == y ) return &(tmp_list->element);
         tmp_list = tmp_list->suite;
     }
     return NULL;
@@ -262,7 +261,7 @@ robot* isBot(int x, int y, robot_liste listOfBot){
 int isBullet(int x, int y, bullet_liste listOfBullet){
     bullet_liste tmp_list = listOfBullet;
     while (tmp_list != NULL) {
-        if ( (int) (tmp_list->element.pos.x) == x && (int) (tmp_list->element.pos.y) == y ) return 1;
+        if ( (int) (tmp_list->element.pos.x+0.5) == x && (int) (tmp_list->element.pos.y+0.5) == y ) return 1;
         tmp_list = tmp_list->suite;
     }
     return 0;

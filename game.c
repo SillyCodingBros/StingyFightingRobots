@@ -12,9 +12,9 @@ robot create_robot(char* name, char id, coord spawn, inventaire* inventaire){
     new_robot.pos = spawn;
     new_robot.direction = 0;
     new_robot.pv = 100;
-    new_robot.speed = 1;
+    new_robot.speed = 10;
     new_robot.bullet_damage = 33;
-    new_robot.speed_bullet = 2;
+    new_robot.speed_bullet = 200;
     new_robot.inventory = inventaire;
     return new_robot;
 }
@@ -24,8 +24,8 @@ bullet create_bullet(robot *bot, float speed_x, float speed_y){
     new_bullet.size = 0;
     new_bullet.speed_x = speed_x;
     new_bullet.speed_y = speed_y;
-    new_bullet.pos.x = (int) ((bot->pos.x + 10000*speed_x)+0.5);
-    new_bullet.pos.y = (int) ((bot->pos.y + 10000*speed_y)+0.5);
+    new_bullet.pos.x = (int) ((bot->pos.x + CYCLE*speed_x)+0.99);
+    new_bullet.pos.y = (int) ((bot->pos.y + CYCLE*speed_y)+0.99);
     new_bullet.damage = bot->bullet_damage;
     return new_bullet;
 }
