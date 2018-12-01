@@ -257,14 +257,15 @@ int interp(cmd sub_com, robot *bot, mqd_t server, mqd_t client, char* buffer, in
     }
   }
   if (sub_com.nb_subcom == 0){
+    return mini_2_c(sub_com,bot,server,client,buffer,taille);
+  }
+  if (sub_com.nb_subcom > 0 && sub_com.nb_args == 0) {
     if (strcmp(sub_com.name, "script") == 0) {
       printf("je suis un script\n");
       for (int i = 0; i < sub_com.nb_subcom+sub_com.nb_args; ++i) {
         return interp(sub_com.subcom[i],bot,server,client,buffer,taille);
       }
     }
-    else
-      return mini_2_c(sub_com,bot,server,client,buffer,taille);
   }
   else {
     if(strcmp(sub_com.name, "while") == 0){
