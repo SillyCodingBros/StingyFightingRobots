@@ -182,7 +182,12 @@ int tirer(robot *bot, float angle, mqd_t server){
 
 /* évalue tous ce qui returne une valeur */
 int eval(cmd sub_com, robot *bot, mqd_t server, mqd_t client, char* buffer, int taille){
-    if(strcmp(sub_com.name, "move") == 0)
+    if (strcmp(sub_com.name, "quit") == 0) {
+      msg message = {bot->id,1};
+      mq_send(server, (char*) &message, sizeof(msg), 1);
+      bot->pv = 0;
+    }
+    else if(strcmp(sub_com.name, "move") == 0)
       return avancer(bot,eval(*sub_com.subcom, bot,server,client,buffer,taille),server,client,buffer,taille);
 
     else if(strcmp(sub_com.name, "pick") == 0)
