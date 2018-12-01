@@ -1,8 +1,13 @@
-shoot 0
-shoot 45
-shoot 90
-shoot 135
-shoot 180
-shoot 225
-shoot 270
-shoot 315
+if == nb_bullet * 5 2 {
+  turn 1
+  move + 4 1
+}
+while > nb_bullet 5 {
+  shoot 0
+  shoot * 45 2
+  shoot + pv * 2 40
+  shoot + * 2 pv - * 4 20 10
+}
+if == nb_bullet % 8 6 {
+  turn / 1 1
+}

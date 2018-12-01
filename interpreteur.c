@@ -38,79 +38,78 @@ cmd create_cmd(char **ligne, FILE *fd){
   //printf("ligne après strtok name : \"%s\" at %p\n", *ligne, ligne);
   cmd new_cmd = {name_cmd,0,0,NULL};
 
+  if(strcmp(name_cmd,"move")==0)
+    new_cmd.nb_args = 1;
+
+  if(strcmp(name_cmd,"turn")==0)
+    new_cmd.nb_args = 1;
+
+  if(strcmp(name_cmd,"coord")==0)
+    new_cmd.nb_args = 1;
+
+  if(strcmp(name_cmd,"shoot")==0)
+    new_cmd.nb_args = 1;
+
+  if(strcmp(name_cmd,"seek")==0)
+    new_cmd.nb_args = 2;
+
   if(strcmp(name_cmd,"while")==0){
     new_cmd.nb_args = 1;
     new_cmd.nb_subcom = 1;
-    //new_cmd.subcom = realloc(new_cmd.subcom,(new_cmd.nb_args)*sizeof(cmd));
-    //new_cmd.subcom[0] = create_cmd(ligne,fd);
-    //ligne = get_line(fd);
-  }
-  if(strcmp(name_cmd,"move")==0){
-    new_cmd.nb_args = 1;
-  }
-  if(strcmp(name_cmd,"turn")==0){
-    new_cmd.nb_args = 1;
-  }
-  if(strcmp(name_cmd,"coord")==0){
-    new_cmd.nb_args = 1;
-  }
-  if(strcmp(name_cmd,"shoot")==0){
-    new_cmd.nb_args = 1;
   }
   if(strcmp(name_cmd,"if")==0){
     new_cmd.nb_args = 1;
     new_cmd.nb_subcom = 1;
-    //new_cmd.subcom = realloc(new_cmd.subcom,(new_cmd.nb_args)*sizeof(cmd));
-    //new_cmd.subcom[0] = create_cmd(ligne,fd);
-    //ligne = get_line(fd);
   }
-  if(strcmp(name_cmd,"affect")==0){
+  if(strcmp(name_cmd,"affect")==0)
     new_cmd.nb_args = 3;
-  }
-  if(strcmp(name_cmd,"!=")==0){
-    new_cmd.nb_args = 2;
-  }
-  if(strcmp(name_cmd,"==")==0){
-    new_cmd.nb_args = 2;
-  }
 
-  //printf("nb_args : %d\n", new_cmd.nb_args);
-  //printf("nb_subcom : %d\n", new_cmd.nb_subcom);
+  if(strcmp(name_cmd,"!=")==0)
+    new_cmd.nb_args = 2;
 
-  /*
-  if (new_cmd.nb_subcom != 0) {
-    //ligne = get_line(fd);
-    new_cmd.nb_subcom = 0;
-    printf("la ligne entre les crochets : %s\n", ligne);
-    while (strcmp(ligne,"}")) {
-      new_cmd.subcom = realloc(new_cmd.subcom,(new_cmd.nb_args+new_cmd.nb_subcom+1)*sizeof(cmd));
-      printf("la ligne qui est ajouter en subcom : %s\n", ligne);
-      new_cmd.subcom[new_cmd.nb_args+new_cmd.nb_subcom] = create_cmd(ligne,fd);
-      ++new_cmd.nb_subcom;
-      printf("l'index new_cmd.nb_subcom ++ : %d\n", new_cmd.nb_subcom);
-      ligne = get_line(fd);
-      printf("la ligne suivante : %s\n", ligne);
-    }
-    //ligne = get_line(fd);
-  }
-  */
+  if(strcmp(name_cmd,"==")==0)
+    new_cmd.nb_args = 2;
+
+  if(strcmp(name_cmd,"<=")==0)
+    new_cmd.nb_args = 2;
+
+  if(strcmp(name_cmd,">=")==0)
+    new_cmd.nb_args = 2;
+
+  if(strcmp(name_cmd,"<")==0)
+    new_cmd.nb_args = 2;
+
+  if(strcmp(name_cmd,">")==0)
+    new_cmd.nb_args = 2;
+
+  if(strcmp(name_cmd,"+")==0)
+    new_cmd.nb_args = 2;
+
+  if(strcmp(name_cmd,"-")==0)
+    new_cmd.nb_args = 2;
+
+  if(strcmp(name_cmd,"*")==0)
+    new_cmd.nb_args = 2;
+
+  if(strcmp(name_cmd,"/")==0)
+    new_cmd.nb_args = 2;
+
+  if(strcmp(name_cmd,"%%")==0)
+      new_cmd.nb_args = 2;
 
   new_cmd.subcom = malloc(new_cmd.nb_args*sizeof(cmd));
   for (int i = 0; i < new_cmd.nb_args; ++i) {
-    //printf("ligne av : \"%s\" at %p\n", *ligne,ligne);
-    //printf("name cmd \"%s\" num_args %d ligne qui va être cmd : \"%s\"\n", new_cmd.name, new_cmd.nb_args, ligne);
     new_cmd.subcom[i] = create_cmd(ligne,fd);
-    //printf("ligne ap : \"%s\" at %p\n", *ligne,ligne);
   }
 
   if (new_cmd.nb_subcom != 0) {
-    new_cmd.nb_subcom = 0;
-    //printf("!=0 line : \"%s\"\n", *ligne);
+    if (new_cmd.nb_args == 1)
+      new_cmd.nb_subcom = 0;
+
     if (strcmp(*ligne, "{")==0) {
+      //printf("lecture bloc cmd\n");
       *ligne = get_line(fd);
-      //printf("i'm in !\n");
       while (strcmp(*ligne,"}")) {
-        //printf("HELLLLLLLLO : %s\n", *ligne);
         new_cmd.subcom = realloc(new_cmd.subcom,(new_cmd.nb_args+new_cmd.nb_subcom+1)*sizeof(cmd));
         new_cmd.subcom[new_cmd.nb_args+new_cmd.nb_subcom] = create_cmd(ligne,fd);
         ++new_cmd.nb_subcom;
@@ -137,13 +136,19 @@ void glup(cmd com){
 
 void printw(cmd w){
   //printf("name 1 : %s, name 2 : %s, name 3 : %s\n", w.subcom[0].name,w.subcom[1].name,w.subcom[2].name);
-  printf("name 1 : %s, name 2 : %s\n", w.subcom[0].name,w.subcom[1].name);
+  //printf("name 1 : %s, name 2 : %s\n", w.subcom[0].name,w.subcom[1].name);
 
   for (int i = 0; i < w.nb_args+w.nb_subcom; ++i) {
+    printf("com %d name : %s\n", i, w.subcom[i].name);
     cmd y = w.subcom[i];
-    for (int j = 0; j < y.nb_args; ++j) {
-      printf("subcom %d name : %s\n", i, y.subcom[j].name);
+    for (int j = 0; j < y.nb_args+y.nb_subcom; ++j) {
+      printf("subcom %d name : %s\n", j, y.subcom[j].name);
+      cmd x = y.subcom[j];
+      for (int k = 0; k < x.nb_args+x.nb_subcom; ++k) {
+        printf("sub subcom %d name : %s\n", k, x.subcom[k].name);
+      }
     }
+    printf("\n");
 
   }
 }
@@ -161,7 +166,10 @@ int main() {
 
   glup(script);
 
-  printw(script.subcom[4]);
+  for (int i = 0; i < script.nb_subcom; i++) {
+    printw(script.subcom[i]);
+  }
+
 
   return 0;
 }

@@ -142,15 +142,15 @@ int client(char* name){
             }else if (strcmp(exec_com, "observer") == 0) {
                 arg = str_tok(&com_scan, " \n");
                 if (arg != NULL){
-                    printf("l'objet %c est en (%d,%d)\n",arg[0],seek(&bot,arg[0],"x",server,client,buffer,taille),seek(&bot,arg[0],"y",server,client,buffer,taille) );
+                    printf("l'objet %c est en (%d,%d)\n",arg[0],seek(&bot,&arg[0],"x",server,client,buffer,taille),seek(&bot,&arg[0],"y",server,client,buffer,taille));
                 }
             }else if (strcmp(exec_com, "tourner") == 0) {
                 arg = str_tok(&com_scan, " \n");
                 if (arg != NULL){
                     tourner(&bot,atoi(arg),server);
                 }
-            }else if (strcmp(exec_com, "rammasser") == 0) {
-                rammasser(&bot,server,client,buffer,taille);
+            }else if (strcmp(exec_com, "ramasser") == 0) {
+                ramasser(&bot,server,client,buffer,taille);
             }else if (strcmp(exec_com, "tirer") == 0) {
                 arg = str_tok(&com_scan, " \n");
                 if (arg != NULL){
