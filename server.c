@@ -102,7 +102,7 @@ int server(char* map_name){
                     nbclient -=1;
                 }else if (demande.action == 2) {
                     new_pos = *((coord*) &(buffer[sizeof(msg)]));
-                    if (mapOfGame.map[((int) new_pos.y)*mapOfGame.width+((int) new_pos.x)] != 'w') {
+                    if (mapOfGame.map[((int) new_pos.y)*mapOfGame.width+((int) new_pos.x)] != 'W') {
                         cur_bot->pos = new_pos;
                     }
                     str_concat(concat_msg,(char*) &demande,sizeof(msg),(char*) &(cur_bot->pos),sizeof(coord));
