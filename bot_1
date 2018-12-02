@@ -1,15 +1,12 @@
-= mon_i_perso + 4 1
-if == nb_bullet 10 {
-  turn 1
-  move mon_i_perso
+while != nb_bullet 0 {
+  if == move 1 -1 {
+    turn 1
+  }
+  pick
+  if != seek R x coord x {
+    if != seek R y coord y {
+      shoot aim seek R x seek R y
+    }
+  }
+  move 1
 }
-while > nb_bullet 5 {
-  shoot 0
-  shoot * 45 2
-  shoot + pv * 2 40
-  shoot + * 2 pv - * 4 20 10
-}
-if == nb_bullet mod 8 6 {
-  turn / 1 1
-}
-script bot_2

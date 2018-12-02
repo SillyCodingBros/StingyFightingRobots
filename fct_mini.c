@@ -94,6 +94,27 @@ int avancer(robot *bot, int move, mqd_t server, mqd_t client, char* buffer, int 
   return 0;
 }
 
+int aim(robot *bot, int x, int y){
+  double angle;
+  int ix, igrec;
+  double argshit=0;
+  //double distance=sqrt((double)((x-bot->pos.x)*(x-bot->pos.x)+(y-bot->pos.y)*(y-bot->pos.y)));
+  double tbl_angle_convert[4]={90,0,270,180};
+  ix = x - bot->pos.x;
+  igrec = y - bot->pos.y;
+  if (ix == 0) {
+    angle = 90;
+  }else{
+    angle = atan(igrec/ix)/RAD;
+  }
+  if (x-bot->pos.x>=0) {
+    argshit=0;
+  }else{
+    argshit=180;
+  }
+  angle=angle+tbl_angle_convert[(int)bot->direction]+argshit;
+  return angle;
+}
 
 int seek(robot *bot, char *obj, char *axis, mqd_t server, mqd_t client, char* buffer, int taille){
     msg message;
@@ -207,6 +228,9 @@ int eval(cmd sub_com, robot *bot, mqd_t server, mqd_t client, char* buffer, int 
 
   else if(strcmp(sub_com.name, "shoot") == 0)
     return tirer(bot,eval(*sub_com.subcom, bot,server,client,buffer,taille,dico),server);
+
+  else if(strcmp(sub_com.name, "aim") == 0)
+    return aim(bot,eval(sub_com.subcom[0], bot,server,client,buffer,taille),eval(sub_com.subcom[1], bot,server,client,buffer,taille));
 
   else if(strcmp(sub_com.name, "seek") == 0)
     return seek(bot, sub_com.subcom[0].name, sub_com.subcom[1].name, server, client, buffer, taille);

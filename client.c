@@ -109,7 +109,7 @@ int client(char* name){
         perror("mq_open");
         return EXIT_FAILURE;
     }
-    inventory.nb_bullet = 10;
+    inventory.nb_bullet = 100;
     inventory.money = 0;
     inventory.armor = 0;
     aff *dico = NULL;

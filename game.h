@@ -39,7 +39,7 @@ robot* isBot(int x, int y, robot_liste listOfBot);
 int isBullet(int x, int y, bullet_liste listOfBullet);
 int server(char* map_name);
 int win(robot_liste bot_list);
-coord observer(map mapOfGame, robot_liste listOfBot, robot* bot, char* buffer);
+coord bot_interact(map mapOfGame, robot_liste listOfBot, robot* bot, char* buffer);
 void affichage(map mapOfGame, robot_liste listOfBot, bullet_liste listOfBullet);
 void move_bullet(bullet_liste* list_bullet, robot_liste* bot_list, map mapOfGame, mqd_t* mq_list);
 int search_place(char* place,int nb_place);
@@ -108,14 +108,15 @@ struct map{
 struct robot{
     char* name;              // nom du script du robot
     char id;                 // num de la file_de_message
-    char reach;               // taille du robot
+    char reach;              // champ de vision
+    char pick;               // porté de ramassage
     coord pos;               // position
     char direction;          // N=0 E=1 S=2 O=3
     char pv;                 // points de vie
     int speed;               // vitesse de déplacemment mm/s a diviser par 1000
     char bullet_damage;      // puissance de l'attaque à distance
     int speed_bullet;        // vitesse de la balle pour le robot basique mm/s a diviser par 1000
-    inventaire* inventory;    // inventaire du robot
+    inventaire* inventory;   // inventaire du robot
 };
 
 struct elem_robot{

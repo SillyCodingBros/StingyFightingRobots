@@ -57,6 +57,9 @@ cmd create_cmd(char **ligne, FILE *fd){
   else if(strcmp(name_cmd,"shoot")==0)
     new_cmd.nb_args = 1;
 
+  else if(strcmp(name_cmd,"aim")==0)
+    new_cmd.nb_args = 2;
+
   else if(strcmp(name_cmd,"seek")==0)
     new_cmd.nb_args = 2;
 
