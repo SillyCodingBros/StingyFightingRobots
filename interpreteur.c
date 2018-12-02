@@ -70,8 +70,8 @@ cmd create_cmd(char **ligne, FILE *fd){
     new_cmd.nb_args = 1;
     new_cmd.nb_subcom = 1;
   }
-  else if(strcmp(name_cmd,"affect")==0)
-    new_cmd.nb_args = 3;
+  else if(strcmp(name_cmd,"=")==0)
+    new_cmd.nb_args = 2;
 
   else if(strcmp(name_cmd,"!=")==0)
     new_cmd.nb_args = 2;

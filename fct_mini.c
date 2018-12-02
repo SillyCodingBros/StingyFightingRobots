@@ -289,10 +289,3 @@ int interp(cmd sub_com, robot *bot, mqd_t server, mqd_t client, char* buffer, in
   }
   return -1;
 }
-
-void script(robot *bot, char *name, mqd_t server, mqd_t client, char* buffer, int taille){
-  FILE *fd = fopen(name, "r");
-  cmd com = create_cmd(NULL, fd);
-  interp(com,bot,server,client,buffer,taille);
-  fclose(fd);
-}
