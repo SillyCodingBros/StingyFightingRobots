@@ -1,1 +1,8 @@
-move 2
+shoot 0
+shoot 45
+shoot 90
+shoot + 90 45
+shoot 180
+shoot + 180 45
+shoot + 180 90
+shoot + + 180 90 45

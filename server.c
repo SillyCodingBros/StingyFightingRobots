@@ -62,7 +62,7 @@ int server(char* map_name){
         clock_gettime(CLOCK_REALTIME,&t1);
         if (!time_set) {
           t2 = t1;
-          t2.tv_sec += 30;
+          t2.tv_sec += 15;
           time_set++;
         }else {
           if (t1.tv_sec > t2.tv_sec) {
@@ -129,18 +129,19 @@ int server(char* map_name){
             str_concat(concat_msg,(char*) &demande,sizeof(msg),(char*) &(cur_bot->pos),sizeof(coord));
             mq_send(mq_list[(int) demande.client],concat_msg,sizeof(msg)+sizeof(coord),1);
           }else if (demande.action == 3) {
+            new_pos = bot_interact(mapOfGame,listOfBot,cur_bot,NULL);
             char* tmp_msg = malloc(sizeof(msg)+1);
             add = (int)(rand() / (double)RAND_MAX * (10 - 1));
-            str_concat(tmp_msg,(char*) &demande,sizeof(msg),&mapOfGame.map[((int) (cur_bot->pos.y+0.5))*mapOfGame.width+((int) (cur_bot->pos.x+0.5))],1);
+            str_concat(tmp_msg,(char*) &demande,sizeof(msg),&mapOfGame.map[((int) new_pos.y)*mapOfGame.width+((int) new_pos.x)],1);
             str_concat(concat_msg,tmp_msg,sizeof(msg)+1,(char*) &add,sizeof(int));
             mq_send(mq_list[(int) demande.client],concat_msg,sizeof(msg)+1+sizeof(int),1);
-            mapOfGame.map[((int) (cur_bot->pos.y+0.5))*mapOfGame.width+((int) (cur_bot->pos.x+0.5))] = ' ';
+            mapOfGame.map[((int) new_pos.y)*mapOfGame.width+((int) new_pos.x)] = ' ';
           }else if (demande.action == 4) {
             cur_bot->direction = buffer[sizeof(msg)];
           }else if (demande.action == 5) {
             add_bullet(create_bullet(cur_bot,((coord*) &(buffer[sizeof(msg)]))->x,((coord*) &(buffer[sizeof(msg)]))->y),&listOfBullet);
           }else if (demande.action == 6) {
-            new_pos = observer(mapOfGame,listOfBot,cur_bot,buffer);
+            new_pos = bot_interact(mapOfGame,listOfBot,cur_bot,buffer);
             str_concat(concat_msg,(char*) &demande,sizeof(msg),(char*) &new_pos,sizeof(coord));
             mq_send(mq_list[(int) demande.client],concat_msg,sizeof(msg)+sizeof(coord),1);
           }
@@ -172,16 +173,29 @@ int server(char* map_name){
     return 0;
 }
 
-//fonction d'observation
-coord observer(map mapOfGame, robot_liste listOfBot, robot* bot, char* buffer){
-  coord pos_object = {bot->pos.x,bot->pos.y};
+//fonction d'interaction entre la map et les joueurs (sert a detecter un objet pour pick et seek)
+coord bot_interact(map mapOfGame, robot_liste listOfBot, robot* bot, char* buffer){
+  coord pos_object;
   robot* tmp_bot;
-  for (int r = 0; r < bot->reach; r++) {
-    for (int i = bot->pos.y-(r/2); i < bot->pos.y+(r/2); i++) {
-      for (int j = bot->pos.x-(r/2); j < bot->pos.x+(r/2); j++) {
-        if (buffer[sizeof(msg)] == 'R') {
+  int range;
+
+  pos_object = bot->pos;
+  if (buffer == NULL)
+    range = bot->pick;
+  else
+    range = bot->reach;
+  for (int r = 0; r < range; r++) {
+    for (int i = bot->pos.y-r; i < bot->pos.y+r; i++) {
+      for (int j = bot->pos.x-r; j < bot->pos.x+r; j++) {
+        if (buffer == NULL) {
+          if (search("ABC",mapOfGame.map[i*mapOfGame.width+j]) == 0) {
+            pos_object.x = j;
+            pos_object.y = i;
+            return pos_object;
+          }
+        }else if (buffer[sizeof(msg)] == 'R') {
           tmp_bot = isBot(j,i,listOfBot);
-          if (tmp_bot != NULL) {
+          if (tmp_bot != NULL && (tmp_bot->pos.x != bot->pos.x || tmp_bot->pos.y != bot->pos.y)) {
             return tmp_bot->pos;
           }
         }else if (mapOfGame.map[i*mapOfGame.width+j] == buffer[sizeof(msg)]) {
