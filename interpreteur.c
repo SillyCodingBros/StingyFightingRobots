@@ -116,7 +116,7 @@ cmd create_cmd(char **ligne, FILE *fd){
     if (strcmp(*ligne, "{")==0) {
       //printf("lecture bloc cmd\n");
       *ligne = get_line(fd);
-      while (strcmp(*ligne,"}")) {
+      while (search(*ligne,'}')) {
         new_cmd.subcom = realloc(new_cmd.subcom,(new_cmd.nb_args+new_cmd.nb_subcom+1)*sizeof(cmd));
         new_cmd.subcom[new_cmd.nb_args+new_cmd.nb_subcom] = create_cmd(ligne,fd);
         ++new_cmd.nb_subcom;
