@@ -135,7 +135,7 @@ int server(char* map_name){
             str_concat(tmp_msg,(char*) &demande,sizeof(msg),&mapOfGame.map[((int) new_pos.y)*mapOfGame.width+((int) new_pos.x)],1);
             str_concat(concat_msg,tmp_msg,sizeof(msg)+1,(char*) &add,sizeof(int));
             mq_send(mq_list[(int) demande.client],concat_msg,sizeof(msg)+1+sizeof(int),1);
-            mapOfGame.map[((int) new_pos.y)*mapOfGame.width+((int) new_pos.x)] = ' ';
+            mapOfGame.map[((int) (new_pos.y+0.5))*mapOfGame.width+((int) (new_pos.x+0.5))] = ' ';
           }else if (demande.action == 4) {
             cur_bot->direction = buffer[sizeof(msg)];
           }else if (demande.action == 5) {

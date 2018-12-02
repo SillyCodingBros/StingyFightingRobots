@@ -5,7 +5,7 @@ while != nb_bullet 0 {
   pick
   if != seek R x coord x {
     if != seek R y coord y {
-      script bot_2
+      shoot aim seek R x seek R y
     }
   }
   move 1
