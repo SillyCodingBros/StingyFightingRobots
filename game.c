@@ -8,7 +8,7 @@ robot create_robot(char* name, char id, coord spawn, inventaire* inventaire){
     new_robot.name = malloc(strlen(name));
     strcpy(new_robot.name, name);
     new_robot.id = id;
-    new_robot.reach = 10;
+    new_robot.reach = 20;
     new_robot.pos = spawn;
     new_robot.direction = 0;
     new_robot.pv = 100;

@@ -30,18 +30,19 @@ int reception(mqd_t fdem, char** buffer, int taille, robot* bot, char obj){
   while (done) {
     if (mq_timedreceive(fdem,tmp_buf,taille,NULL,&tw) > 0){
       message = *((msg*) tmp_buf);
-      printf("{%d,%d}\n",message.client,message.action);
+      //printf("{%d,%d}\n",message.client,message.action);
       if (message.client == -1) {
         bot->pv -= message.action;
+        bot->reach = (int) (bot->reach * bot->pv/100);
+        bot->speed = (int) (bot->speed * bot->pv/100);
         if (bot->pv <= 0) {
-          return -1;
+          return -2;
         }
       }else {
         if (message.action == -1) {
           printf("en attente des joueur\n");
-          return 2;
+          return -1;
         } else if (message.action == 0) {
-          printf("gagné\n");
           return 2;
         } else if (message.action == 4) {
           timer = *((int*) &(tmp_buf[sizeof(msg)]));
@@ -65,7 +66,7 @@ int reception(mqd_t fdem, char** buffer, int taille, robot* bot, char obj){
 int client(char* name){
     mqd_t server, client;
     msg message;
-    int taille;
+    int taille, recep;
     char *buffer, *FdeM, *concat_msg;
     char *com_scan, *exec_com;
     struct mq_attr attr;
@@ -120,9 +121,13 @@ int client(char* name){
         fgets(com_scan,40,stdin);
         exec_com = malloc(strlen(com_scan));
         strcpy(exec_com,com_scan);
-        if (reception(client,&buffer,taille,&bot,0) == 2){
-            printf("GAGNÉ\n");
-            break;
+        recep = reception(client,&buffer,taille,&bot,0);
+        if (recep == 2){
+          printf("GAGNÉ\n");
+          break;
+        }else if (recep == -2) {
+          printf("PERDU\n");
+          break;
         }
         printf("return %d\n", interp(create_cmd(&exec_com,NULL),&bot,server,client,buffer,taille));
     }

@@ -36,6 +36,7 @@ cmd create_cmd(char **ligne, FILE *fd){
   char *name_cmd = str_tok(ligne," \n");
   //printf("ligne après strtok name : \"%s\" at %p\n", *ligne, ligne);
   cmd new_cmd = {name_cmd,0,0,NULL};
+  cmd null = {NULL,0,0,NULL};
   if (name_cmd == NULL) {
     return new_cmd;
   }else if(strcmp(name_cmd,"script")==0){
@@ -103,19 +104,15 @@ cmd create_cmd(char **ligne, FILE *fd){
   else if(strcmp(name_cmd,"mod")==0)
     new_cmd.nb_args = 2;
 
-  printf("malloc\n");
   new_cmd.subcom = malloc(new_cmd.nb_args*sizeof(cmd));
-  printf("malloc\n");
   for (int i = 0; i < new_cmd.nb_args; ++i) {
     new_cmd.subcom[i] = create_cmd(ligne,fd);
+    if (new_cmd.subcom[i].name == NULL) return null;
   }
 
   if (new_cmd.nb_subcom != 0) {
     new_cmd.nb_subcom = 0;
-    if (fd == NULL) {
-        cmd null = {NULL,0,0,NULL};
-        return null;
-    }
+    if (fd == NULL) return null;
     if (strcmp(*ligne, "{")==0) {
       //printf("lecture bloc cmd\n");
       *ligne = get_line(fd);
@@ -127,7 +124,6 @@ cmd create_cmd(char **ligne, FILE *fd){
       }
     }
   }
-  printf("cmd : %s, nb_args : %d, nb_subcom : %d\n",new_cmd.name,new_cmd.nb_args,new_cmd.nb_subcom);
   return new_cmd;
 }
 
