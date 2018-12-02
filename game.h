@@ -49,6 +49,7 @@ void start(mqd_t* mq_list);
 //debug
 void test(robot_liste listOfBot);
 void test2(bullet_liste test);
+void test3(aff* dico);
 void printw(cmd w);
 void glup(cmd com, int nb_tab);
 
@@ -85,6 +86,7 @@ int suppr_bullet(bullet bullet, bullet_liste* listOfBullet);
 robot* search_robot(char id, robot_liste listOfBot);
 int nb_bot(robot_liste listOfBot);
 float distance(coord p1, coord p2);
+int affect_dico(char* name, int data, aff** dico);
 
 // fonctions de interpreteur.c
 cmd create_cmd(char **ligne, FILE *fd);

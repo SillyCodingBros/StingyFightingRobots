@@ -230,7 +230,7 @@ int eval(cmd sub_com, robot *bot, mqd_t server, mqd_t client, char* buffer, int 
     return tirer(bot,eval(*sub_com.subcom, bot,server,client,buffer,taille,dico),server);
 
   else if(strcmp(sub_com.name, "aim") == 0)
-    return aim(bot,eval(sub_com.subcom[0], bot,server,client,buffer,taille),eval(sub_com.subcom[1], bot,server,client,buffer,taille));
+    return aim(bot,eval(sub_com.subcom[0], bot,server,client,buffer,taille,dico),eval(sub_com.subcom[1], bot,server,client,buffer,taille,dico));
 
   else if(strcmp(sub_com.name, "seek") == 0)
     return seek(bot, sub_com.subcom[0].name, sub_com.subcom[1].name, server, client, buffer, taille);
@@ -287,29 +287,8 @@ int eval(cmd sub_com, robot *bot, mqd_t server, mqd_t client, char* buffer, int 
     return eval(sub_com.subcom[0],bot,server,client,buffer,taille,dico) % eval(sub_com.subcom[1],bot,server,client,buffer,taille,dico);
 
   else if (strcmp(sub_com.name, "=") == 0) {
-    printf("début de =\n");
-    aff *tmpdico = malloc(sizeof(aff));
-    aff *tmp2dico = *dico;
-    while (tmp2dico->next != NULL) {
-      if (tmp2dico->next->name == sub_com.subcom[0].name) {
-        tmp2dico->next->data = eval(sub_com.subcom[1],bot,server,client,buffer,taille,dico);
-        *dico = tmp2dico;
-        return 0;
-      }
-      printf("passe suivant\n");
-      tmp2dico = tmp2dico->next;
-    }
-    printf("n'est pas dans le dico\n");
-    //aff* new_aff = malloc(sizeof(aff));
-    tmpdico->name = sub_com.subcom[0].name;
-    tmpdico->data = eval(sub_com.subcom[1],bot,server,client,buffer,taille,dico);
-    tmpdico->next = *dico;
-    printf("avant ajout au dico\n");
-    *dico = tmpdico;
-    printf("ajout au dico\n");
-    return 0;
-  }
-  else {
+    affect_dico(sub_com.subcom[0].name,eval(sub_com.subcom[1],bot,server,client,buffer,taille,dico),dico);
+  }else {
     while (*dico != NULL) {
       printf("dico name : %s, sub_com name : %s\n",(*dico)->name,sub_com.name);
       if (strcmp((*dico)->name,sub_com.name)==0) {

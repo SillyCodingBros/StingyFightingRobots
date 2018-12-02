@@ -155,3 +155,40 @@ int nb_bot(robot_liste listOfBot){
     }
     return nb_bot;
 }
+
+//fonction du diictionnaire
+int affect_dico(char* name, int data, aff** dico){
+  aff* new_aff;
+  aff* i;
+
+  new_aff = malloc(sizeof(aff));
+  new_aff->name = malloc(strlen(name));
+  strcpy(new_aff->name,name);
+  new_aff->data = data;
+
+  if (dico == NULL) return EXIT_FAILURE;
+  if (*dico == NULL) {
+    *dico = new_aff;
+    return 0;
+  }
+  if (strcmp((*dico)->name, name) == 0) {
+    (*dico)->data = data;
+    return 0;
+  }
+  for (i = *dico; i->next != NULL; i = i->next) {
+    if (strcmp(i->next->name, name) == 0) {
+      (*dico)->data = data;
+      return 0;
+    }
+  }
+  i->next = new_aff;
+  return 0;
+}
+
+void test3(aff* dico){
+  while (dico != NULL) {
+    printf("%s %d -->",dico->name, dico->data);
+    dico = dico->next;
+  }
+  printf("NULL\n");
+}

@@ -72,6 +72,7 @@ int client(char* name){
     struct mq_attr attr;
     robot bot;
     inventaire inventory;
+    aff *dico;
 
     server = mq_open("/server",O_WRONLY,0600,NULL);
     client = mq_open("/new_Client",O_RDONLY,0600,NULL);
@@ -112,7 +113,7 @@ int client(char* name){
     inventory.nb_bullet = 100;
     inventory.money = 0;
     inventory.armor = 0;
-    aff *dico = NULL;
+    dico = NULL;
     bot = create_robot(name, message.client, *((coord*) &(buffer[sizeof(msg)])), &inventory);
     com_scan = malloc(40);
     while (reception(client,&buffer,taille,&bot,0) < 0);
@@ -123,6 +124,7 @@ int client(char* name){
         exec_com = malloc(strlen(com_scan));
         strcpy(exec_com,com_scan);
         recep = reception(client,&buffer,taille,&bot,0);
+        test3(dico);
         if (recep == 2){
           printf("GAGNÉ\n");
           break;
