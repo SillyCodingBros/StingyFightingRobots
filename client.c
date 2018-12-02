@@ -112,6 +112,7 @@ int client(char* name){
     inventory.nb_bullet = 10;
     inventory.money = 0;
     inventory.armor = 0;
+    aff *dico = NULL;
     bot = create_robot(name, message.client, *((coord*) &(buffer[sizeof(msg)])), &inventory);
     com_scan = malloc(40);
     while (reception(client,&buffer,taille,&bot,0) < 0);
@@ -129,7 +130,7 @@ int client(char* name){
           printf("PERDU\n");
           break;
         }
-        printf("return %d\n", interp(create_cmd(&exec_com,NULL),&bot,server,client,buffer,taille));
+        printf("return %d\n", interp(create_cmd(&exec_com,NULL),&bot,server,client,buffer,taille,&dico));
     }
     mq_close(client);
     mq_unlink(FdeM);

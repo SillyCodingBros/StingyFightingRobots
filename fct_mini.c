@@ -180,9 +180,16 @@ int tirer(robot *bot, float angle, mqd_t server){
     }
     return -1;
 }
-
+//void test42(aff dico){
+//    aff print = dico;
+//    while (print != NULL) {
+//        printf(" name %s, pos (%f,%f), pv %d,addr %p --->\n",print->element.name, print->element.pos.x, print->element.pos.y, print->element.pv, &print->element);
+//        print = print->suite;
+//    }
+//    printf(" NULL\n");
+//}
 /* évalue tous ce qui returne une valeur */
-int eval(cmd sub_com, robot *bot, mqd_t server, mqd_t client, char* buffer, int taille){
+int eval(cmd sub_com, robot *bot, mqd_t server, mqd_t client, char* buffer, int taille, aff **dico){
   if (sub_com.name == NULL) {
     return -1;
   }else if (strcmp(sub_com.name, "quit") == 0) {
@@ -190,16 +197,16 @@ int eval(cmd sub_com, robot *bot, mqd_t server, mqd_t client, char* buffer, int 
     mq_send(server, (char*) &message, sizeof(msg), 1);
     bot->pv = 0;
   }else if(strcmp(sub_com.name, "move") == 0)
-    return avancer(bot,eval(*sub_com.subcom, bot,server,client,buffer,taille),server,client,buffer,taille);
+    return avancer(bot,eval(*sub_com.subcom, bot,server,client,buffer,taille,dico),server,client,buffer,taille);
 
   else if(strcmp(sub_com.name, "pick") == 0)
     return ramasser(bot, server, client, buffer, taille);
 
   else if(strcmp(sub_com.name, "turn") == 0)
-    return tourner(bot,eval(*sub_com.subcom, bot,server,client,buffer,taille),server);
+    return tourner(bot,eval(*sub_com.subcom, bot,server,client,buffer,taille,dico),server);
 
   else if(strcmp(sub_com.name, "shoot") == 0)
-    return tirer(bot,eval(*sub_com.subcom, bot,server,client,buffer,taille),server);
+    return tirer(bot,eval(*sub_com.subcom, bot,server,client,buffer,taille,dico),server);
 
   else if(strcmp(sub_com.name, "seek") == 0)
     return seek(bot, sub_com.subcom[0].name, sub_com.subcom[1].name, server, client, buffer, taille);
@@ -223,77 +230,106 @@ int eval(cmd sub_com, robot *bot, mqd_t server, mqd_t client, char* buffer, int 
     return get_coord(bot,sub_com.subcom->name);
 
   else if(strcmp(sub_com.name, "!=") == 0)
-    return eval(sub_com.subcom[0],bot,server,client,buffer,taille) != eval(sub_com.subcom[1],bot,server,client,buffer,taille);
+    return eval(sub_com.subcom[0],bot,server,client,buffer,taille,dico) != eval(sub_com.subcom[1],bot,server,client,buffer,taille,dico);
 
   else if(strcmp(sub_com.name, "==") == 0)
-    return eval(sub_com.subcom[0],bot,server,client,buffer,taille) == eval(sub_com.subcom[1],bot,server,client,buffer,taille);
+    return eval(sub_com.subcom[0],bot,server,client,buffer,taille,dico) == eval(sub_com.subcom[1],bot,server,client,buffer,taille,dico);
 
   else if(strcmp(sub_com.name, ">") == 0)
-    return eval(sub_com.subcom[0],bot,server,client,buffer,taille) > eval(sub_com.subcom[1],bot,server,client,buffer,taille);
+    return eval(sub_com.subcom[0],bot,server,client,buffer,taille,dico) > eval(sub_com.subcom[1],bot,server,client,buffer,taille,dico);
 
   else if(strcmp(sub_com.name, "<") == 0)
-    return eval(sub_com.subcom[0],bot,server,client,buffer,taille) < eval(sub_com.subcom[1],bot,server,client,buffer,taille);
+    return eval(sub_com.subcom[0],bot,server,client,buffer,taille,dico) < eval(sub_com.subcom[1],bot,server,client,buffer,taille,dico);
 
   else if(strcmp(sub_com.name, ">=") == 0)
-    return eval(sub_com.subcom[0],bot,server,client,buffer,taille) >= eval(sub_com.subcom[1],bot,server,client,buffer,taille);
+    return eval(sub_com.subcom[0],bot,server,client,buffer,taille,dico) >= eval(sub_com.subcom[1],bot,server,client,buffer,taille,dico);
 
   else if(strcmp(sub_com.name, "<=") == 0)
-    return eval(sub_com.subcom[0],bot,server,client,buffer,taille) <= eval(sub_com.subcom[1],bot,server,client,buffer,taille);
+    return eval(sub_com.subcom[0],bot,server,client,buffer,taille,dico) <= eval(sub_com.subcom[1],bot,server,client,buffer,taille,dico);
 
   else if(strcmp(sub_com.name, "+") == 0)
-    return eval(sub_com.subcom[0],bot,server,client,buffer,taille) + eval(sub_com.subcom[1],bot,server,client,buffer,taille);
+    return eval(sub_com.subcom[0],bot,server,client,buffer,taille,dico) + eval(sub_com.subcom[1],bot,server,client,buffer,taille,dico);
 
   else if(strcmp(sub_com.name, "-") == 0)
-    return eval(sub_com.subcom[0],bot,server,client,buffer,taille) - eval(sub_com.subcom[1],bot,server,client,buffer,taille);
+    return eval(sub_com.subcom[0],bot,server,client,buffer,taille,dico) - eval(sub_com.subcom[1],bot,server,client,buffer,taille,dico);
 
   else if(strcmp(sub_com.name, "*") == 0)
-    return eval(sub_com.subcom[0],bot,server,client,buffer,taille) * eval(sub_com.subcom[1],bot,server,client,buffer,taille);
+    return eval(sub_com.subcom[0],bot,server,client,buffer,taille,dico) * eval(sub_com.subcom[1],bot,server,client,buffer,taille,dico);
 
   else if(strcmp(sub_com.name, "/") == 0)
-    return eval(sub_com.subcom[0],bot,server,client,buffer,taille) / eval(sub_com.subcom[1],bot,server,client,buffer,taille);
+    return eval(sub_com.subcom[0],bot,server,client,buffer,taille,dico) / eval(sub_com.subcom[1],bot,server,client,buffer,taille,dico);
 
   else if(strcmp(sub_com.name, "mod") == 0)
-    return eval(sub_com.subcom[0],bot,server,client,buffer,taille) % eval(sub_com.subcom[1],bot,server,client,buffer,taille);
+    return eval(sub_com.subcom[0],bot,server,client,buffer,taille,dico) % eval(sub_com.subcom[1],bot,server,client,buffer,taille,dico);
 
+  else if (strcmp(sub_com.name, "=") == 0) {
+    printf("début de =\n");
+    aff *tmpdico = malloc(sizeof(aff));
+    aff *tmp2dico = *dico;
+    while (tmp2dico->next != NULL) {
+      if (tmp2dico->next->name == sub_com.subcom[0].name) {
+        tmp2dico->next->data = eval(sub_com.subcom[1],bot,server,client,buffer,taille,dico);
+        *dico = tmp2dico;
+        return 0;
+      }
+      printf("passe suivant\n");
+      tmp2dico = tmp2dico->next;
+    }
+    printf("n'est pas dans le dico\n");
+    //aff* new_aff = malloc(sizeof(aff));
+    tmpdico->name = sub_com.subcom[0].name;
+    tmpdico->data = eval(sub_com.subcom[1],bot,server,client,buffer,taille,dico);
+    tmpdico->next = *dico;
+    printf("avant ajout au dico\n");
+    *dico = tmpdico;
+    printf("ajout au dico\n");
+    return 0;
+  }
+  else {
+    while (*dico != NULL) {
+      printf("dico name : %s, sub_com name : %s\n",(*dico)->name,sub_com.name);
+      if (strcmp((*dico)->name,sub_com.name)==0) {
+        return (*dico)->data;
+      }
+      *dico = (*dico)->next;
+    }
+    printf("pas trouvé dans le dico\n");
+  }
+  printf("atoi\n");
   return atoi(sub_com.name);
-  //return -1;
 }
 
-int interp(cmd sub_com, robot *bot, mqd_t server, mqd_t client, char* buffer, int taille){
+int interp(cmd sub_com, robot *bot, mqd_t server, mqd_t client, char* buffer, int taille, aff **dico){
   if (sub_com.nb_subcom > 0 && sub_com.nb_args == 0) {
     if (strcmp(sub_com.name, "script") == 0) {
       printf("je suis un script\n");
       for (int i = 0; i < sub_com.nb_subcom+sub_com.nb_args; ++i) {
-        interp(sub_com.subcom[i],bot,server,client,buffer,taille);
+        interp(sub_com.subcom[i],bot,server,client,buffer,taille,dico);
       }
     }
   }
   if (sub_com.nb_subcom == 0){
-    return eval(sub_com,bot,server,client,buffer,taille);
+    return eval(sub_com,bot,server,client,buffer,taille,dico);
   }else {
     if(strcmp(sub_com.name, "while") == 0){
       printf("c'est un while\n");
-      while (eval(sub_com.subcom[0],bot,server,client,buffer,taille)) {
+      while (eval(sub_com.subcom[0],bot,server,client,buffer,taille,dico)) {
         for (int i = 1; i <= sub_com.nb_subcom; ++i) {
-          interp(sub_com.subcom[i],bot,server,client,buffer,taille);
+          interp(sub_com.subcom[i],bot,server,client,buffer,taille,dico);
         }
       }
     }
     if(strcmp(sub_com.name, "if") == 0){
       printf("c'est un if\n");
-      if (eval(sub_com.subcom[0],bot,server,client,buffer,taille)) {
+      if (eval(sub_com.subcom[0],bot,server,client,buffer,taille,dico)) {
+        printf("if ok\n");
         for (int i = 1; i <= sub_com.nb_subcom; ++i) {
-          interp(sub_com.subcom[i],bot,server,client,buffer,taille);
+          printf("for ok %d\n",i);
+          interp(sub_com.subcom[i],bot,server,client,buffer,taille,dico);
+          printf("interp ok %d\n",i);
         }
       }
     }
   }
   return -1;
-}
-
-void script(robot *bot, char *name, mqd_t server, mqd_t client, char* buffer, int taille){
-  FILE *fd = fopen(name, "r");
-  cmd com = create_cmd(NULL, fd);
-  interp(com,bot,server,client,buffer,taille);
-  fclose(fd);
 }

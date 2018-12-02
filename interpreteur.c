@@ -158,6 +158,12 @@ void printw(cmd w){
       for (int k = 0; k < x.nb_args+x.nb_subcom; ++k) {
         printf("\t\t");
         printf("sub subcom %d name : %s\n", k, x.subcom[k].name);
+        cmd z = x.subcom[k];
+        for (int l = 0; l < z.nb_args+z.nb_subcom; ++l) {
+          printf("\t\t");
+          printf("sub sub subcom %d name : %s\n", l, z.subcom[l].name);
+          //cmd a = z.subcom[l];
+        }
       }
     }
     printf("\n");
@@ -182,4 +188,5 @@ int main() {
   glup(script,0);
 
   return 0;
-}*/
+}
+*/

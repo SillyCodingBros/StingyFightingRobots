@@ -30,6 +30,7 @@ typedef struct elem_bullet elem_bullet;
 typedef struct elem_bullet* bullet_liste;
 typedef struct chest chest;
 typedef struct commande cmd;
+typedef struct affect aff;
 
 //fonctions de server.c
 int create_map(char* path_file, map* new_map);
@@ -68,8 +69,7 @@ int ramasser(robot *bot, mqd_t server, mqd_t client, char* buffer, int taille);
 int avancer(robot *bot, int move, mqd_t server, mqd_t client, char* buffer, int taille);
 int tourner(robot *bot, short direc, mqd_t server);
 int tirer(robot *bot, float angle, mqd_t serveur);
-void script(robot *bot, char *name, mqd_t server, mqd_t client, char* buffer, int taille);
-int interp(cmd sub_com, robot *bot, mqd_t server, mqd_t client, char* buffer, int taille);
+int interp(cmd sub_com, robot *bot, mqd_t server, mqd_t client, char* buffer, int taille, aff **dico);
 
 //fonctions de game.c
 robot create_robot(char* name, char id, coord spawn, inventaire* inventaire);
@@ -163,6 +163,13 @@ struct commande {
     int nb_args;    //nombre d'arguments
     int nb_subcom;  //nombre de sous commandes
     cmd* subcom;    //tableau des sous commandes
+};
+
+//structure des affectations variable du joueur
+struct affect {
+    char* name;     //le nom de la variable
+    int data;       //valeur de la variable
+    aff* next;      //struct de la prochaine affectation
 };
 
 
