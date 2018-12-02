@@ -38,7 +38,7 @@ robot* isBot(int x, int y, robot_liste listOfBot);
 int isBullet(int x, int y, bullet_liste listOfBullet);
 int server(char* map_name);
 int win(robot_liste bot_list);
-coord observer(map mapOfGame, robot* bot, char* buffer);
+coord observer(map mapOfGame, robot_liste listOfBot, robot* bot, char* buffer);
 void affichage(map mapOfGame, robot_liste listOfBot, bullet_liste listOfBullet);
 void move_bullet(bullet_liste* list_bullet, robot_liste* bot_list, map mapOfGame, mqd_t* mq_list);
 int search_place(char* place,int nb_place);

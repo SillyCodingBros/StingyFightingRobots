@@ -19,7 +19,6 @@ char* get_line(FILE *fd){
 void printw(cmd w);
 
 cmd create_cmd(char **ligne, FILE *fd){
-  //printf("com : %s\n", ligne);
   if(ligne == NULL){
     cmd new_cmd = {"script",0,0,NULL};
     new_cmd.subcom = malloc(sizeof(cmd));
@@ -35,19 +34,17 @@ cmd create_cmd(char **ligne, FILE *fd){
   }
   //printf("\nligne avant strtok name : \"%s\" at %p\n", *ligne,ligne);
   char *name_cmd = str_tok(ligne," \n");
-  //printf("name of cmd : \"%s\"\n", name_cmd);
   //printf("ligne après strtok name : \"%s\" at %p\n", *ligne, ligne);
   cmd new_cmd = {name_cmd,0,0,NULL};
-
-  if(strcmp(name_cmd,"script")==0){
+  if (name_cmd == NULL) {
+    return new_cmd;
+  }else if(strcmp(name_cmd,"script")==0){
     char* name_file = str_tok(ligne," \n");
     FILE *fd2 = fopen(name_file, "r");
     cmd tmp = create_cmd(NULL,fd2);
     fclose(fd2);
     return(tmp);
-  }
-
-  else if(strcmp(name_cmd,"move")==0)
+  }else if(strcmp(name_cmd,"move")==0)
     new_cmd.nb_args = 1;
 
   else if(strcmp(name_cmd,"turn")==0)
@@ -104,9 +101,11 @@ cmd create_cmd(char **ligne, FILE *fd){
     new_cmd.nb_args = 2;
 
   else if(strcmp(name_cmd,"mod")==0)
-      new_cmd.nb_args = 2;
+    new_cmd.nb_args = 2;
 
+  printf("malloc\n");
   new_cmd.subcom = malloc(new_cmd.nb_args*sizeof(cmd));
+  printf("malloc\n");
   for (int i = 0; i < new_cmd.nb_args; ++i) {
     new_cmd.subcom[i] = create_cmd(ligne,fd);
   }
@@ -128,6 +127,7 @@ cmd create_cmd(char **ligne, FILE *fd){
       }
     }
   }
+  printf("cmd : %s, nb_args : %d, nb_subcom : %d\n",new_cmd.name,new_cmd.nb_args,new_cmd.nb_subcom);
   return new_cmd;
 }
 

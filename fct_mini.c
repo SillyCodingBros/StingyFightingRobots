@@ -183,79 +183,80 @@ int tirer(robot *bot, float angle, mqd_t server){
 
 /* évalue tous ce qui returne une valeur */
 int eval(cmd sub_com, robot *bot, mqd_t server, mqd_t client, char* buffer, int taille){
-    if (strcmp(sub_com.name, "quit") == 0) {
-      msg message = {bot->id,1};
-      mq_send(server, (char*) &message, sizeof(msg), 1);
-      bot->pv = 0;
-    }
-    else if(strcmp(sub_com.name, "move") == 0)
-      return avancer(bot,eval(*sub_com.subcom, bot,server,client,buffer,taille),server,client,buffer,taille);
+  if (sub_com.name == NULL) {
+    return -1;
+  }else if (strcmp(sub_com.name, "quit") == 0) {
+    msg message = {bot->id,1};
+    mq_send(server, (char*) &message, sizeof(msg), 1);
+    bot->pv = 0;
+  }else if(strcmp(sub_com.name, "move") == 0)
+    return avancer(bot,eval(*sub_com.subcom, bot,server,client,buffer,taille),server,client,buffer,taille);
 
-    else if(strcmp(sub_com.name, "pick") == 0)
-      return ramasser(bot, server, client, buffer, taille);
+  else if(strcmp(sub_com.name, "pick") == 0)
+    return ramasser(bot, server, client, buffer, taille);
 
-    else if(strcmp(sub_com.name, "turn") == 0)
-      return tourner(bot,eval(*sub_com.subcom, bot,server,client,buffer,taille),server);
+  else if(strcmp(sub_com.name, "turn") == 0)
+    return tourner(bot,eval(*sub_com.subcom, bot,server,client,buffer,taille),server);
 
-    else if(strcmp(sub_com.name, "shoot") == 0)
-      return tirer(bot,eval(*sub_com.subcom, bot,server,client,buffer,taille),server);
+  else if(strcmp(sub_com.name, "shoot") == 0)
+    return tirer(bot,eval(*sub_com.subcom, bot,server,client,buffer,taille),server);
 
-    else if(strcmp(sub_com.name, "seek") == 0)
-      return seek(bot, sub_com.subcom[0].name, sub_com.subcom[1].name, server, client, buffer, taille);
+  else if(strcmp(sub_com.name, "seek") == 0)
+    return seek(bot, sub_com.subcom[0].name, sub_com.subcom[1].name, server, client, buffer, taille);
 
-    else if(strcmp(sub_com.name, "pv") == 0)
-      return get_pv(bot);
+  else if(strcmp(sub_com.name, "pv") == 0)
+    return get_pv(bot);
 
-    else if(strcmp(sub_com.name, "steer") == 0)
-      return get_direction(bot);
+  else if(strcmp(sub_com.name, "steer") == 0)
+    return get_direction(bot);
 
-    else if(strcmp(sub_com.name, "money") == 0)
-      return get_money(bot);
+  else if(strcmp(sub_com.name, "money") == 0)
+    return get_money(bot);
 
-    else if(strcmp(sub_com.name, "nb_bullet") == 0)
-      return get_nb_bullet(bot);
+  else if(strcmp(sub_com.name, "nb_bullet") == 0)
+    return get_nb_bullet(bot);
 
-    else if(strcmp(sub_com.name, "armor") == 0)
-      return get_armor(bot);
+  else if(strcmp(sub_com.name, "armor") == 0)
+    return get_armor(bot);
 
-    else if(strcmp(sub_com.name, "coord") == 0)
-      return get_coord(bot,sub_com.subcom->name);
+  else if(strcmp(sub_com.name, "coord") == 0)
+    return get_coord(bot,sub_com.subcom->name);
 
-    else if(strcmp(sub_com.name, "!=") == 0)
-      return eval(sub_com.subcom[0],bot,server,client,buffer,taille) != eval(sub_com.subcom[1],bot,server,client,buffer,taille);
+  else if(strcmp(sub_com.name, "!=") == 0)
+    return eval(sub_com.subcom[0],bot,server,client,buffer,taille) != eval(sub_com.subcom[1],bot,server,client,buffer,taille);
 
-    else if(strcmp(sub_com.name, "==") == 0)
-      return eval(sub_com.subcom[0],bot,server,client,buffer,taille) == eval(sub_com.subcom[1],bot,server,client,buffer,taille);
+  else if(strcmp(sub_com.name, "==") == 0)
+    return eval(sub_com.subcom[0],bot,server,client,buffer,taille) == eval(sub_com.subcom[1],bot,server,client,buffer,taille);
 
-    else if(strcmp(sub_com.name, ">") == 0)
-      return eval(sub_com.subcom[0],bot,server,client,buffer,taille) > eval(sub_com.subcom[1],bot,server,client,buffer,taille);
+  else if(strcmp(sub_com.name, ">") == 0)
+    return eval(sub_com.subcom[0],bot,server,client,buffer,taille) > eval(sub_com.subcom[1],bot,server,client,buffer,taille);
 
-    else if(strcmp(sub_com.name, "<") == 0)
-      return eval(sub_com.subcom[0],bot,server,client,buffer,taille) < eval(sub_com.subcom[1],bot,server,client,buffer,taille);
+  else if(strcmp(sub_com.name, "<") == 0)
+    return eval(sub_com.subcom[0],bot,server,client,buffer,taille) < eval(sub_com.subcom[1],bot,server,client,buffer,taille);
 
-    else if(strcmp(sub_com.name, ">=") == 0)
-      return eval(sub_com.subcom[0],bot,server,client,buffer,taille) >= eval(sub_com.subcom[1],bot,server,client,buffer,taille);
+  else if(strcmp(sub_com.name, ">=") == 0)
+    return eval(sub_com.subcom[0],bot,server,client,buffer,taille) >= eval(sub_com.subcom[1],bot,server,client,buffer,taille);
 
-    else if(strcmp(sub_com.name, "<=") == 0)
-      return eval(sub_com.subcom[0],bot,server,client,buffer,taille) <= eval(sub_com.subcom[1],bot,server,client,buffer,taille);
+  else if(strcmp(sub_com.name, "<=") == 0)
+    return eval(sub_com.subcom[0],bot,server,client,buffer,taille) <= eval(sub_com.subcom[1],bot,server,client,buffer,taille);
 
-    else if(strcmp(sub_com.name, "+") == 0)
-      return eval(sub_com.subcom[0],bot,server,client,buffer,taille) + eval(sub_com.subcom[1],bot,server,client,buffer,taille);
+  else if(strcmp(sub_com.name, "+") == 0)
+    return eval(sub_com.subcom[0],bot,server,client,buffer,taille) + eval(sub_com.subcom[1],bot,server,client,buffer,taille);
 
-    else if(strcmp(sub_com.name, "-") == 0)
-      return eval(sub_com.subcom[0],bot,server,client,buffer,taille) - eval(sub_com.subcom[1],bot,server,client,buffer,taille);
+  else if(strcmp(sub_com.name, "-") == 0)
+    return eval(sub_com.subcom[0],bot,server,client,buffer,taille) - eval(sub_com.subcom[1],bot,server,client,buffer,taille);
 
-    else if(strcmp(sub_com.name, "*") == 0)
-      return eval(sub_com.subcom[0],bot,server,client,buffer,taille) * eval(sub_com.subcom[1],bot,server,client,buffer,taille);
+  else if(strcmp(sub_com.name, "*") == 0)
+    return eval(sub_com.subcom[0],bot,server,client,buffer,taille) * eval(sub_com.subcom[1],bot,server,client,buffer,taille);
 
-    else if(strcmp(sub_com.name, "/") == 0)
-      return eval(sub_com.subcom[0],bot,server,client,buffer,taille) / eval(sub_com.subcom[1],bot,server,client,buffer,taille);
+  else if(strcmp(sub_com.name, "/") == 0)
+    return eval(sub_com.subcom[0],bot,server,client,buffer,taille) / eval(sub_com.subcom[1],bot,server,client,buffer,taille);
 
-    else if(strcmp(sub_com.name, "mod") == 0)
-      return eval(sub_com.subcom[0],bot,server,client,buffer,taille) % eval(sub_com.subcom[1],bot,server,client,buffer,taille);
+  else if(strcmp(sub_com.name, "mod") == 0)
+    return eval(sub_com.subcom[0],bot,server,client,buffer,taille) % eval(sub_com.subcom[1],bot,server,client,buffer,taille);
 
-    return atoi(sub_com.name);
-    //return -1;
+  return atoi(sub_com.name);
+  //return -1;
 }
 
 int interp(cmd sub_com, robot *bot, mqd_t server, mqd_t client, char* buffer, int taille){
@@ -269,8 +270,7 @@ int interp(cmd sub_com, robot *bot, mqd_t server, mqd_t client, char* buffer, in
   }
   if (sub_com.nb_subcom == 0){
     return eval(sub_com,bot,server,client,buffer,taille);
-  }
-  else {
+  }else {
     if(strcmp(sub_com.name, "while") == 0){
       printf("c'est un while\n");
       while (eval(sub_com.subcom[0],bot,server,client,buffer,taille)) {
@@ -289,4 +289,11 @@ int interp(cmd sub_com, robot *bot, mqd_t server, mqd_t client, char* buffer, in
     }
   }
   return -1;
+}
+
+void script(robot *bot, char *name, mqd_t server, mqd_t client, char* buffer, int taille){
+  FILE *fd = fopen(name, "r");
+  cmd com = create_cmd(NULL, fd);
+  interp(com,bot,server,client,buffer,taille);
+  fclose(fd);
 }

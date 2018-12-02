@@ -124,7 +124,7 @@ int server(char* map_name){
               add_bullet(create_bullet(cur_bot,((coord*) &(buffer[sizeof(msg)]))->x,((coord*) &(buffer[sizeof(msg)]))->y),&listOfBullet);
             }else if (demande.action == 6) {
               printf("observer : %c\n",buffer[sizeof(msg)]);
-              new_pos = observer(mapOfGame,cur_bot,buffer);
+              new_pos = observer(mapOfGame,listOfBot,cur_bot,buffer);
               str_concat(concat_msg,(char*) &demande,sizeof(msg),(char*) &new_pos,sizeof(coord));
               mq_send(mq_list[(int) demande.client],concat_msg,sizeof(msg)+sizeof(coord),1);
             }
@@ -161,18 +161,24 @@ int server(char* map_name){
 }
 
 //fonction d'observation
-coord observer(map mapOfGame, robot* bot, char* buffer){
-    coord pos_object = {bot->pos.x,bot->pos.y};
-    for (int i = bot->pos.y-(bot->reach/2); i < bot->pos.y+(bot->reach/2); i++) {
-        for (int j = bot->pos.x-(bot->reach/2); j < bot->pos.x+(bot->reach/2); j++) {
-            if (mapOfGame.map[i*mapOfGame.width+j] == buffer[sizeof(msg)]) {
-                pos_object.x = j;
-                pos_object.y = i;
-                return pos_object;
-            }
+coord observer(map mapOfGame, robot_liste listOfBot, robot* bot, char* buffer){
+  coord pos_object = {bot->pos.x,bot->pos.y};
+  robot* tmp_bot;
+  for (int i = bot->pos.y-(bot->reach/2); i < bot->pos.y+(bot->reach/2); i++) {
+    for (int j = bot->pos.x-(bot->reach/2); j < bot->pos.x+(bot->reach/2); j++) {
+      if (buffer[sizeof(msg)] == 'R') {
+        tmp_bot = isBot(j,i,listOfBot);
+        if (tmp_bot != NULL) {
+          return tmp_bot->pos;
         }
+      }else if (mapOfGame.map[i*mapOfGame.width+j] == buffer[sizeof(msg)]) {
+        pos_object.x = j;
+        pos_object.y = i;
+        return pos_object;
+      }
     }
-    return pos_object;
+  }
+  return pos_object;
 }
 
 //fonction test les robots
@@ -218,22 +224,22 @@ void start(mqd_t* mq_list) {
 
 //fonction de deplacement des bullets
 void move_bullet(bullet_liste* list_bullet, robot_liste* bot_list, map mapOfGame, mqd_t* mq_list){
-    bullet_liste tmp_list = *list_bullet;
+    bullet_liste tmp_list;
+    coord tmp_coord;
+    robot* tmp_bot;
+    msg message;
+
+    tmp_list = *list_bullet;
     while (tmp_list) {
-        coord tmp_coord = {tmp_list->element.pos.x + tmp_list->element.speed_x , tmp_list->element.pos.y + tmp_list->element.speed_y};
-        robot* tmp_bot = isBot((int) tmp_coord.x, (int)tmp_coord.y, *bot_list);
+        tmp_coord.x = tmp_list->element.pos.x + tmp_list->element.speed_x;
+        tmp_coord.y = tmp_list->element.pos.y + tmp_list->element.speed_y;
+        tmp_bot = isBot((int) tmp_coord.x, (int) tmp_coord.y, *bot_list);
         if(tmp_bot){
             tmp_bot->pv -= tmp_list->element.damage;
             suppr_bullet(tmp_list->element,list_bullet);
-            if (tmp_bot->pv > 0) {
-                msg message = {tmp_bot->id,1};
-                char* tmp_msg = malloc(sizeof(msg)+sizeof(char));
-                str_concat(tmp_msg, (char*) &message, sizeof(msg), &(tmp_list->element.damage), sizeof(char));
-                mq_send(mq_list[(int) (tmp_bot->id)], tmp_msg, sizeof(msg)+sizeof(char), 1);
-            }else{
-                msg message = {tmp_bot->id,0};
-                mq_send(mq_list[(int) (tmp_bot->id)], (char*) &message, sizeof(msg), 1);
-            }
+            message.client = -1;
+            message.action = tmp_list->element.damage;
+            mq_send(mq_list[(int) tmp_bot->id],(char*) &message,sizeof(msg),1);
         }else if (search("wW",mapOfGame.map[((int) tmp_coord.y)*mapOfGame.width+((int) tmp_coord.x)]) == 0) {
             suppr_bullet(tmp_list->element,list_bullet);
         }else{
