@@ -87,6 +87,7 @@ robot* search_robot(char id, robot_liste listOfBot);
 int nb_bot(robot_liste listOfBot);
 float distance(coord p1, coord p2);
 int affect_dico(char* name, int data, aff** dico);
+aff* search_in_dico(char* var ,aff* dico);
 
 // fonctions de interpreteur.c
 cmd create_cmd(char **ligne, FILE *fd);

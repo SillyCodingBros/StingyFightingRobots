@@ -1,6 +1,8 @@
+= tour 1
 while != nb_bullet 0 {
-  if == move 1 -1 {
-    turn 1
+  if == move 2 -1 {
+    turn tour
+    = tour + tour 1
   }
   pick
   if != seek R x coord x {
@@ -8,5 +10,4 @@ while != nb_bullet 0 {
       shoot aim seek R x seek R y
     }
   }
-  move 1
 }

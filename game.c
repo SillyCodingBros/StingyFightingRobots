@@ -165,6 +165,7 @@ int affect_dico(char* name, int data, aff** dico){
   new_aff->name = malloc(strlen(name));
   strcpy(new_aff->name,name);
   new_aff->data = data;
+  new_aff->next = NULL;
 
   if (dico == NULL) return EXIT_FAILURE;
   if (*dico == NULL) {
@@ -185,9 +186,21 @@ int affect_dico(char* name, int data, aff** dico){
   return 0;
 }
 
+//fonction de recherche dans un dico
+aff* search_in_dico(char* var ,aff* dico){
+  while (dico != NULL) {
+    if(strcmp(dico->name, var) == 0){
+      return dico;
+    }
+    dico = dico->next;
+  }
+  return NULL;
+}
+
+//fonction debug dico
 void test3(aff* dico){
   while (dico != NULL) {
-    printf("%s %d -->",dico->name, dico->data);
+    printf("%s %d %p -->",dico->name, dico->data, dico);
     dico = dico->next;
   }
   printf("NULL\n");

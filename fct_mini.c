@@ -30,6 +30,7 @@ short get_armor(robot *bot){
 
 
 int avancer(robot *bot, int move, mqd_t server, mqd_t client, char* buffer, int taille) {
+  printf("%d\n", move);
   float* modif_axis, speed;
   msg message;
   char concat_msg[sizeof(msg)+sizeof(coord)];
@@ -99,20 +100,20 @@ int aim(robot *bot, int x, int y){
   int ix, igrec;
   double argshit=0;
   //double distance=sqrt((double)((x-bot->pos.x)*(x-bot->pos.x)+(y-bot->pos.y)*(y-bot->pos.y)));
-  double tbl_angle_convert[4]={90,0,270,180};
+  double tbl_angle_convert[4] = {90,0,270,180};
   ix = x - bot->pos.x;
   igrec = y - bot->pos.y;
   if (ix == 0) {
     angle = 90;
   }else{
-    angle = atan(igrec/ix)/RAD;
+    angle = atan(igrec / ix) / RAD;
   }
-  if (x-bot->pos.x>=0) {
-    argshit=0;
+  if (x - bot->pos.x >= 0) {
+    argshit = 0;
   }else{
-    argshit=180;
+    argshit = 180;
   }
-  angle=angle+tbl_angle_convert[(int)bot->direction]+argshit;
+  angle = angle + tbl_angle_convert[(int) bot->direction] + argshit;
   return angle;
 }
 
@@ -217,10 +218,11 @@ int eval(cmd sub_com, robot *bot, mqd_t server, mqd_t client, char* buffer, int 
     msg message = {bot->id,1};
     mq_send(server, (char*) &message, sizeof(msg), 1);
     bot->pv = 0;
-  }else if(strcmp(sub_com.name, "move") == 0)
-    return avancer(bot,eval(*sub_com.subcom, bot,server,client,buffer,taille,dico),server,client,buffer,taille);
+  }else if(strcmp(sub_com.name, "move") == 0){
+    //printf("je move\n");
+    return avancer(bot,eval(sub_com.subcom[0], bot,server,client,buffer,taille,dico),server,client,buffer,taille);
 
-  else if(strcmp(sub_com.name, "pick") == 0)
+  }else if(strcmp(sub_com.name, "pick") == 0)
     return ramasser(bot, server, client, buffer, taille);
 
   else if(strcmp(sub_com.name, "turn") == 0)
@@ -256,10 +258,11 @@ int eval(cmd sub_com, robot *bot, mqd_t server, mqd_t client, char* buffer, int 
   else if(strcmp(sub_com.name, "!=") == 0)
     return eval(sub_com.subcom[0],bot,server,client,buffer,taille,dico) != eval(sub_com.subcom[1],bot,server,client,buffer,taille,dico);
 
-  else if(strcmp(sub_com.name, "==") == 0)
+  else if(strcmp(sub_com.name, "==") == 0){
+    //printf("je suis un comparateur : %s , %s\n",sub_com.subcom[0].name,sub_com.subcom[1].name);
     return eval(sub_com.subcom[0],bot,server,client,buffer,taille,dico) == eval(sub_com.subcom[1],bot,server,client,buffer,taille,dico);
 
-  else if(strcmp(sub_com.name, ">") == 0)
+  }else if(strcmp(sub_com.name, ">") == 0)
     return eval(sub_com.subcom[0],bot,server,client,buffer,taille,dico) > eval(sub_com.subcom[1],bot,server,client,buffer,taille,dico);
 
   else if(strcmp(sub_com.name, "<") == 0)
@@ -288,17 +291,17 @@ int eval(cmd sub_com, robot *bot, mqd_t server, mqd_t client, char* buffer, int 
 
   else if (strcmp(sub_com.name, "=") == 0) {
     affect_dico(sub_com.subcom[0].name,eval(sub_com.subcom[1],bot,server,client,buffer,taille,dico),dico);
+    //test3(*dico);
   }else {
-    while (*dico != NULL) {
-      printf("dico name : %s, sub_com name : %s\n",(*dico)->name,sub_com.name);
-      if (strcmp((*dico)->name,sub_com.name)==0) {
-        return (*dico)->data;
-      }
-      *dico = (*dico)->next;
+    //printf("search %s\n", sub_com.name);
+    aff* elem = search_in_dico(sub_com.name,*dico);
+    //printf("on a trouvé\n");
+    if (elem != NULL) {
+      return elem->data;
     }
-    printf("pas trouvé dans le dico\n");
+    //printf("pas trouvé dans le dico : %s\n", sub_com.name);
   }
-  printf("atoi\n");
+  //printf("atoi\n");
   return atoi(sub_com.name);
 }
 
