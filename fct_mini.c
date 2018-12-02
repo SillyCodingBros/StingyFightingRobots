@@ -30,67 +30,68 @@ short get_armor(robot *bot){
 
 
 int avancer(robot *bot, int move, mqd_t server, mqd_t client, char* buffer, int taille) {
-    float* modif_axis, speed;
-    msg message;
-    char concat_msg[sizeof(msg)+sizeof(coord)];
-    int recep, nsec, cycle, distance;
-    coord last_pos, init_pos;
+  float* modif_axis, speed;
+  msg message;
+  char concat_msg[sizeof(msg)+sizeof(coord)];
+  int recep, dist_obj;
+  coord last_pos, init_pos;
+  float d1, d2;
+  struct timespec remain, request;
 
-    message.client = bot->id;
-    message.action = 2;
-    cycle = CYCLE*100;
-    speed = ((float) bot->speed) / cycle;
-    nsec = 0;
+  message.client = bot->id;
+  message.action = 2;
+  speed = ((float) bot->speed) / CYCLE;
 
-    switch (bot->direction) {
-      case 0:
-        modif_axis = &(bot->pos.y);
-        speed = (-1 * speed * move)/fabs(move);
-        distance = fabs((bot->pos.y-move)-bot->pos.y);
-        break;
-      case 1:
-        modif_axis = &(bot->pos.x);
-        speed = (speed * move)/fabs(move);
-        distance = fabs((bot->pos.y+move)-bot->pos.y);
-        break;
-      case 2:
-        modif_axis = &(bot->pos.y);
-        speed = (speed * move)/fabs(move);
-        distance = fabs((bot->pos.y+move)-bot->pos.y);
-        break;
-      case 3:
-        modif_axis = &(bot->pos.x);
-        speed = (-1 * speed * move)/fabs(move);
-        distance = fabs((bot->pos.x-move)-bot->pos.x);
-        move *= -1;
-        break;
-    }
+  switch (bot->direction) {
+    case 0:
+      modif_axis = &(bot->pos.y);
+      speed = (-1 * speed * move)/fabs(move);
+      dist_obj = fabs((bot->pos.y-move)-bot->pos.y);
+      break;
+    case 1:
+      modif_axis = &(bot->pos.x);
+      speed = (speed * move)/fabs(move);
+      dist_obj = fabs((bot->pos.y+move)-bot->pos.y);
+      break;
+    case 2:
+      modif_axis = &(bot->pos.y);
+      speed = (speed * move)/fabs(move);
+      dist_obj = fabs((bot->pos.y+move)-bot->pos.y);
+      break;
+    case 3:
+      modif_axis = &(bot->pos.x);
+      speed = (-1 * speed * move)/fabs(move);
+      dist_obj = fabs((bot->pos.x-move)-bot->pos.x);
+      move *= -1;
+      break;
+  }
 
-    init_pos = bot->pos;
-    while(sqrt(pow((bot->pos.x-init_pos.x),2)+pow((bot->pos.y-init_pos.y),2)) < distance) {
-        last_pos = bot->pos;
-        *modif_axis += speed;
-        //printf("(%f,%f)\n", bot->pos.x,bot->pos.y);
-        if (nsec == CYCLE) {
-            str_concat(concat_msg,(char*) &message,sizeof(msg),(char*) &(bot->pos),sizeof(coord));
-            mq_send(server,concat_msg,sizeof(msg)+sizeof(coord),1);
-            recep = reception(client,&buffer,taille,bot,2);
-            if (recep != 1) return recep;
-            bot->pos = *((coord*) &(buffer[sizeof(msg)]));
-            if (bot->pos.x == last_pos.x && bot->pos.y == last_pos.y) {
-              return -1;
-            }
-            nsec = 0;
-        }
-        nsec++;
-    }
-
+  init_pos = bot->pos;
+  while(distance(init_pos,bot->pos) < dist_obj) {
+    last_pos = bot->pos;
+    d1 = distance(init_pos,last_pos);
+    *modif_axis += speed;
+    clock_gettime(CLOCK_REALTIME,&request);
+    request.tv_nsec += 1;
+    clock_nanosleep(CLOCK_REALTIME, TIMER_ABSTIME,&request,&remain);
     str_concat(concat_msg,(char*) &message,sizeof(msg),(char*) &(bot->pos),sizeof(coord));
     mq_send(server,concat_msg,sizeof(msg)+sizeof(coord),1);
     recep = reception(client,&buffer,taille,bot,2);
     if (recep != 1) return recep;
     bot->pos = *((coord*) &(buffer[sizeof(msg)]));
-    return 0;
+    d2 = distance(init_pos,bot->pos);
+    //printf("%f %f\n",d1,d2);
+    if (d1 >= d2) {
+      return -1;
+    }
+  }
+
+  str_concat(concat_msg,(char*) &message,sizeof(msg),(char*) &(bot->pos),sizeof(coord));
+  mq_send(server,concat_msg,sizeof(msg)+sizeof(coord),1);
+  recep = reception(client,&buffer,taille,bot,2);
+  if (recep != 1) return recep;
+  bot->pos = *((coord*) &(buffer[sizeof(msg)]));
+  return 0;
 }
 
 

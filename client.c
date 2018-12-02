@@ -18,37 +18,47 @@ int main(int argc, char *argv[]) {
 
 //fonction qui traite les infos de la file de message
 int reception(mqd_t fdem, char** buffer, int taille, robot* bot, char obj){
-    //printf("reception\n");
-    msg message;
-    char done;
-    struct timespec tw;
+  //printf("reception\n");
+  msg message;
+  char done;
+  int timer;
+  char tmp_buf[taille];
+  struct timespec tw;
 
-    done = 1;
-    clock_gettime(CLOCK_REALTIME,&tw);
-    while (done) {
-        if (mq_timedreceive(fdem,*buffer,taille,NULL,&tw) > 0){
-            message = *((msg*) *buffer);
-            //printf("{%d,%d}\n",message.client,message.action);
-            if (message.client == -1) {
-                bot->pv -= message.action;
-                if (bot->pv <= 0) {
-                    return -1;
-                }
-            }else {
-                if (message.action == 0) {
-                    printf("gagné\n");
-                    return 2;
-                } else if (message.action == 4) {
-                    printf("reprise de la partie dans %d sec\n", *(buffer[sizeof(msg)]));
-                } else if (message.action == obj && obj != 0) {
-                    return 1;
-                }
-            }
-        }else if (obj == 0) {
-            done = 0;
+  done = 1;
+  clock_gettime(CLOCK_REALTIME,&tw);
+  while (done) {
+    if (mq_timedreceive(fdem,tmp_buf,taille,NULL,&tw) > 0){
+      message = *((msg*) tmp_buf);
+      printf("{%d,%d}\n",message.client,message.action);
+      if (message.client == -1) {
+        bot->pv -= message.action;
+        if (bot->pv <= 0) {
+          return -1;
         }
+      }else {
+        if (message.action == -1) {
+          printf("en attente des joueur\n");
+          return 2;
+        } else if (message.action == 0) {
+          printf("gagné\n");
+          return 2;
+        } else if (message.action == 4) {
+          timer = *((int*) &(tmp_buf[sizeof(msg)]));
+          printf("reprise de la partie dans %d sec\n", timer);
+          if (timer == 0) {
+            return 0;
+          }
+        } else if (message.action == obj && obj != 0) {
+          *buffer = tmp_buf;
+          return 1;
+        }
+      }
+    }else if (obj == 0) {
+      done = 0;
     }
-    return 0;
+  }
+  return -1;
 }
 
 
@@ -59,7 +69,6 @@ int client(char* name){
     char *buffer, *FdeM, *concat_msg;
     char *com_scan, *exec_com;
     struct mq_attr attr;
-    struct timespec tw;
     robot bot;
     inventaire inventory;
 
@@ -83,9 +92,7 @@ int client(char* name){
     message.action = -1;
     str_concat(concat_msg,(char*) &message,sizeof(msg),name,strlen(name)+1);
     mq_send(server,concat_msg,taille,1);
-    printf("send\n");
-    clock_gettime(CLOCK_REALTIME,&tw);
-    mq_receive(client,buffer,taille,NULL);
+    mq_receive(client,buffer,taille,0);
     message = *((msg*) buffer);
     if (message.client == -1) {
         fprintf(stderr, "game is full\n");
@@ -106,13 +113,14 @@ int client(char* name){
     inventory.armor = 0;
     bot = create_robot(name, message.client, *((coord*) &(buffer[sizeof(msg)])), &inventory);
     com_scan = malloc(40);
+    while (reception(client,&buffer,taille,&bot,0) < 0);
     while (bot.pv > 0) {
         printf("commande robot %d : ",bot.id);
         com_scan = realloc(0,40);
         fgets(com_scan,40,stdin);
         exec_com = malloc(strlen(com_scan));
         strcpy(exec_com,com_scan);
-        if (reception(server,&buffer,taille,&bot,0) == 2){
+        if (reception(client,&buffer,taille,&bot,0) == 2){
             printf("GAGNÉ\n");
             break;
         }

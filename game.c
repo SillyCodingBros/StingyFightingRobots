@@ -8,11 +8,11 @@ robot create_robot(char* name, char id, coord spawn, inventaire* inventaire){
     new_robot.name = malloc(strlen(name));
     strcpy(new_robot.name, name);
     new_robot.id = id;
-    new_robot.reach = 20;
+    new_robot.reach = 10;
     new_robot.pos = spawn;
     new_robot.direction = 0;
     new_robot.pv = 100;
-    new_robot.speed = 10;
+    new_robot.speed = 5;
     new_robot.bullet_damage = 33;
     new_robot.speed_bullet = 200;
     new_robot.inventory = inventaire;
@@ -139,6 +139,10 @@ robot* search_robot(char id, robot_liste listOfBot){
         }
     }
     return NULL;
+}
+
+float distance(coord p1, coord p2){
+  return (float) sqrt(pow(p2.x-p1.x,2)+pow(p2.y-p1.y,2));
 }
 
 //fonction pour chercher un robot avec l'id
