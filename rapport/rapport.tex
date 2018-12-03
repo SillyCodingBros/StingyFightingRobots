@@ -192,7 +192,7 @@ int tirer(robot *bot, float angle, mqd_t server)
 \end{lstlisting}
 La fonction \emph{tirer}, demande au serveur de un tir d'angle \emph{angle} depuis la position courrante du  \emph{bot}\\
 
-Les deux fonctions suivantes prennent en arguments la structure \emph{cmd sub\_com} représentant la commande saisie par l'utilisateur manuellement ou par un script ainsi qu'un pointeur sur un pointeur de structure \emph{aff}, \emph{dico} qui va permettre de stocker les variables définit par l'utilisateur.
+Les deux fonctions suivantes prennent en arguments la structure \emph{cmd sub\_com} représentant la commande saisie par l'utilisateur manuellement ou par un script ainsi qu'un pointeur sur un pointeur de structure \emph{aff}, \emph{dico} qui va permettre de stocker les variables définit par l'utilisateur.\\
 
 \begin {lstlisting} [language=c]
 int eval(cmd sub_com, robot *bot, mqd_t server, mqd_t client, char* buffer, int taille, aff **dico)
@@ -216,18 +216,6 @@ cmd create_cmd(char **ligne, FILE *fd)
 La fonction \emph{create\_cmd}, prend en argument \emph{ligne}, un pointeur sur chaîne de caractères et \emph{fd}, un pointeur sur un descripteur de fichier et retourne le contenu du fichier sur lequel pointe \emph{fd} en une structure \emph{cmd}.\\
 
 \newpage
-\subsection{Les fonctions de \emph{client.c}}
-\begin {lstlisting} [language=c]
-int reception(mqd_t fdem, char** buffer, int taille, robot* bot, char obj)
-\end{lstlisting}
-La fonction \emph{reception}, prend en argument \emph{fdem}, un descripteur sur une file de message en lecture, \emph{buffer}, un pointeur sur une chaine de caractère, \emph{taille}, la taille des message lu, \emph{bot}, un pointeur sur un robot et \emph{obj}, la valeur recherché par la fonction qui appelle \emph{reception}. Cette fonction va traduire les messages envoyer par le serveur et retourner l'information demandé par client\\
-
-\begin {lstlisting} [language=c]
-int client(char* name)
-\end{lstlisting}
-La fonction \emph{client}, prends en argument \emph{name}, une chaine de caractère qui represente le nom du robot associé a ce client. Cette fonction éxécute dans l'ordre les differentes fonctions pouvant etre appelé par le client\\
-
-\newpage
 \subsection{Les fonctions de \emph{server.c}}
 \begin {lstlisting} [language=c]
 int server(char* map\_name)
@@ -248,12 +236,23 @@ La fonction \emph{start}, prends en argument \emph{list\_mqueue}, la liste des f
 \begin {lstlisting} [language=c]
 void move_bullet(bullet_liste* list_bullet, robot_liste* bot_list, map mapOfGame, mqd_t* list_mqueue)
 \end{lstlisting}
-La fonction \emph{move_bullet}, prends en argument \emph{list_bullet}, la liste des balles presente sur la map, \emph{bot_list}, un pointeur sur la liste des robots present dans le jeu, \emph{mapOfGame}, la structure qui contient les données de la map et \emph{list_mqueue} la liste des file de message des clients connecté au serveur.\\
+La fonction \emph{move\_bullet}, prends en argument \emph{list\_bullet}, la liste des balles presente sur la map, \emph{bot\_list}, un pointeur sur la liste des robots present dans le jeu, \emph{mapOfGame}, la structure qui contient les données de la map et \emph{list\_mqueue} la liste des file de message des clients connecté au serveur.\\
 
 \begin {lstlisting} [language=c]
 coord bot_interact(map mapOfGame, robot_liste listOfBot, robot* bot, char* buffer)
 \end{lstlisting}
-La fonction \emph{bot_interact}, prends en argument \emph{mapOfGame}, la structure qui contient les données de la map, \emph{listOfBot}, la liste des robots present dans le jeu, \emph{bot}, un pointeur sur le robot qui demande une interaction et \emph{buffer} la chaine de caractère qui contient la demande du robot.\\
+La fonction \emph{bot\_interact}, prends en argument \emph{mapOfGame}, la structure qui contient les données de la map, \emph{listOfBot}, la liste des robots present dans le jeu, \emph{bot}, un pointeur sur le robot qui demande une interaction et \emph{buffer} la chaine de caractère qui contient la demande du robot.\\
+
+\subsection{Les fonctions de \emph{client.c}}
+\begin {lstlisting} [language=c]
+int reception(mqd_t fdem, char** buffer, int taille, robot* bot, char obj)
+\end{lstlisting}
+La fonction \emph{reception}, prend en argument \emph{fdem}, un descripteur sur une file de message en lecture, \emph{buffer}, un pointeur sur une chaine de caractère, \emph{taille}, la taille des message lu, \emph{bot}, un pointeur sur un robot et \emph{obj}, la valeur recherché par la fonction qui appelle \emph{reception}. Cette fonction va traduire les messages envoyer par le serveur et retourner l'information demandé par client\\
+
+\begin {lstlisting} [language=c]
+int client(char* name)
+\end{lstlisting}
+La fonction \emph{client}, prends en argument \emph{name}, une chaine de caractère qui represente le nom du robot associé a ce client. Cette fonction éxécute dans l'ordre les differentes fonctions pouvant etre appelé par le client\\
 
 \newpage
 \section{Traces d'utilisation}
