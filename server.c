@@ -188,7 +188,7 @@ coord bot_interact(map mapOfGame, robot_liste listOfBot, robot* bot, char* buffe
     for (int i = bot->pos.y-r; i < bot->pos.y+r; i++) {
       for (int j = bot->pos.x-r; j < bot->pos.x+r; j++) {
         if (buffer == NULL) {
-          if (search("ABCV",mapOfGame.map[i*mapOfGame.width+j]) == 0) {
+          if (search("ABCL",mapOfGame.map[i*mapOfGame.width+j]) == 0) {
             pos_object.x = j;
             pos_object.y = i;
             return pos_object;
