@@ -8,7 +8,7 @@ robot create_robot(char* name, char id, coord spawn, inventaire* inventaire){
     new_robot.name = malloc(strlen(name));
     strcpy(new_robot.name, name);
     new_robot.id = id;
-    new_robot.reach = 20;
+    new_robot.reach = 10;
     new_robot.winner = 0;
     new_robot.wait_player = 0;
     new_robot.pick = 2;
@@ -16,7 +16,7 @@ robot create_robot(char* name, char id, coord spawn, inventaire* inventaire){
     new_robot.direction = 0;
     new_robot.pv = 100;
     new_robot.speed = 5;
-    new_robot.bullet_damage = 33;
+    new_robot.bullet_damage = 10;
     new_robot.speed_bullet = 200;
     new_robot.inventory = inventaire;
     return new_robot;
