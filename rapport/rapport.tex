@@ -61,8 +61,49 @@
 \newpage
 \section{Procédures mise en \oe uvre}
 \subsection{Les problèmatiques}
-\subsubsection{Creation de l'air de jeu}
+\subsubsection{Création de l'air de jeu}
 Afin de générer une aire de jeu personnalisable nous avons decidé de stocker les maps dans des fichiers, notre jeu devait donc être en mesure de récupérer ces données et les utiliser. Pour ce faire nous avons commencé par coder une fonction qui récupére chaque caractère du fichier et les stocke dans un tableau de la taille du fichier que l'on calcule préalablement. Pendant le parcours du fichier ....
+
+\newpage
+\section{Mode d'emploi}
+\subsection{Language minimaliste}
+Le langage minimaliste que nous avons developpé utilise une notation préfixé sans parenthèses, l'arité des opérateurs est fixé de la manière suivante :\\\\
+\begin{tabular}{|l|c|l|l|}
+   \hline
+   Commande & Arité & Description & Exemple \\
+	 \hline
+   quit & 0 & Abandonner la partie & quit \\
+   \hline
+   six & sept & & huit \\
+   \hline
+	 Commande & Arité & & Exemple \\
+	 \hline
+   quit & 0 & & quit \\
+   \hline
+   six & sept & & huit \\
+   \hline
+	 Commande & Arité & & Exemple \\
+	 \hline
+   quit & 0 & & quit \\
+   \hline
+   six & sept & & huit \\
+   \hline
+	 Commande & Arité & & Exemple \\
+	 \hline
+   quit & 0 & & quit \\
+   \hline
+   six & sept & & huit \\
+   \hline
+	 Commande & Arité & & Exemple \\
+	 \hline
+   quit & 0 & & quit \\
+   \hline
+   six & sept & & huit \\
+   \hline
+\end{tabular}
+
+\subsection{Lancer le jeu}
+\subsection{Jouer}
 
 \newpage
 \section{Listing du programme}
@@ -141,7 +182,6 @@ int interp(cmd sub_com, robot *bot, mqd_t server, mqd_t client, char* buffer, in
 \end{lstlisting}
 La fonction \emph{interp}, va se charger d'interpréter correctement la structure commande \emph{sub\_com}\\
 
-\newpage
 \subsection{Les fonctions de \emph{interpreteur.c}}
 \begin {lstlisting} [language=c]
 char* get_line(FILE *fd)
@@ -160,13 +200,8 @@ La fonction \emph{create\_cmd}, prend en argument \emph{ligne}, un pointeur sur 
 \subsection{Les fonctions de \emph{server.c}}
 
 \newpage
-\section{Mode d'emploi}
-\subsection{Comment ouvrir un terminal}
-\subsubsection{}
-
-\newpage
 \section{Traces d'utilisation}
-\subsection{Sreen shoots}
+\subsection{Captures d'écran}
 
 \newpage
 \section{Code complet}
@@ -174,7 +209,7 @@ La fonction \emph{create\_cmd}, prend en argument \emph{ligne}, un pointeur sur 
 %\lstinputlisting[language=c]{../game.h}
 
 \newpage
-\subsection{Le jeu}
+\subsection{Fonctions utilitaires}
 %\lstinputlisting[language=c]{../game.c}
 
 \newpage
