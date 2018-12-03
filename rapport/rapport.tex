@@ -96,6 +96,8 @@ Le langage minimaliste que nous avons developpé utilise une notation préfixé 
    \hline
    coord & 1 & Donne la coordonnée sur l'axe \emph{x} ou \emph{y} & coord x \\
    \hline
+	 seek & 2 & Donne la coordonnée \emph{x} ou \emph{y} d'un objet (\emph{B},\emph{L},\emph{A},\emph{C},\emph{R}) & seek R x \\
+   \hline
 	 aim & 2 & Donne l'angle de tir pour des coordonnées & aim 15 6 \\
    \hline
 	 != & 2 & Opérateur d'inégalité & != pos x steer \\
@@ -277,7 +279,7 @@ La fonction \emph{isBullet}, prend en argument \emph{x}, l'abscisse du point tes
 \begin {lstlisting} [language=c]
 int in_range(coord pos,robot_liste listOfBot)
 \end{lstlisting}
-La fonction \emph{in_range}, prend en argument \emph{pos}, les coordonnées du point testé, \emph{listOfBot}, la liste des robots present dans le jeu. Cette fonction teste si le point de coordonnées \emph{pos} est à portée du robot\\
+La fonction \emph{in\_range}, prend en argument \emph{pos}, les coordonnées du point testé, \emph{listOfBot}, la liste des robots present dans le jeu. Cette fonction teste si le point de coordonnées \emph{pos} est à portée du robot\\
 
 \begin {lstlisting} [language=c]
 int win(robot_liste listOfBot)
@@ -287,12 +289,12 @@ La fonction \emph{win}, prend en argument \emph{listOfBot}, la liste des robots 
 \begin {lstlisting} [language=c]
 int search_place(char* place,int nb_place)
 \end{lstlisting}
-La fonction \emph{search_place}, prend en argument \emph{place}, un tableau qui represente les places prise et les places restante dans le jeu, et \emph{nb_place} le nombre de place totale. Cette fonction retourne l'index d'une case libre, -1 sinon.\\
+La fonction \emph{search\_place}, prend en argument \emph{place}, un tableau qui represente les places prise et les places restante dans le jeu, et \emph{nb\_place} le nombre de place totale. Cette fonction retourne l'index d'une case libre, -1 sinon.\\
 
 \begin {lstlisting} [language=c]
 int create_map(char* path_file, map* new_map)
 \end{lstlisting}
-La fonction \emph{create_map}, prend en argument \emph{path_file}, une chaîne de caractère qui represente le nom du fichier à lire, et \emph{new_map} un pointeur sur la map du jeu. Cette fonction remplie la map avec les informations du fichier.\\
+La fonction \emph{create\_map}, prend en argument \emph{path\_file}, une chaîne de caractère qui represente le nom du fichier à lire, et \emph{new\_map} un pointeur sur la map du jeu. Cette fonction remplie la map avec les informations du fichier.\\
 
 \subsection{Les fonctions de \emph{client.c}}
 \begin {lstlisting} [language=c]
