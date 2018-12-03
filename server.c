@@ -160,7 +160,7 @@ int server(char* map_name){
         printf("{%d,%d}\n",demande.client,demande.action);
         if (mq_send(list_mqueue[mvp],(char*) &demande,sizeof(msg),1) < 0) perror("mq_send");
         cur_bot = search_robot(mvp,listOfBot);
-        printf("%s A GAGNÉ !!!!\n", cur_bot->name);
+        printf("%s à gagné !!!!\n", cur_bot->name);
       }
       if (cycle_display > CYCLE && nbclient > 1) {
         printf("\f");
