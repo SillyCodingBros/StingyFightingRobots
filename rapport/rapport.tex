@@ -1,0 +1,59 @@
+\documentclass[a4paper, 11pt]{report}
+\usepackage[utf8]{inputenc}
+\usepackage[french]{babel}
+
+\usepackage[T1]{fontenc}
+\usepackage{amsmath}
+\usepackage{amsfonts}
+\usepackage{amssymb}
+\usepackage{authblk}
+
+\usepackage{hyperref}
+\usepackage{listings, graphicx}
+\usepackage{color, hyperref}
+\hypersetup{
+	colorlinks=true,
+	linktoc=all,
+	linkcolor=blue,
+}
+\usepackage{lmodern}  % for bold teletype font
+\usepackage{amsmath}  % for \hookrightarrow
+\usepackage{xcolor}   % for \textcolor
+
+\usepackage{titling}
+
+
+
+\lstset{
+  basicstyle=\ttfamily,
+  columns=fullflexible,
+  frame=single,
+  breaklines=true,
+  postbreak=\mbox{\textcolor{red}{$\hookrightarrow$}\space},
+}
+%\pretitle{\begin{center}\fontesize{16pt}{16pt}\selectfont}
+%\posttitle{\par\end{center}\vskip 3em}
+\font\myfont=cmr12 at 42pt
+\title{\myfont {Robots programmables}}
+\author{\huge {COTREZ Léo}\and \huge {ORNIACKI Thomas}\and \\Université Paris-VIII, Saint-Denis, France}
+\date{}
+\begin{document}
+\maketitle
+
+\tableofcontents
+\newpage
+\chapter{Procédures mise en \oe uvre}
+\section{Les problèmatiques}
+\subsection{Titre de la sous-section}
+\subsubsection{Titre de la sous-sous-section}
+\paragraph{Titre du paragraphe}
+\subparagraph{Titre du sous-paragraphe}
+\chapter{Listing du programme}
+\section{Les fonctions de game.c}
+\chapter{Mode d'emploi}
+\section{Comment ouvrir un terminal}
+\chapter{Traces d'utilisation}
+\section{Sreen shoots}
+\chapter{Code complet}
+\section{truc.c}
+\end{document}

@@ -1,3 +1,12 @@
+# Latex
+*.aux
+*.fls
+*.log
+*.gz
+*.toc
+*.fdb_latexmk
+*.pdf
+
 # Prerequisites
 *.d
 
