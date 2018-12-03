@@ -164,6 +164,12 @@ $ ./client Harpagon
 \end{lstlisting}
 
 \subsection{Jouer}
+À la fin du décompte ça y est l'aire jeu s'affiche et on peut commencer à jouer\\
+Deux s'offre alors à nous télécommander le robot en inscrivant les commandes unes par unes, ou bien programmer son robot à l'aide de script préalablement réalisés.
+Voici des exemples de scripts on remarquera qu'un script peut en appeler un autre tant que ce dernier ne fait de même sur le précédent.\\
+
+\lstinputlisting[language=c]{../bot_1}
+\lstinputlisting[language=c]{../bot_2}
 
 \newpage
 \section{Listing du programme}
@@ -258,13 +264,13 @@ La fonction \emph{create\_cmd}, prend en argument \emph{ligne}, un pointeur sur 
 \begin {lstlisting} [language=c]
 int server(char* map\_name)
 \end{lstlisting}
-La fonction \emph{server}, prend en argument \emph{map\_name}, une chaine de caractère qui represente le nom de la map à charger. Cette
+La fonction \emph{server}, prend en argument \emph{map\_name}, une chaine de caractère qui represente le nom de l'aire de jeu à charger. Cette
 fonction éxécute dans l'ordre les differentes fonctions pouvant être appelé par le serveur.\\
 
 \begin {lstlisting} [language=c]
 coord bot\_interact(map mapOfGame, robot\_liste listOfBot, robot* bot, char* buffer)
 \end{lstlisting}
-La fonction \emph{bot\_interact}, prend en argument \emph{mapOfGame}, la structure qui contient les données de la map, \emph{listOfBot}, la liste des robots present dans le jeu, \emph{bot}, un pointeur sur le robot qui demande une interaction et \emph{buffer} la chaîne de caractères qui contient la demande du robot. Cette fonction renvois les coordonnées de l'objet, demandé par le client, au serveur.\\
+La fonction \emph{bot\_interact}, prend en argument \emph{mapOfGame}, la structure qui contient les données de l'aire de jeu, \emph{listOfBot}, la liste des robots present dans le jeu, \emph{bot}, un pointeur sur le robot qui demande une interaction et \emph{buffer} la chaîne de caractères qui contient la demande du robot. Cette fonction renvois les coordonnées de l'objet, demandé par le client, au serveur.\\
 
 \begin {lstlisting} [language=c]
 void start(mqd\_t* list\_mqueue)
@@ -274,17 +280,17 @@ La fonction \emph{start}, prend en argument \emph{list\_mqueue}, la liste des fi
 \begin {lstlisting} [language=c]
 void move_bullet(bullet_liste* list_bullet, robot_liste* bot_list, map mapOfGame, mqd_t* list_mqueue)
 \end{lstlisting}
-La fonction \emph{move\_bullet}, prend en argument \emph{list\_bullet}, la liste des balles presente sur la map, \emph{bot\_list}, un pointeur sur la liste des robots present dans le jeu, \emph{mapOfGame}, la structure qui contient les données de la map et \emph{list\_mqueue} la liste des file de message des clients connecté au serveur. Cette fonctions permet d'actualiser les balles de la map et d'informer les clients des dégâts reçus.\\
+La fonction \emph{move\_bullet}, prend en argument \emph{list\_bullet}, la liste des balles presente sur l'aire de jeu, \emph{bot\_list}, un pointeur sur la liste des robots present dans le jeu, \emph{mapOfGame}, la structure qui contient les données de l'aire de jeu et \emph{list\_mqueue} la liste des file de message des clients connecté au serveur. Cette fonctions permet d'actualiser les balles de l'aire de jeu et d'informer les clients des dégâts reçus.\\
 
 \begin {lstlisting} [language=c]
 coord bot_interact(map mapOfGame, robot_liste listOfBot, robot* bot, char* buffer)
 \end{lstlisting}
-La fonction \emph{bot\_interact}, prend en argument \emph{mapOfGame}, la structure qui contient les données de la map, \emph{listOfBot}, la liste des robots present dans le jeu, \emph{bot}, un pointeur sur le robot qui demande une interaction et \emph{buffer} la chaîne de caractères qui contient la demande du robot. Cette fonction retourne la position de l'objet que le client a demandé.\\
+La fonction \emph{bot\_interact}, prend en argument \emph{mapOfGame}, la structure qui contient les données de l'aire de jeu, \emph{listOfBot}, la liste des robots present dans le jeu, \emph{bot}, un pointeur sur le robot qui demande une interaction et \emph{buffer} la chaîne de caractères qui contient la demande du robot. Cette fonction retourne la position de l'objet que le client a demandé.\\
 
 \begin {lstlisting} [language=c]
 void affichage(map mapOfGame, robot_liste listOfBot, bullet_liste listOfBullet)
 \end{lstlisting}
-La fonction \emph{affichage}, prend en argument \emph{mapOfGame}, la structure qui contient les données de la map, \emph{listOfBot}, la liste des robots present dans le jeu, \emph{listOfBullet}, la liste des balles presente dans le jeu. Cette fonction affiche l'etat du jeu.\\
+La fonction \emph{affichage}, prend en argument \emph{mapOfGame}, la structure qui contient les données de l'aire de jeu, \emph{listOfBot}, la liste des robots present dans le jeu, \emph{listOfBullet}, la liste des balles presente dans le jeu. Cette fonction affiche l'etat du jeu.\\
 
 \begin {lstlisting} [language=c]
 robot* isBot(int x, int y, robot_liste listOfBot)
@@ -314,7 +320,7 @@ La fonction \emph{search\_place}, prend en argument \emph{place}, un tableau qui
 \begin {lstlisting} [language=c]
 int create_map(char* path_file, map* new_map)
 \end{lstlisting}
-La fonction \emph{create\_map}, prend en argument \emph{path\_file}, une chaîne de caractère qui represente le nom du fichier à lire, et \emph{new\_map} un pointeur sur la map du jeu. Cette fonction remplie la map avec les informations du fichier.\\
+La fonction \emph{create\_map}, prend en argument \emph{path\_file}, une chaîne de caractère qui represente le nom du fichier à lire, et \emph{new\_map} un pointeur sur l'aire de jeu du jeu. Cette fonction remplie l'aire de jeu avec les informations du fichier.\\
 
 \subsection{Les fonctions de \emph{client.c}}
 \begin {lstlisting} [language=c]
@@ -333,28 +339,29 @@ La fonction \emph{client}, prend en argument \emph{name}, une chaîne de caract�
 \subsection{Captures d'écran}
 
 \newpage
-\section*{Code complet}
-\subsection*{Les déclarations}
+\appendix
+\section{Code complet}
+\subsection{Les déclarations}
 \lstinputlisting[language=c]{../game.h}
 
 \newpage
-\subsection*{Fonctions utilitaires}
+\subsection{Fonctions utilitaires}
 \lstinputlisting[language=c]{../game.c}
 
 \newpage
-\subsection*{Le client}
+\subsection{Le client}
 \lstinputlisting[language=c]{../client.c}
 
 \newpage
-\subsection*{Le serveur}
+\subsection{Le serveur}
 \lstinputlisting[language=c]{../server.c}
 
 \newpage
-\subsection*{Les fonctions minimalistes}
+\subsection{Les fonctions minimalistes}
 \lstinputlisting[language=c]{../fct_mini.c}
 
 \newpage
-\subsection*{L'interpréteur}
+\subsection{L'interpréteur}
 \lstinputlisting[language=c]{../interpreteur.c}
 
 \end{document}
