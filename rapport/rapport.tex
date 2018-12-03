@@ -220,28 +220,63 @@ La fonction \emph{create\_cmd}, prend en argument \emph{ligne}, un pointeur sur 
 \begin {lstlisting} [language=c]
 int server(char* map\_name)
 \end{lstlisting}
-La fonction \emph{server}, prends en argument \emph{map\_name}, une chaine de caractère qui represente le nom de la map à charger. Cette
-fonction éxécute dans l'ordre les differentes fonctions pouvant etre appelé par le serveur\\
+La fonction \emph{server}, prend en argument \emph{map\_name}, une chaine de caractère qui represente le nom de la map à charger. Cette
+fonction éxécute dans l'ordre les differentes fonctions pouvant être appelé par le serveur\\
 
 \begin {lstlisting} [language=c]
 coord bot\_interact(map mapOfGame, robot\_liste listOfBot, robot* bot, char* buffer)
 \end{lstlisting}
-La fonction \emph{bot\_interact}, prends en argument \emph{mapOfGame}, la structure qui contient les données de la map, \emph{listOfBot}, la liste des robots present dans le jeu, \emph{bot}, un pointeur sur le robot qui demande une interaction et \emph{buffer} la chaine de caractère qui contient la demande du robot. Cette fonction renvois les coordonnées de l'objet, demandé par le client, au serveur\\
+La fonction \emph{bot\_interact}, prend en argument \emph{mapOfGame}, la structure qui contient les données de la map, \emph{listOfBot}, la liste des robots present dans le jeu, \emph{bot}, un pointeur sur le robot qui demande une interaction et \emph{buffer} la chaîne de caractères qui contient la demande du robot. Cette fonction renvois les coordonnées de l'objet, demandé par le client, au serveur\\
 
 \begin {lstlisting} [language=c]
 void start(mqd\_t* list\_mqueue)
 \end{lstlisting}
-La fonction \emph{start}, prends en argument \emph{list\_mqueue}, la liste des file de message des clients connecté au serveur.\\
+La fonction \emph{start}, prend en argument \emph{list\_mqueue}, la liste des file de message des clients connecté au serveur. Cette fonction envoie a tout les clients un message de debut de partie toutes les secondes pendant 5 secondes\\
 
 \begin {lstlisting} [language=c]
 void move_bullet(bullet_liste* list_bullet, robot_liste* bot_list, map mapOfGame, mqd_t* list_mqueue)
 \end{lstlisting}
-La fonction \emph{move\_bullet}, prends en argument \emph{list\_bullet}, la liste des balles presente sur la map, \emph{bot\_list}, un pointeur sur la liste des robots present dans le jeu, \emph{mapOfGame}, la structure qui contient les données de la map et \emph{list\_mqueue} la liste des file de message des clients connecté au serveur.\\
+La fonction \emph{move\_bullet}, prend en argument \emph{list\_bullet}, la liste des balles presente sur la map, \emph{bot\_list}, un pointeur sur la liste des robots present dans le jeu, \emph{mapOfGame}, la structure qui contient les données de la map et \emph{list\_mqueue} la liste des file de message des clients connecté au serveur. Cette fonctions permet d'actualiser les balles de la map et d'informer les clients des dégâts reçus.\\
 
 \begin {lstlisting} [language=c]
 coord bot_interact(map mapOfGame, robot_liste listOfBot, robot* bot, char* buffer)
 \end{lstlisting}
-La fonction \emph{bot\_interact}, prends en argument \emph{mapOfGame}, la structure qui contient les données de la map, \emph{listOfBot}, la liste des robots present dans le jeu, \emph{bot}, un pointeur sur le robot qui demande une interaction et \emph{buffer} la chaine de caractère qui contient la demande du robot.\\
+La fonction \emph{bot\_interact}, prend en argument \emph{mapOfGame}, la structure qui contient les données de la map, \emph{listOfBot}, la liste des robots present dans le jeu, \emph{bot}, un pointeur sur le robot qui demande une interaction et \emph{buffer} la chaîne de caractères qui contient la demande du robot. Cette fonction retourne la position de l'objet que le client a demandé.\\
+
+\begin {lstlisting} [language=c]
+void affichage(map mapOfGame, robot_liste listOfBot, bullet_liste listOfBullet)
+\end{lstlisting}
+La fonction \emph{affichage}, prend en argument \emph{mapOfGame}, la structure qui contient les données de la map, \emph{listOfBot}, la liste des robots present dans le jeu, \emph{listOfBullet}, la liste des balles presente dans le jeu. Cette fonction affiche l'etat du jeu.\\
+
+\begin {lstlisting} [language=c]
+robot* isBot(int x, int y, robot_liste listOfBot)
+\end{lstlisting}
+La fonction \emph{isBot}, prend en argument \emph{x}, l'abscisse du point testé, \emph{y}, l'ordonné du point testé, \emph{listOfBot}, la liste des robots present dans le jeu. Cette fonction teste si il y a un robot au coordonnées indiqué et retourne un pointeur sur le robot et NULL si il n'y en a pas.\\
+
+\begin {lstlisting} [language=c]
+int isBullet(int x, int y, bullet_liste listOfBullet)
+\end{lstlisting}
+La fonction \emph{isBullet}, prend en argument \emph{x}, l'abscisse du point testé, \emph{y}, l'ordonné du point testé, \emph{listOfBullet}, la liste des balles presentes dans le jeu. Cette fonction teste si il y a une balle au coordonnées indiqué.\\
+
+\begin {lstlisting} [language=c]
+int in_range(coord pos,robot_liste listOfBot)
+\end{lstlisting}
+La fonction \emph{in_range}, prend en argument \emph{pos}, les coordonnées du point testé, \emph{listOfBot}, la liste des robots present dans le jeu. Cette fonction teste si le point de coordonnées \emph{pos} est à portée du robot\\
+
+\begin {lstlisting} [language=c]
+int win(robot_liste listOfBot)
+\end{lstlisting}
+La fonction \emph{win}, prend en argument \emph{listOfBot}, la liste des robots present dans le jeu. Cette fonction teste si un joueur a gagné, retourne l'identifiant du gagnant, -1 sinon.\\
+
+\begin {lstlisting} [language=c]
+int search_place(char* place,int nb_place)
+\end{lstlisting}
+La fonction \emph{search_place}, prend en argument \emph{place}, un tableau qui represente les places prise et les places restante dans le jeu, et \emph{nb_place} le nombre de place totale. Cette fonction retourne l'index d'une case libre, -1 sinon.\\
+
+\begin {lstlisting} [language=c]
+int create_map(char* path_file, map* new_map)
+\end{lstlisting}
+La fonction \emph{create_map}, prend en argument \emph{path_file}, une chaîne de caractère qui represente le nom du fichier à lire, et \emph{new_map} un pointeur sur la map du jeu. Cette fonction remplie la map avec les informations du fichier.\\
 
 \subsection{Les fonctions de \emph{client.c}}
 \begin {lstlisting} [language=c]
@@ -252,7 +287,8 @@ La fonction \emph{reception}, prend en argument \emph{fdem}, un descripteur sur 
 \begin {lstlisting} [language=c]
 int client(char* name)
 \end{lstlisting}
-La fonction \emph{client}, prends en argument \emph{name}, une chaine de caractère qui represente le nom du robot associé a ce client. Cette fonction éxécute dans l'ordre les differentes fonctions pouvant etre appelé par le client\\
+La fonction \emph{client}, prend en argument \emph{name}, une chaîne de caractères qui represente le nom du robot associé à ce client. Cette fonction éxécute dans l'ordre les differentes fonctions pouvant être appelées par le client.\\
+
 
 \newpage
 \section{Traces d'utilisation}
