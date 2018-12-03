@@ -30,7 +30,7 @@ short get_armor(robot *bot){
 
 
 int avancer(robot *bot, int move, mqd_t server, mqd_t client, char* buffer, int taille) {
-  printf("%d\n", move);
+  //printf("%d\n", move);
   float* modif_axis, speed;
   msg message;
   char concat_msg[sizeof(msg)+sizeof(coord)];
@@ -189,11 +189,11 @@ int tourner(robot *bot, short direc, mqd_t server){
 
 int tirer(robot *bot, float angle, mqd_t server){
     int cycle = CYCLE*100;
-    printf("demande de tir\n");
+    //printf("demande de tir\n");
     if (bot->inventory->nb_bullet > 0) {
         bot->inventory->nb_bullet -= 1;
         coord speed = { (float) cos((angle+bot->direction*90-90)*RAD)/cycle*bot->speed_bullet, (float) sin((angle+bot->direction*90-90)*RAD)/cycle*bot->speed_bullet};
-        printf("speed %f , %f\n", speed.x,speed.y);
+        //printf("speed %f , %f\n", speed.x,speed.y);
         msg message = {bot->id,5};
         char* tmp_msg = malloc(sizeof(msg)+sizeof(coord));
         str_concat(tmp_msg, (char*) &message, sizeof(msg), (char*) &speed, sizeof(coord));
@@ -308,31 +308,35 @@ int eval(cmd sub_com, robot *bot, mqd_t server, mqd_t client, char* buffer, int 
 int interp(cmd sub_com, robot *bot, mqd_t server, mqd_t client, char* buffer, int taille, aff **dico){
   if (sub_com.nb_subcom > 0 && sub_com.nb_args == 0) {
     if (strcmp(sub_com.name, "script") == 0) {
-      printf("je suis un script\n");
+      //printf("je suis un script\n");
       for (int i = 0; i < sub_com.nb_subcom+sub_com.nb_args; ++i) {
+        if (bot->winner != 0 || bot->wait_player != 0) return -1;
         interp(sub_com.subcom[i],bot,server,client,buffer,taille,dico);
       }
     }
   }
   if (sub_com.nb_subcom == 0){
+    if (bot->winner != 0 || bot->wait_player != 0) return -1;
     return eval(sub_com,bot,server,client,buffer,taille,dico);
   }else {
     if(strcmp(sub_com.name, "while") == 0){
-      printf("c'est un while\n");
+      //printf("c'est un while\n");
       while (eval(sub_com.subcom[0],bot,server,client,buffer,taille,dico)) {
         for (int i = 1; i <= sub_com.nb_subcom; ++i) {
+          if (bot->winner != 0 || bot->wait_player != 0) return -1;
           interp(sub_com.subcom[i],bot,server,client,buffer,taille,dico);
         }
       }
     }
     if(strcmp(sub_com.name, "if") == 0){
-      printf("c'est un if\n");
+      //printf("c'est un if\n");
       if (eval(sub_com.subcom[0],bot,server,client,buffer,taille,dico)) {
-        printf("if ok\n");
+        //printf("if ok\n");
         for (int i = 1; i <= sub_com.nb_subcom; ++i) {
-          printf("for ok %d\n",i);
+          if (bot->winner != 0 || bot->wait_player != 0) return -1;
+          //printf("for ok %d\n",i);
           interp(sub_com.subcom[i],bot,server,client,buffer,taille,dico);
-          printf("interp ok %d\n",i);
+          //printf("interp ok %d\n",i);
         }
       }
     }

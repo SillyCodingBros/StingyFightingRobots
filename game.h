@@ -111,6 +111,8 @@ struct map{
 struct robot{
     char* name;              // nom du script du robot
     char id;                 // num de la file_de_message
+    char winner;
+    char wait_player;
     char reach;              // champ de vision
     char pick;               // porté de ramassage
     coord pos;               // position
