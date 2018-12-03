@@ -11,7 +11,7 @@
 #include <string.h>
 #include <math.h>
 
-/* #define _POSIX_C_SOURCE 199309L */
+/*#define _POSIX_C_SOURCE 199309L */
 #define CYCLE 10000
 #define RAD (3.14159265/180)
 

@@ -160,7 +160,7 @@ int server(char* map_name){
         printf("{%d,%d}\n",demande.client,demande.action);
         if (mq_send(list_mqueue[mvp],(char*) &demande,sizeof(msg),1) < 0) perror("mq_send");
         cur_bot = search_robot(mvp,listOfBot);
-        printf("%s A GAGNER\n", cur_bot->name);
+        printf("%s A GAGNÉ !!!!\n", cur_bot->name);
       }
       if (cycle_display > CYCLE && nbclient > 1) {
         printf("\f");
@@ -188,7 +188,7 @@ coord bot_interact(map mapOfGame, robot_liste listOfBot, robot* bot, char* buffe
     for (int i = bot->pos.y-r; i < bot->pos.y+r; i++) {
       for (int j = bot->pos.x-r; j < bot->pos.x+r; j++) {
         if (buffer == NULL) {
-          if (search("ABC",mapOfGame.map[i*mapOfGame.width+j]) == 0) {
+          if (search("ABCV",mapOfGame.map[i*mapOfGame.width+j]) == 0) {
             pos_object.x = j;
             pos_object.y = i;
             return pos_object;
