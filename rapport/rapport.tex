@@ -68,7 +68,7 @@ Afin de générer une aire de jeu personnalisable nous avons decidé de stocker 
 \newpage
 \section{Mode d'emploi}
 \subsection{Language minimaliste}
-Le langage minimaliste que nous avons developpé utilise une notation préfixé sans parenthèses, l'arité des opérateurs est fixé de la manière suivante :\\\\
+Le langage minimaliste que nous avons developpé utilise une notation préfixé sans parenthèses, l'arité des opérateurs est fixé de la manière détaillée ci-dessous.\\\\
 \begin{tabular}{|c|c|c|c|}
    \hline
    Commande & Arité & Description & Exemple \\
@@ -127,7 +127,7 @@ Le langage minimaliste que nous avons developpé utilise une notation préfixé 
    \hline
 \end{tabular}
 \\\\\\
-Syntaxe du \emph{while} dans un script :
+Syntaxe du \emph{while} et du \emph{if} dans un script :
 \begin {lstlisting} [language=c]
 while == nb_bullet 5 {
 	move 12
@@ -135,7 +135,6 @@ while == nb_bullet 5 {
 }
 \end{lstlisting}
 
-Syntaxe du \emph{if} dans un script :
 \begin {lstlisting} [language=c]
 if < coord x seek R x {
 	= lavie pv
@@ -144,6 +143,19 @@ if < coord x seek R x {
 \end{lstlisting}
 
 \subsection{Lancer le jeu}
+Afin de lancer le jeu il est nécessaire d'ouvrir trois consoles en executant les commandes comme détaillées ci-dessous.\\
+Il suffit de deux clients pour lancer une partie mais plus en est de fou plus on rit.
+\begin {lstlisting}[language=bash,title={Console - Serveur}]
+$ make
+$ ./server map_2
+\end{lstlisting}
+\begin {lstlisting}[language=bash,title={Console - Client 2}]
+$ ./client Piscsou
+\end{lstlisting}
+\begin {lstlisting}[language=bash,title={Console - Client 3}]
+$ ./client Harpagon
+\end{lstlisting}
+
 \subsection{Jouer}
 
 \newpage
