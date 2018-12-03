@@ -1,8 +1,8 @@
 #include "game.h"
 
-//fichier de fonction utiliser dans tout les executables
+/*  fichier de fonction utiliser dans tout les executables  */
 
-//fonction de creation des robots
+/*  fonction de creation des robots  */
 robot create_robot(char* name, char id, coord spawn, inventaire* inventaire){
     robot new_robot;
     new_robot.name = malloc(strlen(name));
@@ -22,6 +22,7 @@ robot create_robot(char* name, char id, coord spawn, inventaire* inventaire){
     return new_robot;
 }
 
+/*  fonction de creation des balles  */
 bullet create_bullet(robot *bot, float speed_x, float speed_y){
     bullet new_bullet;
     new_bullet.size = 0;
@@ -33,7 +34,7 @@ bullet create_bullet(robot *bot, float speed_x, float speed_y){
     return new_bullet;
 }
 
-//fonction pour concat les msgs avant de les envoyer
+/*  fonction pour concat les msgs avant de les envoyer  */
 void str_concat(char* str, char* elem1, int t_elem1, char* elem2, int t_elem2){
     for (int i = 0; i < t_elem1+t_elem2; i++) {
         if(i<t_elem1){
@@ -44,7 +45,7 @@ void str_concat(char* str, char* elem1, int t_elem1, char* elem2, int t_elem2){
     }
 }
 
-//fonction utiliser par str_tok detecter la presence d'un caractere dans un string
+/*  fonction qui cherche la presence d'un caractere dans un string  */
 int search(char* string, char element){
 	for(int i = 0; i < strlen(string); i++){
 		if(string[i] == element) return 0;
@@ -52,7 +53,7 @@ int search(char* string, char element){
 	return 1;
 }
 
-//fonction qui separe la string selon des separateur
+/*  fonction qui separe la string selon des separateur  */
 char* str_tok(char** str, char* delim){
 	char* start_str = NULL;
 	int i = 0;
@@ -73,7 +74,7 @@ char* str_tok(char** str, char* delim){
 	return start_str;
 }
 
-//fonction pour ajouter des robot a la liste
+/*  fonction pour ajouter des robot a la liste  */
 int add_bot(robot bot, robot_liste* listOfBot){
     elem_robot* new_bot = malloc(sizeof(elem_robot));
     new_bot->element = bot;
@@ -82,7 +83,7 @@ int add_bot(robot bot, robot_liste* listOfBot){
     return 0;
 }
 
-//fonction pour supprimer un robot de la liste avec l'id
+/*  fonction pour supprimer un robot de la liste avec l'id  */
 int suppr_bot(char id, robot_liste* listOfBot){
     if (*listOfBot == NULL) return EXIT_FAILURE;
     if ((*listOfBot)->element.id == id) {
@@ -102,7 +103,7 @@ int suppr_bot(char id, robot_liste* listOfBot){
     return EXIT_FAILURE;
 }
 
-//fonction pour ajouter une balle a la liste
+/*  fonction pour ajouter une balle a la liste  */
 int add_bullet(bullet bullet, bullet_liste* listOfBullet){
     elem_bullet* new_bullet = malloc(sizeof(elem_bullet));
     new_bullet->element = bullet;
@@ -111,7 +112,7 @@ int add_bullet(bullet bullet, bullet_liste* listOfBullet){
     return 0;
 }
 
-//fonction pour supprimer une bullet
+/*  fonction pour supprimer une balle  */
 int suppr_bullet(bullet bullet, bullet_liste* listOfBullet){
     if (*listOfBullet == NULL) return EXIT_FAILURE;
     if ((*listOfBullet)->element.pos.x == bullet.pos.x && (*listOfBullet)->element.pos.y == bullet.pos.y) {
@@ -131,7 +132,7 @@ int suppr_bullet(bullet bullet, bullet_liste* listOfBullet){
     return EXIT_FAILURE;
 }
 
-//fonction pour chercher un robot avec l'id
+/*  fonction pour chercher un robot avec l'id  */
 robot* search_robot(char id, robot_liste listOfBot){
     if (listOfBot != NULL) {
         if (listOfBot->element.id == id) return &(listOfBot->element);
@@ -144,21 +145,12 @@ robot* search_robot(char id, robot_liste listOfBot){
     return NULL;
 }
 
+/* fonction pour calculer la distance entre deux points  */
 float distance(coord p1, coord p2){
   return (float) sqrt(pow(p2.x-p1.x,2)+pow(p2.y-p1.y,2));
 }
 
-//fonction pour chercher un robot avec l'id
-int nb_bot(robot_liste listOfBot){
-    int nb_bot = 0;
-    while (listOfBot){
-        listOfBot = listOfBot->suite;
-        nb_bot++;
-    }
-    return nb_bot;
-}
-
-//fonction du diictionnaire
+/*  fonction du dictionnaire  */
 int affect_dico(char* name, int data, aff** dico){
   aff* new_aff;
   aff* i;
@@ -188,7 +180,7 @@ int affect_dico(char* name, int data, aff** dico){
   return 0;
 }
 
-//fonction de recherche dans un dico
+/*  fonction de recherche dans un dico  */
 aff* search_in_dico(char* var ,aff* dico){
   while (dico != NULL) {
     if(strcmp(dico->name, var) == 0){
@@ -197,13 +189,4 @@ aff* search_in_dico(char* var ,aff* dico){
     dico = dico->next;
   }
   return NULL;
-}
-
-//fonction debug dico
-void test3(aff* dico){
-  while (dico != NULL) {
-    printf("%s %d %p -->",dico->name, dico->data, dico);
-    dico = dico->next;
-  }
-  printf("NULL\n");
 }

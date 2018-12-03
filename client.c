@@ -18,7 +18,6 @@ int main(int argc, char *argv[]) {
 
 //fonction qui traite les infos de la file de message
 int reception(mqd_t fdem, char** buffer, int taille, robot* bot, char obj){
-  //printf("reception\n");
   msg message;
   char done;
   int timer;
@@ -30,7 +29,6 @@ int reception(mqd_t fdem, char** buffer, int taille, robot* bot, char obj){
   while (done) {
     if (mq_timedreceive(fdem,tmp_buf,taille,NULL,&tw) > 0){
       message = *((msg*) tmp_buf);
-      //printf("{%d,%d}\n",message.client,message.action);
       if (message.client == -1) {
         bot->pv -= message.action;
         bot->reach = (int) (bot->reach * bot->pv/100);
@@ -65,7 +63,7 @@ int reception(mqd_t fdem, char** buffer, int taille, robot* bot, char obj){
   return -1;
 }
 
-
+/*  fonction de gestion du client  */
 int client(char* name){
     mqd_t server, client;
     msg message;
@@ -128,7 +126,6 @@ int client(char* name){
         exec_com = malloc(strlen(com_scan));
         strcpy(exec_com,com_scan);
         reception(client,&buffer,taille,&bot,0);
-        //test3(dico);
         if (bot.winner == 1){
           printf("GAGNÉ\n");
           done = 0;

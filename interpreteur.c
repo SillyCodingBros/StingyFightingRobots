@@ -1,5 +1,6 @@
 #include "game.h"
 
+/*  fonction de recuperation des lignes dans un fichier */
 char* get_line(FILE *fd){
   int ch,i = 0;
   char *ligne = malloc(100);
@@ -16,14 +17,13 @@ char* get_line(FILE *fd){
   return NULL;
 }
 
-void printw(cmd w);
 
+/*  fonction de creation des commande  */
 cmd create_cmd(char **ligne, FILE *fd){
   if(ligne == NULL){
     cmd new_cmd = {"script",0,0,NULL};
     new_cmd.subcom = malloc(sizeof(cmd));
     while (feof(fd)==0) {
-      //printf("\n%s : %d\n",new_cmd.name,new_cmd.nb_subcom);
       new_cmd.subcom = realloc(new_cmd.subcom,(new_cmd.nb_subcom+1)*sizeof(cmd));
       char *line[100];
       *line = get_line(fd);
@@ -32,9 +32,7 @@ cmd create_cmd(char **ligne, FILE *fd){
     }
     return new_cmd;
   }
-  //printf("\nligne avant strtok name : \"%s\" at %p\n", *ligne,ligne);
   char *name_cmd = str_tok(ligne," \n");
-  //printf("ligne après strtok name : \"%s\" at %p\n", *ligne, ligne);
   cmd new_cmd = {name_cmd,0,0,NULL};
   cmd null = {NULL,0,0,NULL};
   if (name_cmd == NULL) {
@@ -117,7 +115,6 @@ cmd create_cmd(char **ligne, FILE *fd){
     new_cmd.nb_subcom = 0;
     if (fd == NULL) return null;
     if (strcmp(*ligne, "{")==0) {
-      //printf("lecture bloc cmd\n");
       *ligne = get_line(fd);
       while (search(*ligne,'}')) {
         new_cmd.subcom = realloc(new_cmd.subcom,(new_cmd.nb_args+new_cmd.nb_subcom+1)*sizeof(cmd));
@@ -129,67 +126,3 @@ cmd create_cmd(char **ligne, FILE *fd){
   }
   return new_cmd;
 }
-
-void glup(cmd com, int nb_tab){
-  int i;
-  for (int i = 0; i < nb_tab; i++) {
-    printf("\t");
-  }
-  i = 0;
-  printf("com %s : ", com.name);
-  for (i = 0; i < com.nb_args; i++) {
-    printf("%s ",com.subcom[i].name);
-  }
-  printf("\n");
-  while(i < com.nb_args+com.nb_subcom) {
-    glup(com.subcom[i],nb_tab+1);
-    i++;
-  }
-}
-
-void printw(cmd w){
-  //printf("name 1 : %s, name 2 : %s, name 3 : %s\n", w.subcom[0].name,w.subcom[1].name,w.subcom[2].name);
-  //printf("name 1 : %s, name 2 : %s\n", w.subcom[0].name,w.subcom[1].name);
-
-  for (int i = 0; i < w.nb_args+w.nb_subcom; ++i) {
-    printf("com %d name : %s\n", i, w.subcom[i].name);
-    cmd y = w.subcom[i];
-    for (int j = 0; j < y.nb_args+y.nb_subcom; ++j) {
-      printf("\t");
-      printf("subcom %d name : %s\n", j, y.subcom[j].name);
-      cmd x = y.subcom[j];
-      for (int k = 0; k < x.nb_args+x.nb_subcom; ++k) {
-        printf("\t\t");
-        printf("sub subcom %d name : %s\n", k, x.subcom[k].name);
-        cmd z = x.subcom[k];
-        for (int l = 0; l < z.nb_args+z.nb_subcom; ++l) {
-          printf("\t\t");
-          printf("sub sub subcom %d name : %s\n", l, z.subcom[l].name);
-          //cmd a = z.subcom[l];
-        }
-      }
-    }
-    printf("\n");
-
-  }
-}
-
-/*
-int main() {
-  FILE *fd = fopen("bot_1", "r");
-
-  if (fd == NULL){
-    printf("There's no file in here !\n");
-    return 1;
-  }
-  char* user_com = "script bot_1";
-  char* com = malloc(13);
-  strcpy(com,user_com);
-  printf("%s\n", com);
-  cmd script = create_cmd(&com,NULL);
-
-  glup(script,0);
-
-  return 0;
-}
-*/

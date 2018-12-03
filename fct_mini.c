@@ -1,5 +1,6 @@
 #include "game.h"
 
+/*  fonction associé a la commande "coord"  */
 float get_coord(robot *bot, char *axis){
   if (strcmp(axis,"x")==0)
     return bot->pos.x;
@@ -8,29 +9,33 @@ float get_coord(robot *bot, char *axis){
   return 0;
 }
 
+/*  fonction associé a la commande "steer"  */
 short get_direction(robot *bot){
   return bot->direction;
 }
 
+/*  fonction associé a la commande "pv"  */
 short get_pv(robot *bot){
   return bot->pv;
 }
 
+/*  fonction associé a la commande "money"  */
 unsigned long long get_money(robot *bot){
   return bot->inventory->money;
 }
 
+/*  fonction associé a la commande "nb_bullet"  */
 short get_nb_bullet(robot *bot){
   return bot->inventory->nb_bullet;
 }
 
+/*  fonction associé a la commande "armor"  */
 short get_armor(robot *bot){
   return bot->inventory->armor;
 }
 
-
+/*  fonction associé a la commande "move x"  */
 int avancer(robot *bot, int move, mqd_t server, mqd_t client, char* buffer, int taille) {
-  //printf("%d\n", move);
   float* modif_axis, speed;
   msg message;
   char concat_msg[sizeof(msg)+sizeof(coord)];
@@ -81,7 +86,6 @@ int avancer(robot *bot, int move, mqd_t server, mqd_t client, char* buffer, int 
     if (recep != 1) return recep;
     bot->pos = *((coord*) &(buffer[sizeof(msg)]));
     d2 = distance(init_pos,bot->pos);
-    //printf("%f %f\n",d1,d2);
     if (d1 >= d2) {
       return -1;
     }
@@ -95,11 +99,11 @@ int avancer(robot *bot, int move, mqd_t server, mqd_t client, char* buffer, int 
   return 0;
 }
 
+/*  fonction associé a la commande "aim x y"  */
 int aim(robot *bot, int x, int y){
   double angle;
   int ix, igrec;
   double argshit=0;
-  //double distance=sqrt((double)((x-bot->pos.x)*(x-bot->pos.x)+(y-bot->pos.y)*(y-bot->pos.y)));
   double tbl_angle_convert[4] = {90,0,270,180};
   ix = x - bot->pos.x;
   igrec = y - bot->pos.y;
@@ -117,6 +121,7 @@ int aim(robot *bot, int x, int y){
   return angle;
 }
 
+/*  fonction associé a la commande "seek O a"  */
 int seek(robot *bot, char *obj, char *axis, mqd_t server, mqd_t client, char* buffer, int taille){
     msg message;
     char concat_msg[sizeof(msg)+1];
@@ -127,37 +132,29 @@ int seek(robot *bot, char *obj, char *axis, mqd_t server, mqd_t client, char* bu
     message.action = 6;
 
     str_concat(concat_msg,(char*) &message,sizeof(msg),obj,1);
-    // demande si un objet de type 'obj' est à porté du robot au serveur
     mq_send(server,concat_msg,sizeof(msg)+1,1);
-    // attente de d'une reponse serveur
     recep = reception(client,&buffer,taille,bot,6);
     if (recep != 1) return recep;
-    // reponse_serveur (x,y)
     pos_object = *((coord*) &(buffer[sizeof(msg)]));
-    // reponse_serveur si rien (-1,-1)
     if (strcmp(axis, "x") == 0) {
-        //printf("axis : %s\n",axis);
         return pos_object.x;
     }else if (strcmp(axis, "y") == 0) {
-        //printf("axis : %s\n",axis);
         return pos_object.y;
     }
     return 0;
 }
 
+/*  fonction associé a la commande "pick"  */
 int ramasser(robot *bot, mqd_t server, mqd_t client, char* buffer, int taille){
   int recep;
   msg message;
 
   message.client = bot->id;
   message.action = 3;
-  // demande a ramasser un objet de type 'obj' au serveur
   mq_send(server,(char*) &message,sizeof(msg),1);
-  // attente de d'une reponse serveur
   recep = reception(client,&buffer,taille,bot,3);
   if (recep != 1)
     return recep;
-  // reponse_serveur = reponse - 1
   if (buffer[sizeof(msg)] == 'C' ) {
     bot->inventory->money += *((int*) &(buffer[sizeof(msg)+1]));
     return 0;
@@ -173,8 +170,8 @@ int ramasser(robot *bot, mqd_t server, mqd_t client, char* buffer, int taille){
   return -1;
 }
 
+/*  fonction associé a la commande "turn x"  */
 int tourner(robot *bot, short direc, mqd_t server){
-  // informe le server du changement de direction
   bot->direction = (bot->direction + direc) % 4;
   if (bot->direction < 0) {
     bot->direction = 4 + bot->direction;
@@ -187,6 +184,7 @@ int tourner(robot *bot, short direc, mqd_t server){
   return 0;
 }
 
+/*  fonction associé a la commande "shoot x"  */
 int tirer(robot *bot, float angle, mqd_t server){
     int cycle = CYCLE*100;
     //printf("demande de tir\n");
@@ -202,27 +200,19 @@ int tirer(robot *bot, float angle, mqd_t server){
     }
     return -1;
 }
-//void test42(aff dico){
-//    aff print = dico;
-//    while (print != NULL) {
-//        printf(" name %s, pos (%f,%f), pv %d,addr %p --->\n",print->element.name, print->element.pos.x, print->element.pos.y, print->element.pv, &print->element);
-//        print = print->suite;
-//    }
-//    printf(" NULL\n");
-//}
-/* évalue tous ce qui returne une valeur */
+
+/*  fonction d'evaluation des commandes  */
 int eval(cmd sub_com, robot *bot, mqd_t server, mqd_t client, char* buffer, int taille, aff **dico){
   if (sub_com.name == NULL) {
     return -1;
   }else if (strcmp(sub_com.name, "quit") == 0) {
     msg message = {bot->id,1};
     mq_send(server, (char*) &message, sizeof(msg), 1);
-    bot->pv = 0;
-  }else if(strcmp(sub_com.name, "move") == 0){
-    //printf("je move\n");
+    bot->winner = -1;
+  }else if(strcmp(sub_com.name, "move") == 0)
     return avancer(bot,eval(sub_com.subcom[0], bot,server,client,buffer,taille,dico),server,client,buffer,taille);
 
-  }else if(strcmp(sub_com.name, "pick") == 0)
+  else if(strcmp(sub_com.name, "pick") == 0)
     return ramasser(bot, server, client, buffer, taille);
 
   else if(strcmp(sub_com.name, "turn") == 0)
@@ -258,11 +248,10 @@ int eval(cmd sub_com, robot *bot, mqd_t server, mqd_t client, char* buffer, int 
   else if(strcmp(sub_com.name, "!=") == 0)
     return eval(sub_com.subcom[0],bot,server,client,buffer,taille,dico) != eval(sub_com.subcom[1],bot,server,client,buffer,taille,dico);
 
-  else if(strcmp(sub_com.name, "==") == 0){
-    //printf("je suis un comparateur : %s , %s\n",sub_com.subcom[0].name,sub_com.subcom[1].name);
+  else if(strcmp(sub_com.name, "==") == 0)
     return eval(sub_com.subcom[0],bot,server,client,buffer,taille,dico) == eval(sub_com.subcom[1],bot,server,client,buffer,taille,dico);
 
-  }else if(strcmp(sub_com.name, ">") == 0)
+  else if(strcmp(sub_com.name, ">") == 0)
     return eval(sub_com.subcom[0],bot,server,client,buffer,taille,dico) > eval(sub_com.subcom[1],bot,server,client,buffer,taille,dico);
 
   else if(strcmp(sub_com.name, "<") == 0)
@@ -289,26 +278,22 @@ int eval(cmd sub_com, robot *bot, mqd_t server, mqd_t client, char* buffer, int 
   else if(strcmp(sub_com.name, "mod") == 0)
     return eval(sub_com.subcom[0],bot,server,client,buffer,taille,dico) % eval(sub_com.subcom[1],bot,server,client,buffer,taille,dico);
 
-  else if (strcmp(sub_com.name, "=") == 0) {
+  else if (strcmp(sub_com.name, "=") == 0)
     affect_dico(sub_com.subcom[0].name,eval(sub_com.subcom[1],bot,server,client,buffer,taille,dico),dico);
-    //test3(*dico);
-  }else {
-    //printf("search %s\n", sub_com.name);
+
+  else {
     aff* elem = search_in_dico(sub_com.name,*dico);
-    //printf("on a trouvé\n");
     if (elem != NULL) {
       return elem->data;
     }
-    //printf("pas trouvé dans le dico : %s\n", sub_com.name);
   }
-  //printf("atoi\n");
   return atoi(sub_com.name);
 }
 
+/*  fonction d'interpretation des commandes  */
 int interp(cmd sub_com, robot *bot, mqd_t server, mqd_t client, char* buffer, int taille, aff **dico){
   if (sub_com.nb_subcom > 0 && sub_com.nb_args == 0) {
     if (strcmp(sub_com.name, "script") == 0) {
-      //printf("je suis un script\n");
       for (int i = 0; i < sub_com.nb_subcom+sub_com.nb_args; ++i) {
         if (bot->winner != 0 || bot->wait_player != 0) return -1;
         interp(sub_com.subcom[i],bot,server,client,buffer,taille,dico);
@@ -316,11 +301,10 @@ int interp(cmd sub_com, robot *bot, mqd_t server, mqd_t client, char* buffer, in
     }
   }
   if (sub_com.nb_subcom == 0){
-    if (bot->winner != 0 || bot->wait_player != 0) return -1;
+    if (bot->winner != 0) return -1;
     return eval(sub_com,bot,server,client,buffer,taille,dico);
   }else {
     if(strcmp(sub_com.name, "while") == 0){
-      //printf("c'est un while\n");
       while (eval(sub_com.subcom[0],bot,server,client,buffer,taille,dico)) {
         for (int i = 1; i <= sub_com.nb_subcom; ++i) {
           if (bot->winner != 0 || bot->wait_player != 0) return -1;
@@ -329,14 +313,10 @@ int interp(cmd sub_com, robot *bot, mqd_t server, mqd_t client, char* buffer, in
       }
     }
     if(strcmp(sub_com.name, "if") == 0){
-      //printf("c'est un if\n");
       if (eval(sub_com.subcom[0],bot,server,client,buffer,taille,dico)) {
-        //printf("if ok\n");
         for (int i = 1; i <= sub_com.nb_subcom; ++i) {
           if (bot->winner != 0 || bot->wait_player != 0) return -1;
-          //printf("for ok %d\n",i);
           interp(sub_com.subcom[i],bot,server,client,buffer,taille,dico);
-          //printf("interp ok %d\n",i);
         }
       }
     }
