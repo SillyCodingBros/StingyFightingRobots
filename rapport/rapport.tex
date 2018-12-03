@@ -49,7 +49,8 @@
 %\posttitle{\par\end{center}\vskip 3em}
 \font\myfont=cmr12 at 42pt
 \title{\myfont {Robots programmables}}
-\author{\huge {COTREZ Léo}\and \huge {ORNIACKI Thomas}\and \\Université Paris-VIII, Saint-Denis, France}
+\author{\huge {COTREZ Léo}\and \huge {ORNIACKI Thomas}\and \\Université Paris-VIII, Saint-Denis, France\and \\Licence 2 Informatique}
+\date{Premier Semestre 2018}
 
 \begin{document}
 \maketitle
@@ -61,13 +62,14 @@
 \section{Procédures mise en \oe uvre}
 \subsection{Les problèmatiques}
 \subsubsection{Titre de la sous-sous-section}
-\paragraph{Titre du paragraphe}
-\subparagraph{Titre du sous-paragraphe}
 
 \newpage
 \section{Listing du programme}
-\subsection{Les problèmatiques}
 \subsection{Les fonctions de game.c}
+\begin{lstlisting}[language=c]
+float get_coord(robot *bot, char *axis)
+\end{lstlisting}
+\lstinputlisting[language=c, firstline=3, lastline=4]{../fct_mini.c}
 
 \newpage
 \section{Mode d'emploi}
@@ -80,7 +82,7 @@
 
 \newpage
 \section{Code complet}
-\subsection{Les déclarations du jeu}
+\subsection{Les déclarations}
 %\lstinputlisting[language=c]{../game.h}
 
 \newpage
