@@ -1,8 +1,6 @@
 #ifndef GAME_H_
 #define GAME_H_
 
-/* Codé par Leo et Thomas */
-
 #include <unistd.h>
 #include <mqueue.h>
 #include <stdlib.h>
