@@ -167,7 +167,7 @@ int ramasser(robot *bot, mqd_t server, mqd_t client, char* buffer, int taille){
     bot->inventory->nb_bullet += *((int*) &(buffer[sizeof(msg)+1]));
     return 0;
   }
-  if (buffer[sizeof(msg)] == 'V') {
+  if (buffer[sizeof(msg)] == 'L') {
     bot->pv += *((int*) &(buffer[sizeof(msg)+1]));
     return 0;
   }

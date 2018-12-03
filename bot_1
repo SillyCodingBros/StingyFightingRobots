@@ -6,6 +6,7 @@ while != nb_bullet 0 {
   if != seek R x coord x {
     if != seek R y coord y {
       shoot aim seek R x seek R y
+      script bot_2
     }
   }
 }
