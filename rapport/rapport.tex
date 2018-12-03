@@ -1,0 +1,90 @@
+\documentclass[a4paper, 11pt]{report}
+\usepackage[utf8]{inputenc}
+\usepackage[french]{babel}
+
+\usepackage[T1]{fontenc}
+\usepackage{amsmath}
+\usepackage{amsfonts}
+\usepackage{amssymb}
+\usepackage{authblk}
+
+\usepackage{hyperref}
+\usepackage{listings, graphicx}
+\usepackage{color, hyperref}
+\hypersetup{
+	colorlinks=true,
+	linktoc=all,
+	linkcolor=blue,
+}
+\usepackage{lmodern}  % for bold teletype font
+\usepackage{amsmath}  % for \hookrightarrow
+\usepackage{xcolor}   % for \textcolor
+
+\usepackage{titling}
+
+\lstset{literate=
+  {á}{{\'a}}1 {é}{{\'e}}1 {í}{{\'i}}1 {ó}{{\'o}}1 {ú}{{\'u}}1
+  {Á}{{\'A}}1 {É}{{\'E}}1 {Í}{{\'I}}1 {Ó}{{\'O}}1 {Ú}{{\'U}}1
+  {à}{{\`a}}1 {è}{{\`e}}1 {ì}{{\`i}}1 {ò}{{\`o}}1 {ù}{{\`u}}1
+  {À}{{\`A}}1 {È}{{\'E}}1 {Ì}{{\`I}}1 {Ò}{{\`O}}1 {Ù}{{\`U}}1
+  {ä}{{\"a}}1 {ë}{{\"e}}1 {ï}{{\"i}}1 {ö}{{\"o}}1 {ü}{{\"u}}1
+  {Ä}{{\"A}}1 {Ë}{{\"E}}1 {Ï}{{\"I}}1 {Ö}{{\"O}}1 {Ü}{{\"U}}1
+  {â}{{\^a}}1 {ê}{{\^e}}1 {î}{{\^i}}1 {ô}{{\^o}}1 {û}{{\^u}}1
+  {Â}{{\^A}}1 {Ê}{{\^E}}1 {Î}{{\^I}}1 {Ô}{{\^O}}1 {Û}{{\^U}}1
+  {œ}{{\oe}}1 {Œ}{{\OE}}1 {æ}{{\ae}}1 {Æ}{{\AE}}1 {ß}{{\ss}}1
+  {ű}{{\H{u}}}1 {Ű}{{\H{U}}}1 {ő}{{\H{o}}}1 {Ő}{{\H{O}}}1
+  {ç}{{\c c}}1 {Ç}{{\c C}}1 {ø}{{\o}}1 {å}{{\r a}}1 {Å}{{\r A}}1
+  {€}{{\euro}}1 {£}{{\pounds}}1 {«}{{\guillemotleft}}1
+  {»}{{\guillemotright}}1 {ñ}{{\~n}}1 {Ñ}{{\~N}}1 {¿}{{?`}}1
+}
+
+\lstset{
+  basicstyle=\ttfamily,
+  columns=fullflexible,
+  frame=single,
+  breaklines=true,
+  postbreak=\mbox{\textcolor{red}{$\hookrightarrow$}\space},
+}
+%\pretitle{\begin{center}\fontesize{16pt}{16pt}\selectfont}
+%\posttitle{\par\end{center}\vskip 3em}
+\font\myfont=cmr12 at 42pt
+\title{\myfont {Robots programmables}}
+\author{\huge {COTREZ Léo}\and \huge {ORNIACKI Thomas}\and \\Université Paris-VIII, Saint-Denis, France}
+\date{}
+\begin{document}
+\maketitle
+
+\tableofcontents
+\newpage
+\part{Procédures mise en \oe uvre}
+\chapter{L'énoncé}
+\section{Les problèmatiques}
+\subsection{Titre de la sous-section}
+\subsubsection{Titre de la sous-sous-section}
+\paragraph{Titre du paragraphe}
+\subparagraph{Titre du sous-paragraphe}
+\part{Listing du programme}
+\section{Les fonctions de game.c}
+\chapter{Mode d'emploi}
+\section{Comment ouvrir un terminal}
+\part{Traces d'utilisation}
+\section{Sreen shoots}
+\part{Code complet}
+\section{Les déclarations du jeu}
+\lstinputlisting[language=c]{../game.h}
+\newpage
+\section{Le jeu}
+\lstinputlisting[language=c]{../game.c}
+\newpage
+\section{Le client}
+\lstinputlisting[language=c]{../client.c}
+\newpage
+\section{Le serveur}
+\lstinputlisting[language=c]{../server.c}
+\newpage
+\section{Les fonctions minimalistes}
+\lstinputlisting[language=c]{../fct_mini.c}
+\newpage
+\section{L'interpréteur}
+\lstinputlisting[language=c]{../interpreteur.c}
+\end{document}
