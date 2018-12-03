@@ -65,11 +65,98 @@
 
 \newpage
 \section{Listing du programme}
-\subsection{Les fonctions de game.c}
-\begin{lstlisting}[language=c]
+\subsection{Les fonctions de \emph{fct\_mini.c}}
+\begin {lstlisting} [language=c]
 float get_coord(robot *bot, char *axis)
 \end{lstlisting}
-\lstinputlisting[language=c, firstline=3, lastline=4]{../fct_mini.c}
+La fonction \emph{get\_coord}, prend en argument un pointeur sur une structure \emph{robot} et une chaîne de caractères \emph{axis} si cette dernière est \emph{x} ou \emph{y}, alors la fonction retournera alors respectivement la valeur de la position du robot sur l'axe des abscisses ou celui des ordonnées.\\
+
+\begin {lstlisting} [language=c]
+short get_direction(robot *bot)
+\end{lstlisting}
+La fonction \emph{get\_direction}, prend en argument un pointeur sur une structure \emph{robot} et retourne la valeur de la direction du robot 0, 1, 2, ou 3 respectivement pour haut, droite, bas, gauche.\\
+
+\begin {lstlisting} [language=c]
+short get_pv(robot *bot)
+\end{lstlisting}
+La fonction \emph{get\_pv}, prend en argument un pointeur sur une structure \emph{robot} et retourne le nombre de point de vie du robot.\\
+
+\begin {lstlisting} [language=c]
+unsigned long long get_money(robot *bot)
+\end{lstlisting}
+La fonction \emph{get\_money}, prend en argument un pointeur sur une structure \emph{robot} et retourne le solde du robot (\emph{unsigned long long}, il aime vraiment beaucoup l'argent ce robot).\\
+
+\begin {lstlisting} [language=c]
+short get_nb_bullet(robot *bot)
+\end{lstlisting}
+La fonction \emph{get\_nb\_bullet}, prend en argument un pointeur sur une structure \emph{robot} et retourne le nombre de balle du robot.\\
+
+\begin {lstlisting} [language=c]
+short get_armor(robot *bot)
+\end{lstlisting}
+La fonction \emph{get\_armor}, prend en argument un pointeur sur une structure \emph{robot} et retourne le nombre de point d'armure du robot.\\
+
+Les fonctions suivantes peuvent prendre en argument des fils de messages \emph{server}, \emph{client}, une chaîne de caractères \emph{buffer} et un entier \emph{taille} afin de communiquer avec le serveur.\\
+
+\begin {lstlisting} [language=c]
+int avancer(robot *bot, int move, mqd_t server, mqd_t client, char* buffer, int taille)
+\end{lstlisting}
+La fonction \emph{avancer}, prend en argument un pointeur sur une structure \emph{robot}, un entier \emph{move} et demande au plus possible le déplacement du robot de \emph{move} dans sa direction actuelle au serveur.\\
+
+\begin {lstlisting} [language=c]
+int aim(robot *bot, int x, int y)
+\end{lstlisting}
+La fonction \emph{aim}, prend en argument un pointeur sur une structure \emph{robot}, deux entiers \emph{x}, \emph{y} et retoune angle avec lequel le robot doit tirer afin d'atteindre le point formé par ces coordonnées, depuis sa position actuelle.\\
+
+\begin {lstlisting} [language=c]
+int seek(robot *bot, char *obj, char *axis, mqd_t server, mqd_t client, char* buffer, int taille)
+\end{lstlisting}
+La fonction \emph{seek}, prend en argument un pointeur sur une structure \emph{robot}, deux chaines de caractères \emph{obj}, \emph{axis} et retoune si possible la coordonnée, \emph{x} ou \emph{y} selon l'\emph{axis}, de l'objet \emph{obj} le plus proche dans son champ visuel\\
+
+\begin {lstlisting} [language=c]
+int ramasser(robot *bot, mqd_t server, mqd_t client, char* buffer, int taille)
+\end{lstlisting}
+La fonction \emph{ramasser}, demande au serveur si le \emph{bot} pourrait rammasser un collectible tel qu'un coffre , de l'armure ou bien des balles\\
+
+\begin {lstlisting} [language=c]
+int tourner(robot *bot, short direc, mqd_t server)
+\end{lstlisting}
+La fonction \emph{tourner}, demande au serveur de changer la direction du \emph{bot} de \emph{direc} fois dans le sens des aiguilles d'une montre dans le référentiel haut, droite, bas, gauche.\\
+
+\begin {lstlisting} [language=c]
+int tirer(robot *bot, float angle, mqd_t server)
+\end{lstlisting}
+La fonction \emph{tirer}, demande au serveur de un tir d'angle \emph{angle} depuis la position courrante du  \emph{bot}\\
+
+Les deux fonctions suivantes prennent en arguments la structure \emph{cmd sub\_com} représentant la commande saisie par l'utilisateur manuellement ou par un script ainsi qu'un pointeur sur un pointeur de structure \emph{aff}, \emph{dico} qui va permettre de stocker les variables définit par l'utilisateur.
+
+\begin {lstlisting} [language=c]
+int eval(cmd sub_com, robot *bot, mqd_t server, mqd_t client, char* buffer, int taille, aff **dico)
+\end{lstlisting}
+La fonction \emph{eval}, va se charger de retourner la valeur de retour de la fonction associée à la commande \emph{sub\_com}\\
+
+\begin {lstlisting} [language=c]
+int interp(cmd sub_com, robot *bot, mqd_t server, mqd_t client, char* buffer, int taille, aff **dico)
+\end{lstlisting}
+La fonction \emph{interp}, va se charger d'interpréter correctement la structure commande \emph{sub\_com}\\
+
+\newpage
+\subsection{Les fonctions de \emph{interpreteur.c}}
+\begin {lstlisting} [language=c]
+char* get_line(FILE *fd)
+\end{lstlisting}
+La fonction \emph{get\_line}, prend en argument \emph{fd}, un pointeur sur un descripteur de fichier et retourne une chaîne de caractères correspondant au contenu du fichier se trouvant entre le descripteur et le reste de la ligne\\
+
+\begin {lstlisting} [language=c]
+cmd create_cmd(char **ligne, FILE *fd)
+\end{lstlisting}
+La fonction \emph{create\_cmd}, prend en argument \emph{ligne}, un pointeur sur chaîne de caractères et \emph{fd}, un pointeur sur un descripteur de fichier et retourne le contenu du fichier sur lequel pointe \emph{fd} en une structure \emph{cmd}\\
+
+\newpage
+\subsection{Les fonctions de \emph{client.c}}
+
+\newpage
+\subsection{Les fonctions de \emph{server.c}}
 
 \newpage
 \section{Mode d'emploi}
