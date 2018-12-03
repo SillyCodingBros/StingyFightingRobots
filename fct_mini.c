@@ -1,6 +1,6 @@
 #include "game.h"
 
-/*  fonction associé a la commande "coord"  */
+/*  fonction associé à la commande "coord"  */
 float get_coord(robot *bot, char *axis){
   if (strcmp(axis,"x")==0)
     return bot->pos.x;
@@ -9,32 +9,32 @@ float get_coord(robot *bot, char *axis){
   return 0;
 }
 
-/*  fonction associé a la commande "steer"  */
+/*  fonction associé à la commande "steer"  */
 short get_direction(robot *bot){
   return bot->direction;
 }
 
-/*  fonction associé a la commande "pv"  */
+/*  fonction associé à la commande "pv"  */
 short get_pv(robot *bot){
   return bot->pv;
 }
 
-/*  fonction associé a la commande "money"  */
+/*  fonction associé à la commande "money"  */
 unsigned long long get_money(robot *bot){
   return bot->inventory->money;
 }
 
-/*  fonction associé a la commande "nb_bullet"  */
+/*  fonction associé à la commande "nb_bullet"  */
 short get_nb_bullet(robot *bot){
   return bot->inventory->nb_bullet;
 }
 
-/*  fonction associé a la commande "armor"  */
+/*  fonction associé à la commande "armor"  */
 short get_armor(robot *bot){
   return bot->inventory->armor;
 }
 
-/*  fonction associé a la commande "move x"  */
+/*  fonction associé à la commande "move x"  */
 int avancer(robot *bot, int move, mqd_t server, mqd_t client, char* buffer, int taille) {
   float* modif_axis, speed;
   msg message;
@@ -99,7 +99,7 @@ int avancer(robot *bot, int move, mqd_t server, mqd_t client, char* buffer, int 
   return 0;
 }
 
-/*  fonction associé a la commande "aim x y"  */
+/*  fonction associé à la commande "aim x y"  */
 int aim(robot *bot, int x, int y){
   double angle;
   int ix, igrec;
@@ -121,7 +121,7 @@ int aim(robot *bot, int x, int y){
   return angle;
 }
 
-/*  fonction associé a la commande "seek O a"  */
+/*  fonction associé à la commande "seek O a"  */
 int seek(robot *bot, char *obj, char *axis, mqd_t server, mqd_t client, char* buffer, int taille){
     msg message;
     char concat_msg[sizeof(msg)+1];
@@ -144,7 +144,7 @@ int seek(robot *bot, char *obj, char *axis, mqd_t server, mqd_t client, char* bu
     return 0;
 }
 
-/*  fonction associé a la commande "pick"  */
+/*  fonction associé à la commande "pick"  */
 int ramasser(robot *bot, mqd_t server, mqd_t client, char* buffer, int taille){
   int recep;
   msg message;
@@ -170,7 +170,7 @@ int ramasser(robot *bot, mqd_t server, mqd_t client, char* buffer, int taille){
   return -1;
 }
 
-/*  fonction associé a la commande "turn x"  */
+/*  fonction associé à la commande "turn x"  */
 int tourner(robot *bot, short direc, mqd_t server){
   bot->direction = (bot->direction + direc) % 4;
   if (bot->direction < 0) {
@@ -184,7 +184,7 @@ int tourner(robot *bot, short direc, mqd_t server){
   return 0;
 }
 
-/*  fonction associé a la commande "shoot x"  */
+/*  fonction associé à la commande "shoot x"  */
 int tirer(robot *bot, float angle, mqd_t server){
     int cycle = CYCLE*100;
     //printf("demande de tir\n");
