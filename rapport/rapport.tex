@@ -162,11 +162,14 @@ $ ./client Harpagon
 
 \subsection{Jouer}
 À la fin du décompte ça y est l'aire jeu s'affiche et on peut commencer à jouer\\
-Deux s'offre alors à nous télécommander le robot en inscrivant les commandes unes par unes, ou bien programmer son robot à l'aide de script préalablement réalisés.
+Deux s'offre alors à nous télécommander le robot en inscrivant les commandes, vues précédement, unes par unes, ou bien programmer son robot à l'aide de scripts préalablement réalisés.
 Voici des exemples de scripts on remarquera qu'un script peut en appeler un autre tant que ce dernier ne fait de même sur le précédent.\\
 
 \lstinputlisting[language=c]{../bot_1}
 \lstinputlisting[language=c]{../bot_2}
+
+Votre robot est représenté par les symboles (\emph{\^},\emph{>},\emph{V},\emph{<}), les objets collectibles, les coffres \emph{C}, les balles \emph{B}, les points de vie \emph{L}, et les armors \emph{A} ces dernières bien que collectibles ne sont pas effectives. Les murs et les tirs sont respectivement représentés par \emph{W} et \emph{*}.\\
+Un robot gagne la partie en détruisant le robot adverse.
 
 \newpage
 \section{Listing du programme}
@@ -334,6 +337,10 @@ La fonction \emph{client}, prend en argument \emph{name}, une chaîne de caract�
 \newpage
 \section{Traces d'utilisation}
 \subsection{Captures d'écran}
+Terminal ayant saisit plusieurs commandes à son robots\\\\
+\includegraphics[scale=0.3]{utilisation_console.png}\\\\
+Terminal affichant l'aire de jeu lors d'un échange de tirs entre deux robots\\\\
+\includegraphics[scale=0.3]{exemple_de_tir.png}
 
 \newpage
 \appendix
