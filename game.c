@@ -9,6 +9,8 @@ robot create_robot(char* name, char id, coord spawn, inventaire* inventaire){
     strcpy(new_robot.name, name);
     new_robot.id = id;
     new_robot.reach = 20;
+    new_robot.winner = 0;
+    new_robot.wait_player = 0;
     new_robot.pick = 2;
     new_robot.pos = spawn;
     new_robot.direction = 0;
@@ -25,8 +27,8 @@ bullet create_bullet(robot *bot, float speed_x, float speed_y){
     new_bullet.size = 0;
     new_bullet.speed_x = speed_x;
     new_bullet.speed_y = speed_y;
-    new_bullet.pos.x = (int) ((bot->pos.x + CYCLE*speed_x)+0.99);
-    new_bullet.pos.y = (int) ((bot->pos.y + CYCLE*speed_y)+0.99);
+    new_bullet.pos.x = (int) ((bot->pos.x + CYCLE*speed_x));
+    new_bullet.pos.y = (int) ((bot->pos.y + CYCLE*speed_y));
     new_bullet.damage = bot->bullet_damage;
     return new_bullet;
 }

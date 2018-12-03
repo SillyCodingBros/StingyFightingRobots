@@ -36,14 +36,17 @@ int reception(mqd_t fdem, char** buffer, int taille, robot* bot, char obj){
         bot->reach = (int) (bot->reach * bot->pv/100);
         bot->speed = (int) (bot->speed * bot->pv/100);
         if (bot->pv <= 0) {
-          return -2;
+          bot->winner = -1;
+          return -1;
         }
       }else {
         if (message.action == -1) {
           printf("en attente des joueur\n");
+          bot->wait_player = 1;
           return -1;
         } else if (message.action == 0) {
-          return 2;
+          bot->winner = 1;
+          return -1;
         } else if (message.action == 4) {
           timer = *((int*) &(tmp_buf[sizeof(msg)]));
           printf("reprise de la partie dans %d sec\n", timer);
@@ -66,7 +69,7 @@ int reception(mqd_t fdem, char** buffer, int taille, robot* bot, char obj){
 int client(char* name){
     mqd_t server, client;
     msg message;
-    int taille, recep;
+    int taille, done;
     char *buffer, *FdeM, *concat_msg;
     char *com_scan, *exec_com;
     struct mq_attr attr;
@@ -114,22 +117,25 @@ int client(char* name){
     inventory.money = 0;
     inventory.armor = 0;
     dico = NULL;
+    done = 1;
     bot = create_robot(name, message.client, *((coord*) &(buffer[sizeof(msg)])), &inventory);
     com_scan = malloc(40);
     while (reception(client,&buffer,taille,&bot,0) < 0);
-    while (bot.pv > 0) {
+    while (done) {
         printf("commande robot %d : ",bot.id);
         com_scan = realloc(0,40);
         fgets(com_scan,40,stdin);
         exec_com = malloc(strlen(com_scan));
         strcpy(exec_com,com_scan);
-        recep = reception(client,&buffer,taille,&bot,0);
-        test3(dico);
-        if (recep == 2){
+        reception(client,&buffer,taille,&bot,0);
+        //test3(dico);
+        if (bot.winner == 1){
           printf("GAGNÉ\n");
+          done = 0;
           break;
-        }else if (recep == -2) {
+        }else if (bot.winner == -1) {
           printf("PERDU\n");
+          done = 0;
           break;
         }
         printf("return %d\n", interp(create_cmd(&exec_com,NULL),&bot,server,client,buffer,taille,&dico));
