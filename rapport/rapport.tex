@@ -68,37 +68,59 @@ Afin de générer une aire de jeu personnalisable nous avons decidé de stocker 
 \section{Mode d'emploi}
 \subsection{Language minimaliste}
 Le langage minimaliste que nous avons developpé utilise une notation préfixé sans parenthèses, l'arité des opérateurs est fixé de la manière suivante :\\\\
-\begin{tabular}{|l|c|l|l|}
+\begin{tabular}{|c|c|c|c|}
    \hline
    Commande & Arité & Description & Exemple \\
 	 \hline
    quit & 0 & Abandonner la partie & quit \\
    \hline
-   six & sept & & huit \\
+   pv & 0 & Donne les points de vie & pv \\
    \hline
-	 Commande & Arité & & Exemple \\
+	 steer & 0 & Donne la direction & steer \\
 	 \hline
-   quit & 0 & & quit \\
+   money & 0 & Donne le solde & money \\
    \hline
-   six & sept & & huit \\
+   nb\_bullet & 0 & Donne le nombre de balle & nb\_bullet \\
    \hline
-	 Commande & Arité & & Exemple \\
+	 armor & 0 & Donne les points d'armure & armor \\
 	 \hline
-   quit & 0 & & quit \\
+	 pick & 0 & Ramasse l'objet à porté le plus proche & pick \\
    \hline
-   six & sept & & huit \\
+	 script & 1 & Execute le script \emph{nom de fichier} & script bot\_1 \\
    \hline
-	 Commande & Arité & & Exemple \\
+   move & 1 & Déplace le robot de \emph{n} & move 42 \\
+   \hline
+	 turn & 1 & Tourne la direction de \emph{n} & turn -2 \\
 	 \hline
-   quit & 0 & & quit \\
+   shoot & 1 & Tir d'un angle \emph{n} & shoot 90 \\
    \hline
-   six & sept & & huit \\
+   coord & 1 & Donne la coordonnée sur l'axe \emph{x} ou \emph{y} & coord x \\
    \hline
-	 Commande & Arité & & Exemple \\
+	 aim & 2 & Donne l'angle de tir pour des coordonnées & aim 15 6 \\
+   \hline
+	 != & 2 & Opérateur d'inégalité & != pos x steer \\
 	 \hline
-   quit & 0 & & quit \\
+   == & 2 & Opérateur d'égalité  & == pv armor \\
    \hline
-   six & sept & & huit \\
+   > & 2 & Opérateur de supériorité  & > 9 2 \\
+   \hline
+	 < & 2 & Opérateur d'infériorité  & < 8 5 \\
+	 \hline
+   >= & 2 & Opérateur de supériorité et égalité  & >= armor pv \\
+   \hline
+   <= & 2 & Opérateur de infériorité et égalité  & <= 5 9 \\
+   \hline
+	 + & 2 & Opérateur d'addition & + - 5 2 pv \\
+	 \hline
+   - & 2 & Opérateur de soustraction & - pv armor \\
+   \hline
+   * & 2 & Opérateur de multiplication & * pv coord x \\
+   \hline
+	 / & 2 & Opérateur de division & / 28 6 \\
+	 \hline
+   mod & 2 & Modulo & mod 8 6 \\
+   \hline
+   = & 2 & Affectation \emph{n} à la valeur \emph{m}  & = hello 66 \\
    \hline
 \end{tabular}
 
