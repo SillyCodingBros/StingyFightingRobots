@@ -67,6 +67,9 @@ Afin de générer une aire de jeu personnalisable nous avons decidé de stocker 
 Notre compréhension de l'enoncer nous a ammener a faire un jeu en temps reel. La solution qui a été retenue est de separer le jeu en plusieurs executables, un executable serveur et des clients qui communique entre eux grace a des files de messages. Les clients demandent des actions au server qui leur repond en les syncronisants entre eux. Nous avons choisi d'utiliser \emph{mqueue.h}, une librairie de gestion de file de message qui nous permet d'ecrire des chaîne de caractere dans un flux. Cette solution nous a mené a de nouvelle problematique.\\
 Les messages sont de taille variable et il faut que le server et le client est connaissance de la taille de l'information à recuperer et comment l'interpreter. De plus si on envois plusieurs messages sur une file de message lu par plusieurs processus, il y a un risque que les message se melange avec un bout de message par client.\\
 Pour resoudre ces probleme, nous avons créer une structure \emph{msg}, qui contient l'id du robot, qui envoie l'action, et l'identifiant de l'action choisi. Chaque action est differencier des autres grace a un identifiant qui indique au processus la taille du message a recuperer. Puis pour eviter que les messages soit capter par le mauvais processus, ils sont concatenner avant d'être envoyer.\\
+\subsection{Commande et script}
+
+\subsection{affichage}
 
 
 \newpage
