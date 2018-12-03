@@ -123,6 +123,22 @@ Le langage minimaliste que nous avons developpé utilise une notation préfixé 
    = & 2 & Affectation \emph{n} à la valeur \emph{m}  & = hello 66 \\
    \hline
 \end{tabular}
+\\\\\\
+Syntaxe du \emph{while} dans un script :
+\begin {lstlisting} [language=c]
+while == nb_bullet 5 {
+	move 12
+	shoot 42
+}
+\end{lstlisting}
+
+Syntaxe du \emph{if} dans un script :
+\begin {lstlisting} [language=c]
+if < coord x seek R x {
+	= lavie pv
+	+ armor lavie
+}
+\end{lstlisting}
 
 \subsection{Lancer le jeu}
 \subsection{Jouer}
@@ -259,28 +275,28 @@ La fonction \emph{client}, prends en argument \emph{name}, une chaine de caract�
 \subsection{Captures d'écran}
 
 \newpage
-\section{Code complet}
-\subsection{Les déclarations}
-%\lstinputlisting[language=c]{../game.h}
+\section*{Code complet}
+\subsection*{Les déclarations}
+\lstinputlisting[language=c]{../game.h}
 
 \newpage
-\subsection{Fonctions utilitaires}
-%\lstinputlisting[language=c]{../game.c}
+\subsection*{Fonctions utilitaires}
+\lstinputlisting[language=c]{../game.c}
 
 \newpage
-\subsection{Le client}
-%\lstinputlisting[language=c]{../client.c}
+\subsection*{Le client}
+\lstinputlisting[language=c]{../client.c}
 
 \newpage
-\subsection{Le serveur}
-%\lstinputlisting[language=c]{../server.c}
+\subsection*{Le serveur}
+\lstinputlisting[language=c]{../server.c}
 
 \newpage
-\subsection{Les fonctions minimalistes}
-%\lstinputlisting[language=c]{../fct_mini.c}
+\subsection*{Les fonctions minimalistes}
+\lstinputlisting[language=c]{../fct_mini.c}
 
 \newpage
-\subsection{L'interpréteur}
-%\lstinputlisting[language=c]{../interpreteur.c}
+\subsection*{L'interpréteur}
+\lstinputlisting[language=c]{../interpreteur.c}
 
 \end{document}
