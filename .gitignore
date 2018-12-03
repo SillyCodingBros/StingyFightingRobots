@@ -6,6 +6,9 @@
 *.toc
 *.fdb_latexmk
 *.pdf
+*.idx
+*.ilg
+*.ind
 
 # Prerequisites
 *.d

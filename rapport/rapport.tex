@@ -1,4 +1,4 @@
-\documentclass[a4paper, 11pt]{report}
+\documentclass[a4paper, 11pt]{article}
 \usepackage[utf8]{inputenc}
 \usepackage[french]{babel}
 
@@ -14,7 +14,7 @@
 \hypersetup{
 	colorlinks=true,
 	linktoc=all,
-	linkcolor=blue,
+	linkcolor=black,
 }
 \usepackage{lmodern}  % for bold teletype font
 \usepackage{amsmath}  % for \hookrightarrow
@@ -50,41 +50,57 @@
 \font\myfont=cmr12 at 42pt
 \title{\myfont {Robots programmables}}
 \author{\huge {COTREZ Léo}\and \huge {ORNIACKI Thomas}\and \\Université Paris-VIII, Saint-Denis, France}
-\date{}
+
 \begin{document}
 \maketitle
 
-\tableofcontents
 \newpage
-\part{Procédures mise en \oe uvre}
-\chapter{L'énoncé}
-\section{Les problèmatiques}
-\subsection{Titre de la sous-section}
+\tableofcontents
+
+\newpage
+\section{Procédures mise en \oe uvre}
+\subsection{Les problèmatiques}
 \subsubsection{Titre de la sous-sous-section}
 \paragraph{Titre du paragraphe}
 \subparagraph{Titre du sous-paragraphe}
-\part{Listing du programme}
-\section{Les fonctions de game.c}
-\chapter{Mode d'emploi}
-\section{Comment ouvrir un terminal}
-\part{Traces d'utilisation}
-\section{Sreen shoots}
-\part{Code complet}
-\section{Les déclarations du jeu}
-\lstinputlisting[language=c]{../game.h}
+
 \newpage
-\section{Le jeu}
-\lstinputlisting[language=c]{../game.c}
+\section{Listing du programme}
+\subsection{Les problèmatiques}
+\subsection{Les fonctions de game.c}
+
 \newpage
-\section{Le client}
-\lstinputlisting[language=c]{../client.c}
+\section{Mode d'emploi}
+\subsection{Comment ouvrir un terminal}
+\subsubsection{}
+
 \newpage
-\section{Le serveur}
-\lstinputlisting[language=c]{../server.c}
+\section{Traces d'utilisation}
+\subsection{Sreen shoots}
+
 \newpage
-\section{Les fonctions minimalistes}
-\lstinputlisting[language=c]{../fct_mini.c}
+\section{Code complet}
+\subsection{Les déclarations du jeu}
+%\lstinputlisting[language=c]{../game.h}
+
 \newpage
-\section{L'interpréteur}
-\lstinputlisting[language=c]{../interpreteur.c}
+\subsection{Le jeu}
+%\lstinputlisting[language=c]{../game.c}
+
+\newpage
+\subsection{Le client}
+%\lstinputlisting[language=c]{../client.c}
+
+\newpage
+\subsection{Le serveur}
+%\lstinputlisting[language=c]{../server.c}
+
+\newpage
+\subsection{Les fonctions minimalistes}
+%\lstinputlisting[language=c]{../fct_mini.c}
+
+\newpage
+\subsection{L'interpréteur}
+%\lstinputlisting[language=c]{../interpreteur.c}
+
 \end{document}
