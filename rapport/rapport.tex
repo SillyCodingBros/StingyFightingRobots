@@ -62,7 +62,8 @@
 \section{Procédures mise en \oe uvre}
 \subsection{Les problèmatiques}
 \subsubsection{Création de l'air de jeu}
-Afin de générer une aire de jeu personnalisable nous avons decidé de stocker les maps dans des fichiers, notre jeu devait donc être en mesure de récupérer ces données et les utiliser. Pour ce faire nous avons commencé par coder une fonction qui récupére chaque caractère du fichier et les stocke dans un tableau de la taille du fichier que l'on calcule préalablement. Pendant le parcours du fichier ....
+Afin de générer une aire de jeu personnalisable nous avons decidé de stocker les maps dans des fichiers, notre jeu devait donc être en mesure de récupérer ces données et les utiliser. Pour ce faire nous avons commencé par coder une fonction qui récupére chaque caractère du fichier et les stocke dans une structure map qui contient un tableau de caractère pour la map, associé à la largeur et la hauteur, un tableau de zone de réaparition.\\
+\subsubsection{Création de l'air de jeu}
 
 \newpage
 \section{Mode d'emploi}
@@ -193,12 +194,12 @@ La fonction \emph{aim}, prend en argument un pointeur sur une structure \emph{ro
 \begin {lstlisting} [language=c]
 int seek(robot *bot, char *obj, char *axis, mqd_t server, mqd_t client, char* buffer, int taille)
 \end{lstlisting}
-La fonction \emph{seek}, prend en argument un pointeur sur une structure \emph{robot}, deux chaines de caractères \emph{obj}, \emph{axis} et retoune si possible la coordonnée, \emph{x} ou \emph{y} selon l'\emph{axis}, de l'objet \emph{obj} le plus proche dans son champ visuel\\
+La fonction \emph{seek}, prend en argument un pointeur sur une structure \emph{robot}, deux chaines de caractères \emph{obj}, \emph{axis} et retoune si possible la coordonnée, \emph{x} ou \emph{y} selon l'\emph{axis}, de l'objet \emph{obj} le plus proche dans son champ visuel.\\
 
 \begin {lstlisting} [language=c]
 int ramasser(robot *bot, mqd_t server, mqd_t client, char* buffer, int taille)
 \end{lstlisting}
-La fonction \emph{ramasser}, demande au serveur si le \emph{bot} pourrait rammasser un collectible tel qu'un coffre , de l'armure ou bien des balles\\
+La fonction \emph{ramasser}, demande au serveur si le \emph{bot} pourrait rammasser un collectible tel qu'un coffre , de l'armure ou bien des balles.\\
 
 \begin {lstlisting} [language=c]
 int tourner(robot *bot, short direc, mqd_t server)
@@ -208,7 +209,7 @@ La fonction \emph{tourner}, demande au serveur de changer la direction du \emph{
 \begin {lstlisting} [language=c]
 int tirer(robot *bot, float angle, mqd_t server)
 \end{lstlisting}
-La fonction \emph{tirer}, demande au serveur de un tir d'angle \emph{angle} depuis la position courrante du  \emph{bot}\\
+La fonction \emph{tirer}, demande au serveur de un tir d'angle \emph{angle} depuis la position courrante du  \emph{bot}.\\
 
 Les deux fonctions suivantes prennent en arguments la structure \emph{cmd sub\_com} représentant la commande saisie par l'utilisateur manuellement ou par un script ainsi qu'un pointeur sur un pointeur de structure \emph{aff}, \emph{dico} qui va permettre de stocker les variables définit par l'utilisateur.\\
 
@@ -239,17 +240,17 @@ La fonction \emph{create\_cmd}, prend en argument \emph{ligne}, un pointeur sur 
 int server(char* map\_name)
 \end{lstlisting}
 La fonction \emph{server}, prend en argument \emph{map\_name}, une chaine de caractère qui represente le nom de la map à charger. Cette
-fonction éxécute dans l'ordre les differentes fonctions pouvant être appelé par le serveur\\
+fonction éxécute dans l'ordre les differentes fonctions pouvant être appelé par le serveur.\\
 
 \begin {lstlisting} [language=c]
 coord bot\_interact(map mapOfGame, robot\_liste listOfBot, robot* bot, char* buffer)
 \end{lstlisting}
-La fonction \emph{bot\_interact}, prend en argument \emph{mapOfGame}, la structure qui contient les données de la map, \emph{listOfBot}, la liste des robots present dans le jeu, \emph{bot}, un pointeur sur le robot qui demande une interaction et \emph{buffer} la chaîne de caractères qui contient la demande du robot. Cette fonction renvois les coordonnées de l'objet, demandé par le client, au serveur\\
+La fonction \emph{bot\_interact}, prend en argument \emph{mapOfGame}, la structure qui contient les données de la map, \emph{listOfBot}, la liste des robots present dans le jeu, \emph{bot}, un pointeur sur le robot qui demande une interaction et \emph{buffer} la chaîne de caractères qui contient la demande du robot. Cette fonction renvois les coordonnées de l'objet, demandé par le client, au serveur.\\
 
 \begin {lstlisting} [language=c]
 void start(mqd\_t* list\_mqueue)
 \end{lstlisting}
-La fonction \emph{start}, prend en argument \emph{list\_mqueue}, la liste des file de message des clients connecté au serveur. Cette fonction envoie a tout les clients un message de debut de partie toutes les secondes pendant 5 secondes\\
+La fonction \emph{start}, prend en argument \emph{list\_mqueue}, la liste des file de message des clients connecté au serveur. Cette fonction envoie a tout les clients un message de debut de partie toutes les secondes pendant 5 secondes.\\
 
 \begin {lstlisting} [language=c]
 void move_bullet(bullet_liste* list_bullet, robot_liste* bot_list, map mapOfGame, mqd_t* list_mqueue)
@@ -300,7 +301,7 @@ La fonction \emph{create\_map}, prend en argument \emph{path\_file}, une chaîne
 \begin {lstlisting} [language=c]
 int reception(mqd_t fdem, char** buffer, int taille, robot* bot, char obj)
 \end{lstlisting}
-La fonction \emph{reception}, prend en argument \emph{fdem}, un descripteur sur une file de message en lecture, \emph{buffer}, un pointeur sur une chaine de caractère, \emph{taille}, la taille des message lu, \emph{bot}, un pointeur sur un robot et \emph{obj}, la valeur recherché par la fonction qui appelle \emph{reception}. Cette fonction va traduire les messages envoyer par le serveur et retourner l'information demandé par client\\
+La fonction \emph{reception}, prend en argument \emph{fdem}, un descripteur sur une file de message en lecture, \emph{buffer}, un pointeur sur une chaine de caractère, \emph{taille}, la taille des message lu, \emph{bot}, un pointeur sur un robot et \emph{obj}, la valeur recherché par la fonction qui appelle \emph{reception}. Cette fonction va traduire les messages envoyer par le serveur et retourner l'information demandé par client.\\
 
 \begin {lstlisting} [language=c]
 int client(char* name)
