@@ -17,7 +17,6 @@ char* get_line(FILE *fd){
   return NULL;
 }
 
-
 /*  fonction de creation des commande  */
 cmd create_cmd(char **ligne, FILE *fd){
   if(ligne == NULL){
